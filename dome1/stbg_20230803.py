@@ -240,6 +240,7 @@ def use_selenium(proxies):
     response_data = response.json()
 
     products = []
+    latest_date_time = last_date  # Initialize with the last date in case no new data is found
     if response_data["success"]:
         list_data = response_data["data"]["data"]["list"]
         latest_date_time = max(

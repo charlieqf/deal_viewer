@@ -1,0 +1,1677 @@
+上次更新的日期为 2025-01-01 16:00:00
+Proxy test failed: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+获取新的token...
+Attempting to get token without proxy...
+Response status: 200
+data = {'sign': 'Q/d8solfMh3GOoMI5WmGUaZA1ukiCpO5sMwap9ByMZnt4tsJZeSkX6Wq1v3lRrKsnQLcWdAPun00\nLsYa5AtcTZpCs2CvuKf8xTKL5JKkAphGIIEbpsADAhjeg2dCZIBVMUOFd2LaiLvRLJLML9AfJTc/\nI44XV2MvFkyyEBuTLsA=\n', 'UT': 'KGnyzher8KZgNK7G8g1lmueFfRcJQJCkkFFvZT08p16h6W5cevj2PQaLq/wyEre4eHgAkyJzk6Zt\nMbygeCuSW/KKkBqO4iCGhJ5IAkd7dj8BoUf3dlnZp1He/lMBNZFOLxHV4Mfz8zJMgYBYDciyLrBz\nDXSwnksUru5M2apZaU8=\n'}
+token is {'sign': 'Q/d8solfMh3GOoMI5WmGUaZA1ukiCpO5sMwap9ByMZnt4tsJZeSkX6Wq1v3lRrKsnQLcWdAPun00\nLsYa5AtcTZpCs2CvuKf8xTKL5JKkAphGIIEbpsADAhjeg2dCZIBVMUOFd2LaiLvRLJLML9AfJTc/\nI44XV2MvFkyyEBuTLsA=\n', 'UT': 'KGnyzher8KZgNK7G8g1lmueFfRcJQJCkkFFvZT08p16h6W5cevj2PQaLq/wyEre4eHgAkyJzk6Zt\nMbygeCuSW/KKkBqO4iCGhJ5IAkd7dj8BoUf3dlnZp1He/lMBNZFOLxHV4Mfz8zJMgYBYDciyLrBz\nDXSwnksUru5M2apZaU8=\n'}
+info_level: KGnyzher8KZgNK7G8g1lmueFfRcJQJCkkFFvZT08p16h6W5cev...
+sign: Q/d8solfMh3GOoMI5WmGUaZA1ukiCpO5sMwap9ByMZnt4tsJZe...
+访问主页获取Cookie...
+/root/deal_viewer/ABSDaily/ABS/venv/lib/python3.10/site-packages/urllib3/connectionpool.py:1103: InsecureRequestWarning: Unverified HTTPS request is being made to host 'www.chinamoney.com.cn'. Adding certificate verification is strongly advised. See: https://urllib3.readthedocs.io/en/latest/advanced-usage.html#tls-warnings
+  warnings.warn(
+主页访问状态: 200
+获取到的Cookie: {'AlteonP10': 'A86RXiw/F6zEmy5GCSOJWw$$'}
+开始获取新的URL列表...
+
+============================================================
+正在获取第 1 页数据...
+============================================================
+[分页参数] pageIndex=1, op=top, searchAfter=''
+Attempting to post to https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query without proxy...
+HTTP Status Code: 200
+Response keys: dict_keys(['head', 'data', 'records'])
+Data keys: dict_keys(['result'])
+Result keys: dict_keys(['total', 'duration', 'birth', 'pageIndex', 'pageSize', 'pageItems', 'queryItems', 'queryId', 'sortPrev', 'sortNext', 'info'])
+[分页] 从sortNext获取到searchAfter: '1764838800000,13.387592,3245956'
+  sortNext数组: [1764838800000, 13.387592, 3245956]
+当前页有 15 条数据
+  ✓ 新产品: 25惠达ABN001 (日期: 2025-12-09)
+  ⊗ 跳过重复: 25惠达ABN001
+  ⊗ 跳过重复: 25惠达ABN001
+  ✓ 新产品: 25丰田丰驰ABN001 (日期: 2025-12-08)
+  ⊗ 跳过重复: 25丰田丰驰ABN001
+  ✓ 新产品: 25惠州碳和ABN001 (日期: 2025-12-05)
+  ✓ 新产品: 25如皋码头ABN001 (日期: 2025-12-05)
+  ⊗ 跳过重复: 25如皋码头ABN001
+  ⊗ 跳过重复: 25惠州碳和ABN001
+  ✓ 新产品: 25新能源1ABN002 (日期: 2025-12-04)
+  ✓ 新产品: 25京能3号ABN004 (日期: 2025-12-04)
+  ✓ 新产品: 25狮桥上海ABN001 (日期: 2025-12-04)
+  ✓ 新产品: 25中交一航ABN002 (日期: 2025-12-04)
+  ⊗ 跳过重复: 25狮桥上海ABN001
+  ⊗ 跳过重复: 25中交一航ABN002
+第 1 页: 共 15 条数据，其中新数据 15 条
+等待 2.8 秒后继续...
+
+============================================================
+正在获取第 2 页数据...
+============================================================
+[分页参数] pageIndex=2, op=next, searchAfter='1764838800000,13.387592,3245956'
+Attempting to post to https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query without proxy...
+HTTP Status Code: 200
+Response keys: dict_keys(['head', 'data', 'records'])
+Data keys: dict_keys(['result'])
+Result keys: dict_keys(['total', 'duration', 'birth', 'pageIndex', 'pageSize', 'pageItems', 'queryItems', 'queryId', 'sortPrev', 'sortNext', 'info'])
+[分页] 从sortNext获取到searchAfter: '1764288000000,13.803168,3241207'
+  sortNext数组: [1764288000000, 13.803168, 3241207]
+当前页有 15 条数据
+  ✓ 新产品: 25中国一冶1ABN002 (日期: 2025-12-03)
+  ✓ 新产品: 25徽泰1号ABN001 (日期: 2025-12-03)
+  ⊗ 跳过重复: 25徽泰1号ABN001
+  ✓ 新产品: 25畅途恒通ABN005 (日期: 2025-12-02)
+  ⊗ 跳过重复: 25畅途恒通ABN005
+  ⊗ 跳过重复: 25畅途恒通ABN005
+  ✓ 新产品: 25拿去花ABN002 (日期: 2025-11-27)
+  ⊗ 跳过重复: 25拿去花ABN002
+  ⊗ 跳过重复: 25拿去花ABN002
+  ✓ 新产品: 25澄晴ABN001 (日期: 2025-11-27)
+  ⊗ 跳过重复: 25拿去花ABN002
+  ✓ 新产品: 25东裕7叔裕ABN002 (日期: 2025-11-27)
+  ⊗ 跳过重复: 25东裕7叔裕ABN002
+  ⊗ 跳过重复: 25东裕7叔裕ABN002
+  ⊗ 跳过重复: 25澄晴ABN001
+第 2 页: 共 15 条数据，其中新数据 15 条
+等待 2.9 秒后继续...
+
+============================================================
+正在获取第 3 页数据...
+============================================================
+[分页参数] pageIndex=3, op=next, searchAfter='1764288000000,13.803168,3241207'
+Attempting to post to https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query without proxy...
+HTTP Status Code: 200
+Response keys: dict_keys(['head', 'data', 'records'])
+Data keys: dict_keys(['result'])
+Result keys: dict_keys(['total', 'duration', 'birth', 'pageIndex', 'pageSize', 'pageItems', 'queryItems', 'queryId', 'sortPrev', 'sortNext', 'info'])
+[分页] 从sortNext获取到searchAfter: '1764201600000,13.362605,3240418'
+  sortNext数组: [1764201600000, 13.362605, 3240418]
+当前页有 15 条数据
+  ⊗ 跳过重复: 25澄晴ABN001
+  ✓ 新产品: 25华冶科工3ABN001 (日期: 2025-11-27)
+  ⊗ 跳过重复: 25华冶科工3ABN001
+  ✓ 新产品: 25京能新能2ABN001 (日期: 2025-11-27)
+  ⊗ 跳过重复: 25京能新能2ABN001
+  ✓ 新产品: 25武汉交通ABN002 (日期: 2025-11-26)
+  ✓ 新产品: 25启达ABN005 (日期: 2025-11-26)
+  ⊗ 跳过重复: 25启达ABN005
+  ⊗ 跳过重复: 25启达ABN005
+  ⊗ 跳过重复: 25启达ABN005
+  ✓ 新产品: 25远东助力ABN002 (日期: 2025-11-26)
+  ✓ 新产品: 25中和农信ABN003 (日期: 2025-11-26)
+  ⊗ 跳过重复: 25中和农信ABN003
+  ⊗ 跳过重复: 25中和农信ABN003
+  ⊗ 跳过重复: 25远东助力ABN002
+第 3 页: 共 15 条数据，其中新数据 15 条
+等待 3.9 秒后继续...
+
+============================================================
+正在获取第 4 页数据...
+============================================================
+[分页参数] pageIndex=4, op=next, searchAfter='1764201600000,13.362605,3240418'
+Attempting to post to https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query without proxy...
+HTTP Status Code: 200
+Response keys: dict_keys(['head', 'data', 'records'])
+Data keys: dict_keys(['result'])
+Result keys: dict_keys(['total', 'duration', 'birth', 'pageIndex', 'pageSize', 'pageItems', 'queryItems', 'queryId', 'sortPrev', 'sortNext', 'info'])
+[分页] 从sortNext获取到searchAfter: '1764115201000,12.993269,3239550'
+  sortNext数组: [1764115201000, 12.993269, 3239550]
+当前页有 15 条数据
+  ⊗ 跳过重复: 25远东助力ABN002
+  ✓ 新产品: 25川港航4ABN002 (日期: 2025-11-26)
+  ⊗ 跳过重复: 25中和农信ABN003
+  ✓ 新产品: 25天津保税ABN001 (日期: 2025-11-26)
+  ⊗ 跳过重复: 25天津保税ABN001
+  ⊗ 跳过重复: 25天津保税ABN001
+  ✓ 新产品: 25华菱保理ABN001 (日期: 2025-11-26)
+  ⊗ 跳过重复: 25华菱保理ABN001
+  ⊗ 跳过重复: 25武汉交通ABN002
+  ✓ 新产品: 25锦泽ABN002 (日期: 2025-11-25)
+  ✓ 新产品: 25中关租赁ABN001 (日期: 2025-11-25)
+  ✓ 新产品: 25澄嘉ABN008 (日期: 2025-11-25)
+  ⊗ 跳过重复: 25澄嘉ABN008
+  ⊗ 跳过重复: 25锦泽ABN002
+  ⊗ 跳过重复: 25中关租赁ABN001
+第 4 页: 共 15 条数据，其中新数据 15 条
+等待 2.8 秒后继续...
+
+============================================================
+正在获取第 5 页数据...
+============================================================
+[分页参数] pageIndex=5, op=next, searchAfter='1764115201000,12.993269,3239550'
+Attempting to post to https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query without proxy...
+HTTP Status Code: 200
+Response keys: dict_keys(['head', 'data', 'records'])
+Data keys: dict_keys(['result'])
+Result keys: dict_keys(['total', 'duration', 'birth', 'pageIndex', 'pageSize', 'pageItems', 'queryItems', 'queryId', 'sortPrev', 'sortNext', 'info'])
+[分页] 从sortNext获取到searchAfter: '1763718000000,13.128722,3237628'
+  sortNext数组: [1763718000000, 13.128722, 3237628]
+当前页有 15 条数据
+  ⊗ 跳过重复: 25澄嘉ABN008
+  ⊗ 跳过重复: 25锦泽ABN002
+  ✓ 新产品: 25海润浦玉ABN001 (日期: 2025-11-25)
+  ⊗ 跳过重复: 25海润浦玉ABN001
+  ✓ 新产品: 25致远3号ABN001 (日期: 2025-11-24)
+  ⊗ 跳过重复: 25致远3号ABN001
+  ✓ 新产品: 25恒信1号ABN001 (日期: 2025-11-24)
+  ✓ 新产品: 25致远4号ABN001 (日期: 2025-11-24)
+  ⊗ 跳过重复: 25致远4号ABN001
+  ⊗ 跳过重复: 25恒信1号ABN001
+  ✓ 新产品: 25林州供热ABN001 (日期: 2025-11-24)
+  ⊗ 跳过重复: 25林州供热ABN001
+  ✓ 新产品: 25北方华创1ABN002 (日期: 2025-11-23)
+  ✓ 新产品: 25前海招信ABN004 (日期: 2025-11-21)
+  ✓ 新产品: 25厦门建发ABN002 (日期: 2025-11-21)
+第 5 页: 共 15 条数据，其中新数据 15 条
+等待 2.9 秒后继续...
+
+============================================================
+正在获取第 6 页数据...
+============================================================
+[分页参数] pageIndex=6, op=next, searchAfter='1763718000000,13.128722,3237628'
+Attempting to post to https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query without proxy...
+HTTP Status Code: 200
+Response keys: dict_keys(['head', 'data', 'records'])
+Data keys: dict_keys(['result'])
+Result keys: dict_keys(['total', 'duration', 'birth', 'pageIndex', 'pageSize', 'pageItems', 'queryItems', 'queryId', 'sortPrev', 'sortNext', 'info'])
+[分页] 从sortNext获取到searchAfter: '1763596800000,13.561089,3235877'
+  sortNext数组: [1763596800000, 13.561089, 3235877]
+当前页有 15 条数据
+  ⊗ 跳过重复: 25厦门建发ABN002
+  ✓ 新产品: 25华发优生活6ABN005 (日期: 2025-11-21)
+  ⊗ 跳过重复: 25华发优生活6ABN005
+  ⊗ 跳过重复: 25前海招信ABN004
+  ✓ 新产品: 25睿哲ABN001 (日期: 2025-11-20)
+  ⊗ 跳过重复: 25睿哲ABN001
+  ⊗ 跳过重复: 25睿哲ABN001
+  ✓ 新产品: 25电投融和1ABN002 (日期: 2025-11-20)
+  ✓ 新产品: 25京能2号ABN004 (日期: 2025-11-20)
+  ✓ 新产品: 25九州通ABN001 (日期: 2025-11-20)
+  ⊗ 跳过重复: 25九州通ABN001
+  ✓ 新产品: 25拾穗丰润ABN004 (日期: 2025-11-19)
+  ⊗ 跳过重复: 25拾穗丰润ABN004
+  ⊗ 跳过重复: 25拾穗丰润ABN004
+  ✓ 新产品: 25联易盛ABN001 (日期: 2025-11-19)
+第 6 页: 共 15 条数据，其中新数据 15 条
+等待 2.4 秒后继续...
+
+============================================================
+正在获取第 7 页数据...
+============================================================
+[分页参数] pageIndex=7, op=next, searchAfter='1763596800000,13.561089,3235877'
+Attempting to post to https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query without proxy...
+HTTP Status Code: 200
+Response keys: dict_keys(['head', 'data', 'records'])
+Data keys: dict_keys(['result'])
+Result keys: dict_keys(['total', 'duration', 'birth', 'pageIndex', 'pageSize', 'pageItems', 'queryItems', 'queryId', 'sortPrev', 'sortNext', 'info'])
+[分页] 从sortNext获取到searchAfter: '1762992001000,13.128722,3231018'
+  sortNext数组: [1762992001000, 13.128722, 3231018]
+当前页有 15 条数据
+  ⊗ 跳过重复: 25联易盛ABN001
+  ⊗ 跳过重复: 25拾穗丰润ABN004
+  ✓ 新产品: 25申金泰丰ABN001 (日期: 2025-11-19)
+  ⊗ 跳过重复: 25申金泰丰ABN001
+  ✓ 新产品: 25新能源2ABN002 (日期: 2025-11-18)
+  ✓ 新产品: 25奇信1号ABN002 (日期: 2025-11-17)
+  ⊗ 跳过重复: 25奇信1号ABN002
+  ⊗ 跳过重复: 25奇信1号ABN002
+  ⊗ 跳过重复: 25奇信1号ABN002
+  ✓ 新产品: 25五凌3号ABN001 (日期: 2025-11-17)
+  ⊗ 跳过重复: 25五凌3号ABN001
+  ✓ 新产品: 25悦辰ABN010 (日期: 2025-11-13)
+  ⊗ 跳过重复: 25悦辰ABN010
+  ⊗ 跳过重复: 25悦辰ABN010
+  ✓ 新产品: 25惠满ABN005 (日期: 2025-11-12)
+第 7 页: 共 15 条数据，其中新数据 15 条
+等待 2.6 秒后继续...
+
+============================================================
+正在获取第 8 页数据...
+============================================================
+[分页参数] pageIndex=8, op=next, searchAfter='1762992001000,13.128722,3231018'
+Attempting to post to https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query without proxy...
+HTTP Status Code: 200
+Response keys: dict_keys(['head', 'data', 'records'])
+Data keys: dict_keys(['result'])
+Result keys: dict_keys(['total', 'duration', 'birth', 'pageIndex', 'pageSize', 'pageItems', 'queryItems', 'queryId', 'sortPrev', 'sortNext', 'info'])
+[分页] 从sortNext获取到searchAfter: '1762905602000,12.486407,3230089'
+  sortNext数组: [1762905602000, 12.486407, 3230089]
+当前页有 15 条数据
+  ⊗ 跳过重复: 25惠满ABN005
+  ✓ 新产品: 25山东城发ABN001 (日期: 2025-11-12)
+  ⊗ 跳过重复: 25惠满ABN005
+  ⊗ 跳过重复: 25山东城发ABN001
+  ✓ 新产品: 25泰达环保ABN001 (日期: 2025-11-12)
+  ⊗ 跳过重复: 25泰达环保ABN001
+  ⊗ 跳过重复: 25泰达环保ABN001
+  ⊗ 跳过重复: 25泰达环保ABN001
+  ⊗ 跳过重复: 25泰达环保ABN001
+  ⊗ 跳过重复: 25泰达环保ABN001
+  ✓ 新产品: 25惠创ABN003 (日期: 2025-11-11)
+  ⊗ 跳过重复: 25惠创ABN003
+  ⊗ 跳过重复: 25惠创ABN003
+  ✓ 新产品: 25美团美玥ABN003 (日期: 2025-11-11)
+  ✓ 新产品: 25君惠融ABN004 (日期: 2025-11-11)
+第 8 页: 共 15 条数据，其中新数据 15 条
+等待 3.6 秒后继续...
+
+============================================================
+正在获取第 9 页数据...
+============================================================
+[分页参数] pageIndex=9, op=next, searchAfter='1762905602000,12.486407,3230089'
+Attempting to post to https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query without proxy...
+HTTP Status Code: 200
+Response keys: dict_keys(['head', 'data', 'records'])
+Data keys: dict_keys(['result'])
+Result keys: dict_keys(['total', 'duration', 'birth', 'pageIndex', 'pageSize', 'pageItems', 'queryItems', 'queryId', 'sortPrev', 'sortNext', 'info'])
+[分页] 从sortNext获取到searchAfter: '1762507202000,12.562523,3228251'
+  sortNext数组: [1762507202000, 12.562523, 3228251]
+当前页有 15 条数据
+  ✓ 新产品: 25新能源4ABN004 (日期: 2025-11-11)
+  ⊗ 跳过重复: 25美团美玥ABN003
+  ⊗ 跳过重复: 25美团美玥ABN003
+  ⊗ 跳过重复: 25君惠融ABN004
+  ⊗ 跳过重复: 25君惠融ABN004
+  ⊗ 跳过重复: 25君惠融ABN004
+  ✓ 新产品: 25厦门建发ABN001 (日期: 2025-11-11)
+  ⊗ 跳过重复: 25厦门建发ABN001
+  ✓ 新产品: 25中交一公7ABN001 (日期: 2025-11-10)
+  ✓ 新产品: 25和赢易鑫ABN002 (日期: 2025-11-10)
+  ⊗ 跳过重复: 25中交一公7ABN001
+  ⊗ 跳过重复: 25和赢易鑫ABN002
+  ⊗ 跳过重复: 25和赢易鑫ABN002
+  ⊗ 跳过重复: 25和赢易鑫ABN002
+  ✓ 新产品: 25京能4号ABN001 (日期: 2025-11-07)
+第 9 页: 共 15 条数据，其中新数据 15 条
+等待 2.6 秒后继续...
+
+============================================================
+正在获取第 10 页数据...
+============================================================
+[分页参数] pageIndex=10, op=next, searchAfter='1762507202000,12.562523,3228251'
+Attempting to post to https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query without proxy...
+HTTP Status Code: 200
+Response keys: dict_keys(['head', 'data', 'records'])
+Data keys: dict_keys(['result'])
+Result keys: dict_keys(['total', 'duration', 'birth', 'pageIndex', 'pageSize', 'pageItems', 'queryItems', 'queryId', 'sortPrev', 'sortNext', 'info'])
+[分页] 从sortNext获取到searchAfter: '1761868801000,14.723526,3222746'
+  sortNext数组: [1761868801000, 14.723526, 3222746]
+当前页有 15 条数据
+  ✓ 新产品: 25象屿保理ABN002 (日期: 2025-11-07)
+  ⊗ 跳过重复: 25象屿保理ABN002
+  ⊗ 跳过重复: 25京能4号ABN001
+  ✓ 新产品: 25南京交通ABN001 (日期: 2025-11-05)
+  ✓ 新产品: 25惠满ABN004 (日期: 2025-11-05)
+  ⊗ 跳过重复: 25惠满ABN004
+  ⊗ 跳过重复: 25惠满ABN004
+  ✓ 新产品: 25前海招信ABN003 (日期: 2025-10-31)
+  ✓ 新产品: 25浙融绿金1ABN002 (日期: 2025-10-31)
+  ⊗ 跳过重复: 25前海招信ABN003
+  ✓ 新产品: 25东裕5仲裕ABN001 (日期: 2025-10-30)
+  ✓ 新产品: 25惠铭ABN008 (日期: 2025-10-30)
+  ⊗ 跳过重复: 25惠铭ABN008
+  ⊗ 跳过重复: 25东裕5仲裕ABN001
+  ⊗ 跳过重复: 25惠铭ABN008
+第 10 页: 共 15 条数据，其中新数据 15 条
+
+================================================================================
+数据获取完成！
+================================================================================
+找到的URL总数: 64
+上次更新时间: 2025-01-01 16:00:00
+本次最新时间: 2025-12-09 16:00:00
+时间差: 342 天
+================================================================================
+
+
+================================================================================
+处理进度: 1/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X2i%2FbVbyyA3rkZJ59DCf2lAgILFS8Hf8gqwklVujb2DCGTYYat%2BA%2FnYP%2BskhYRLzgg%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X2i%2FbVbyyA3rkZJ59DCf2lAgILFS8Hf8gqwklVujb2DCGTYYat%2BA%2FnYP%2BskhYRLzgg%3D%3D
+url_done.txt not found, creating new file
+发行类型: 定向投资人 -> PrivateEquity
+上海国际信托有限公司2025年度惠达第一期定向资产支持票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'上海国际信托有限公司2025年度惠达第一期定向资产支持票据'
+✓ 找到产品 TrustId=34347, TrustName=上海国际信托有限公司2025年度惠达第一期定向资产支持票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 上海国际信托有限公司2025年度惠达第一期定向资产支持票据
+
+================================================================================
+处理进度: 2/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X31rfyKRBO%2ByqGE9CMmdzWZdtXhOi%2F7nUFZ964gn3saeogWAiCThmamhe3g5stWtRw%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X31rfyKRBO%2ByqGE9CMmdzWZdtXhOi%2F7nUFZ964gn3saeogWAiCThmamhe3g5stWtRw%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+丰田融资租赁有限公司2025年度丰驰第一期定向资产支持票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'丰田融资租赁有限公司2025年度丰驰第一期定向资产支持票据'
+✓ 找到产品 TrustId=34348, TrustName=丰田融资租赁有限公司2025年度丰驰第一期定向资产支持票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 丰田融资租赁有限公司2025年度丰驰第一期定向资产支持票据
+
+================================================================================
+处理进度: 3/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58Xy8a%2FyFszpJ46XHAyaBlRL%2FiI2Q259aJ3F63ETOeCQZWLBrRLO7cPg4bQ5ngjJrleg%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58Xy8a%2FyFszpJ46XHAyaBlRL%2FiI2Q259aJ3F63ETOeCQZWLBrRLO7cPg4bQ5ngjJrleg%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+惠州碳和新能源管理科技有限公司2025年度第一期绿色定向资产支持票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'惠州碳和新能源管理科技有限公司2025年度第一期绿色定向资产支持票据'
+✓ 找到产品 TrustId=34342, TrustName=惠州碳和新能源管理科技有限公司2025年度第一期绿色定向资产支持票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 惠州碳和新能源管理科技有限公司2025年度第一期绿色定向资产支持票据
+
+================================================================================
+处理进度: 4/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X%2B85sI6q02q5X5Hkla27dyKbIxl6oh1v0qQrLXAqWnLn0Gn9hJEL04GnP8UAqX5QwA%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X%2B85sI6q02q5X5Hkla27dyKbIxl6oh1v0qQrLXAqWnLn0Gn9hJEL04GnP8UAqX5QwA%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+如皋苏中国际集装箱码头有限公司2025年度第一期定向资产支持票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'如皋苏中国际集装箱码头有限公司2025年度第一期定向资产支持票据'
+✓ 找到产品 TrustId=34343, TrustName=如皋苏中国际集装箱码头有限公司2025年度第一期定向资产支持票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 如皋苏中国际集装箱码头有限公司2025年度第一期定向资产支持票据
+
+================================================================================
+处理进度: 5/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X5orGWnjVJ%2B8tM0WvlIzyCDgoAOwIB7opvSO%2BnzaXpXyrr67fWi59r3PH1NQ846SOg%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X5orGWnjVJ%2B8tM0WvlIzyCDgoAOwIB7opvSO%2BnzaXpXyrr67fWi59r3PH1NQ846SOg%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+北京京能清洁能源电力股份有限公司2025年度新能源1号第二期绿色定向资产支持商业票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'北京京能清洁能源电力股份有限公司2025年度新能源1号第二期绿色定向资产支持商业票据'
+✓ 找到产品 TrustId=33470, TrustName=北京京能清洁能源电力股份有限公司2025年度新能源1号第二期绿色定向资产支持商业票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 北京京能清洁能源电力股份有限公司2025年度新能源1号第二期绿色定向资产支持商业票据
+
+================================================================================
+处理进度: 6/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X2MWiSv%2Fd6%2BLb20m4xxDXW1OMpDM1FKfAyfyCFGIeHiqgJp9yEsnmTQJIBczXAWjdA%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X2MWiSv%2Fd6%2BLb20m4xxDXW1OMpDM1FKfAyfyCFGIeHiqgJp9yEsnmTQJIBczXAWjdA%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+京能国际能源发展(北京)有限公司2025年度3号第四期定向资产支持商业票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'京能国际能源发展(北京)有限公司2025年度3号第四期定向资产支持商业票据'
+✓ 找到产品 TrustId=33471, TrustName=京能国际能源发展(北京)有限公司2025年度3号第四期定向资产支持商业票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 京能国际能源发展(北京)有限公司2025年度3号第四期定向资产支持商业票据
+
+================================================================================
+处理进度: 7/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X%2BggWY6PwFEs%2BpwJehub%2BXaHJtl4uFHbxN0dS032kyqh4dReAOTm70vnzs9%2BGK9E6w%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X%2BggWY6PwFEs%2BpwJehub%2BXaHJtl4uFHbxN0dS032kyqh4dReAOTm70vnzs9%2BGK9E6w%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+狮桥融资租赁(上海)有限公司2025年度第一期定向资产支持商业票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'狮桥融资租赁(上海)有限公司2025年度第一期定向资产支持商业票据'
+✓ 找到产品 TrustId=33481, TrustName=狮桥融资租赁(上海)有限公司2025年度第一期定向资产支持商业票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 狮桥融资租赁(上海)有限公司2025年度第一期定向资产支持商业票据
+
+================================================================================
+处理进度: 8/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X8D3ymzLFQoo1kIfNY3RxWEW2NngJ9Z1Sx25DBvIj%2Fo3nK897nT5H4UbXh6ZbAsNeA%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X8D3ymzLFQoo1kIfNY3RxWEW2NngJ9Z1Sx25DBvIj%2Fo3nK897nT5H4UbXh6ZbAsNeA%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+中交第一航务工程局有限公司2025年度第二期科技创新定向资产支持证券优先级票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'中交第一航务工程局有限公司2025年度第二期科技创新定向资产支持证券优先级票据'
+❌ 错误: 无法在数据库中找到产品 '中交第一航务工程局有限公司2025年度第二期科技创新定向资产支持证券优先级票据'
+可能原因: 1) 产品名称包含特殊字符 2) 插入失败但未报错 3) 事务未提交
+最近插入的5个产品:
+  TrustId=50148, TrustName=微众银行小微企业贷2021第五期财产权信托
+  TrustId=50147, TrustName=微众银行小微企业贷2021第四期财产权信托
+  TrustId=50146, TrustName=微众银行小微企业贷2021第六期财产权信托
+  TrustId=50145, TrustName=平安银行安悦2021年第一期财产权信托
+  TrustId=50144, TrustName=平安银行安如2021年第三期财产权信托
+⚠️ newProd返回None，跳过此产品
+
+================================================================================
+处理进度: 9/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X%2BLAeCoKC1qUvWPIMlYTNc6J3XOofel3R4oHLLtzMMmMGTGT8GTkeOkKP0d1aUf%2FLg%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X%2BLAeCoKC1qUvWPIMlYTNc6J3XOofel3R4oHLLtzMMmMGTGT8GTkeOkKP0d1aUf%2FLg%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+中国一冶集团有限公司2025年度1号第二期科技创新定向资产支持证券优先级票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'中国一冶集团有限公司2025年度1号第二期科技创新定向资产支持证券优先级票据'
+✓ 找到产品 TrustId=34344, TrustName=中国一冶集团有限公司2025年度1号第二期科技创新定向资产支持证券优先级票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 中国一冶集团有限公司2025年度1号第二期科技创新定向资产支持证券优先级票据
+
+================================================================================
+处理进度: 10/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X5gh9BlTo0Bsw5yMAGcritKdIbW0fP5X9YLUCyTl6UysJi2wwjudHcfvaBGMetkdaA%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X5gh9BlTo0Bsw5yMAGcritKdIbW0fP5X9YLUCyTl6UysJi2wwjudHcfvaBGMetkdaA%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+深圳市海润商业保理有限公司2025年度徽泰1号第一期定向资产支持商业票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'深圳市海润商业保理有限公司2025年度徽泰1号第一期定向资产支持商业票据'
+✓ 找到产品 TrustId=33484, TrustName=深圳市海润商业保理有限公司2025年度徽泰1号第一期定向资产支持商业票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 深圳市海润商业保理有限公司2025年度徽泰1号第一期定向资产支持商业票据
+
+================================================================================
+处理进度: 11/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X%2FZV5d6yRJl3I96kZWYtQaQ%2BUKlx5j1qvTBSeceywnib3qbO5NIkmPMIbsKWJsaR9g%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X%2FZV5d6yRJl3I96kZWYtQaQ%2BUKlx5j1qvTBSeceywnib3qbO5NIkmPMIbsKWJsaR9g%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+上海畅途-天津恒通2025年度第五期定向资产支持票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'上海畅途-天津恒通2025年度第五期定向资产支持票据'
+✓ 找到产品 TrustId=33492, TrustName=上海畅途-天津恒通2025年度第五期定向资产支持票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 上海畅途-天津恒通2025年度第五期定向资产支持票据
+
+================================================================================
+处理进度: 12/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X%2FyCwd3KyAzD%2FENpsZE3VqVvuMFlErIxTzRaBOe6FZixgyxele3jEzqu6uyrckkxmw%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X%2FyCwd3KyAzD%2FENpsZE3VqVvuMFlErIxTzRaBOe6FZixgyxele3jEzqu6uyrckkxmw%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+重庆携程小额贷款有限公司2025年度拿去花第二期定向资产支持票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'重庆携程小额贷款有限公司2025年度拿去花第二期定向资产支持票据'
+✓ 找到产品 TrustId=33512, TrustName=重庆携程小额贷款有限公司2025年度拿去花第二期定向资产支持票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 重庆携程小额贷款有限公司2025年度拿去花第二期定向资产支持票据
+
+================================================================================
+处理进度: 13/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X7FEpWNJprT1NXbgANEz%2F0sRU%2FE6VnkDOJIPXo6QrmvCU9m4aeJS9A7FnubeR7rcVg%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X7FEpWNJprT1NXbgANEz%2F0sRU%2FE6VnkDOJIPXo6QrmvCU9m4aeJS9A7FnubeR7rcVg%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+澄晴2025年度第一期定向资产支持票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'澄晴2025年度第一期定向资产支持票据'
+✓ 找到产品 TrustId=33514, TrustName=澄晴2025年度第一期定向资产支持票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 澄晴2025年度第一期定向资产支持票据
+
+================================================================================
+处理进度: 14/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X7nVWIQyZjPoA4J4xXXberCpAvffFy8U066egyzAenIbgOLXzOxKn3wE8ZZShF7eYw%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X7nVWIQyZjPoA4J4xXXberCpAvffFy8U066egyzAenIbgOLXzOxKn3wE8ZZShF7eYw%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+北京京东世纪贸易有限公司2025年度东裕7号叔裕京东白条第二期定向资产支持商业票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'北京京东世纪贸易有限公司2025年度东裕7号叔裕京东白条第二期定向资产支持商业票据'
+✓ 找到产品 TrustId=33513, TrustName=北京京东世纪贸易有限公司2025年度东裕7号叔裕京东白条第二期定向资产支持商业票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 北京京东世纪贸易有限公司2025年度东裕7号叔裕京东白条第二期定向资产支持商业票据
+
+================================================================================
+处理进度: 15/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X%2FZ1%2BDnOydp6zdEKTdMl1h5F07FJbqcbkhBQFEmyrG%2BAq26%2FAcx%2BV%2BI99ousUY%2B4eQ%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X%2FZ1%2BDnOydp6zdEKTdMl1h5F07FJbqcbkhBQFEmyrG%2BAq26%2FAcx%2BV%2BI99ousUY%2B4eQ%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+中国华冶科工集团有限公司2025年度3号第一期定向资产支持商业票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'中国华冶科工集团有限公司2025年度3号第一期定向资产支持商业票据'
+✓ 找到产品 TrustId=33530, TrustName=中国华冶科工集团有限公司2025年度3号第一期定向资产支持商业票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 中国华冶科工集团有限公司2025年度3号第一期定向资产支持商业票据
+
+================================================================================
+处理进度: 16/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X0IjPCA0EqNjN19FqaOYo%2BA6GQvlo7DnC17CdD0800hIRGpbNouaRy4VzHVcP%2F7t8Q%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X0IjPCA0EqNjN19FqaOYo%2BA6GQvlo7DnC17CdD0800hIRGpbNouaRy4VzHVcP%2F7t8Q%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+北京京能清洁能源电力股份有限公司2025年度新能源2号第一期绿色定向资产支持商业票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'北京京能清洁能源电力股份有限公司2025年度新能源2号第一期绿色定向资产支持商业票据'
+✓ 找到产品 TrustId=33531, TrustName=北京京能清洁能源电力股份有限公司2025年度新能源2号第一期绿色定向资产支持商业票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 北京京能清洁能源电力股份有限公司2025年度新能源2号第一期绿色定向资产支持商业票据
+
+================================================================================
+处理进度: 17/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X5iE7LeOpIwPK%2Fpd1%2B1UXk1mcGu4hMI7LY8LlzMya9c8pDWkhrMQVl1xQldLY2B2iQ%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X5iE7LeOpIwPK%2Fpd1%2B1UXk1mcGu4hMI7LY8LlzMya9c8pDWkhrMQVl1xQldLY2B2iQ%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+武汉市公共交通集团有限责任公司2025年度第二期绿色定向资产支持票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'武汉市公共交通集团有限责任公司2025年度第二期绿色定向资产支持票据'
+❌ 错误: 无法在数据库中找到产品 '武汉市公共交通集团有限责任公司2025年度第二期绿色定向资产支持票据'
+可能原因: 1) 产品名称包含特殊字符 2) 插入失败但未报错 3) 事务未提交
+最近插入的5个产品:
+  TrustId=50148, TrustName=微众银行小微企业贷2021第五期财产权信托
+  TrustId=50147, TrustName=微众银行小微企业贷2021第四期财产权信托
+  TrustId=50146, TrustName=微众银行小微企业贷2021第六期财产权信托
+  TrustId=50145, TrustName=平安银行安悦2021年第一期财产权信托
+  TrustId=50144, TrustName=平安银行安如2021年第三期财产权信托
+⚠️ newProd返回None，跳过此产品
+
+================================================================================
+处理进度: 18/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X89xnAuvZUjJhooSe08SkPRq83C1E3NznklWHJzNoU%2FO4evVHLqII5Dr36Klqy2vVQ%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X89xnAuvZUjJhooSe08SkPRq83C1E3NznklWHJzNoU%2FO4evVHLqII5Dr36Klqy2vVQ%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+华能贵诚信托有限公司2025年度第五期启达定向资产支持票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'华能贵诚信托有限公司2025年度第五期启达定向资产支持票据'
+✓ 找到产品 TrustId=33534, TrustName=华能贵诚信托有限公司2025年度第五期启达定向资产支持票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 华能贵诚信托有限公司2025年度第五期启达定向资产支持票据
+
+================================================================================
+处理进度: 19/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58XypxAP0loghvgP%2FCKCiam%2BnR83jQ0hVA26aKSPIXV62mNN058rXK9p3uGMqQ9dPpSA%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58XypxAP0loghvgP%2FCKCiam%2BnR83jQ0hVA26aKSPIXV62mNN058rXK9p3uGMqQ9dPpSA%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+远东租赁2025年度第二期助力产业升级定向资产支持票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'远东租赁2025年度第二期助力产业升级定向资产支持票据'
+✓ 找到产品 TrustId=33533, TrustName=远东租赁2025年度第二期助力产业升级定向资产支持票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 远东租赁2025年度第二期助力产业升级定向资产支持票据
+
+================================================================================
+处理进度: 20/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X1vtkuqyCTI5sSGUO778I78ChiVJ8eF0UQwL1gAntEL1gqeP9cxJ4BOMDvm%2BTe3PvQ%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X1vtkuqyCTI5sSGUO778I78ChiVJ8eF0UQwL1gAntEL1gqeP9cxJ4BOMDvm%2BTe3PvQ%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+重庆市中和农信小额贷款有限公司2025年度第三期定向资产支持票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'重庆市中和农信小额贷款有限公司2025年度第三期定向资产支持票据'
+❌ 错误: 无法在数据库中找到产品 '重庆市中和农信小额贷款有限公司2025年度第三期定向资产支持票据'
+可能原因: 1) 产品名称包含特殊字符 2) 插入失败但未报错 3) 事务未提交
+最近插入的5个产品:
+  TrustId=50148, TrustName=微众银行小微企业贷2021第五期财产权信托
+  TrustId=50147, TrustName=微众银行小微企业贷2021第四期财产权信托
+  TrustId=50146, TrustName=微众银行小微企业贷2021第六期财产权信托
+  TrustId=50145, TrustName=平安银行安悦2021年第一期财产权信托
+  TrustId=50144, TrustName=平安银行安如2021年第三期财产权信托
+⚠️ newProd返回None，跳过此产品
+
+================================================================================
+处理进度: 21/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X2p9t0cYV187WGjyNThYBl4ffNEli3I8mZOS5LPhaPGkywtBZf%2FAz2V4QiEADii0mw%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X2p9t0cYV187WGjyNThYBl4ffNEli3I8mZOS5LPhaPGkywtBZf%2FAz2V4QiEADii0mw%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+四川省港航投资集团有限责任公司2025年度4号第二期定向资产支持商业票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'四川省港航投资集团有限责任公司2025年度4号第二期定向资产支持商业票据'
+✓ 找到产品 TrustId=33532, TrustName=四川省港航投资集团有限责任公司2025年度4号第二期定向资产支持商业票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 四川省港航投资集团有限责任公司2025年度4号第二期定向资产支持商业票据
+
+================================================================================
+处理进度: 22/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X7GH1xZciqWAvji0f8JyrMkAPM0A0Z4VPNI%2FsZh9U0BDVW%2Bvv8WtAuf0MYjboKlvuQ%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X7GH1xZciqWAvji0f8JyrMkAPM0A0Z4VPNI%2FsZh9U0BDVW%2Bvv8WtAuf0MYjboKlvuQ%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+天津天保商业保理有限公司2025年度天津保税区第一期科技创新定向资产支持证券次级票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'天津天保商业保理有限公司2025年度天津保税区第一期科技创新定向资产支持证券次级票据'
+❌ 错误: 无法在数据库中找到产品 '天津天保商业保理有限公司2025年度天津保税区第一期科技创新定向资产支持证券次级票据'
+可能原因: 1) 产品名称包含特殊字符 2) 插入失败但未报错 3) 事务未提交
+最近插入的5个产品:
+  TrustId=50148, TrustName=微众银行小微企业贷2021第五期财产权信托
+  TrustId=50147, TrustName=微众银行小微企业贷2021第四期财产权信托
+  TrustId=50146, TrustName=微众银行小微企业贷2021第六期财产权信托
+  TrustId=50145, TrustName=平安银行安悦2021年第一期财产权信托
+  TrustId=50144, TrustName=平安银行安如2021年第三期财产权信托
+⚠️ newProd返回None，跳过此产品
+
+================================================================================
+处理进度: 23/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X6Y0J9VDgcJ0VgaUnbCXu9TgwIntxLEGLWm%2FgniCK%2BcBW0zaUiRC4NJq7fVgqMm9Ag%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X6Y0J9VDgcJ0VgaUnbCXu9TgwIntxLEGLWm%2FgniCK%2BcBW0zaUiRC4NJq7fVgqMm9Ag%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+深圳华菱商业保理有限公司2025年度1号第一期定向资产支持商业票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'深圳华菱商业保理有限公司2025年度1号第一期定向资产支持商业票据'
+✓ 找到产品 TrustId=33547, TrustName=深圳华菱商业保理有限公司2025年度1号第一期定向资产支持商业票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 深圳华菱商业保理有限公司2025年度1号第一期定向资产支持商业票据
+
+================================================================================
+处理进度: 24/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X1J%2B%2FMphZVrIEiuBqF8mcZfsKh0tzteaYfZvdZ5Xk5w23pvy2wcvvT9H5lK2CQb5Ag%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X1J%2B%2FMphZVrIEiuBqF8mcZfsKh0tzteaYfZvdZ5Xk5w23pvy2wcvvT9H5lK2CQb5Ag%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+锦泽2025年度第二期定向资产支持票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'锦泽2025年度第二期定向资产支持票据'
+✓ 找到产品 TrustId=33551, TrustName=锦泽2025年度第二期定向资产支持票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 锦泽2025年度第二期定向资产支持票据
+
+================================================================================
+处理进度: 25/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X7xxSCRo5HaFSJTzawgL0QD6uRjTu0VVCFbuMTR7ZquiZRh8u38fWylsa1MEYuny8w%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X7xxSCRo5HaFSJTzawgL0QD6uRjTu0VVCFbuMTR7ZquiZRh8u38fWylsa1MEYuny8w%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+中关村科技租赁股份有限公司2025年度第一期定向资产支持商业票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'中关村科技租赁股份有限公司2025年度第一期定向资产支持商业票据'
+✓ 找到产品 TrustId=33558, TrustName=中关村科技租赁股份有限公司2025年度第一期定向资产支持商业票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 中关村科技租赁股份有限公司2025年度第一期定向资产支持商业票据
+
+================================================================================
+处理进度: 26/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X9Tt0sOd7eGNUZJBM3HHJ6qo9%2FyTXiMCvVc14WefleJxX2ABXnSsxab1Qsf1qv0Cqw%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X9Tt0sOd7eGNUZJBM3HHJ6qo9%2FyTXiMCvVc14WefleJxX2ABXnSsxab1Qsf1qv0Cqw%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+澄嘉2025年度第八期定向资产支持票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'澄嘉2025年度第八期定向资产支持票据'
+✓ 找到产品 TrustId=33550, TrustName=澄嘉2025年度第八期定向资产支持票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 澄嘉2025年度第八期定向资产支持票据
+
+================================================================================
+处理进度: 27/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58XzcoqF1TcTBGXc0LiDX5nng7WR4ZvaxIqigDVo2PY5tqwlYwddJxM9uEmVGuPbpMjg%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58XzcoqF1TcTBGXc0LiDX5nng7WR4ZvaxIqigDVo2PY5tqwlYwddJxM9uEmVGuPbpMjg%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+深圳市海润商业保理有限公司2025年度第一期浦玉定向资产支持票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'深圳市海润商业保理有限公司2025年度第一期浦玉定向资产支持票据'
+✓ 找到产品 TrustId=33560, TrustName=深圳市海润商业保理有限公司2025年度第一期浦玉定向资产支持票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 深圳市海润商业保理有限公司2025年度第一期浦玉定向资产支持票据
+
+================================================================================
+处理进度: 28/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X4On4rqSYLsrVEqpYf1lQtW50zViLI%2Frj0%2F0l9KPXUzJIgMeXGVc5LHvdxSqoStHUQ%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X4On4rqSYLsrVEqpYf1lQtW50zViLI%2Frj0%2F0l9KPXUzJIgMeXGVc5LHvdxSqoStHUQ%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+国投泰康信托有限公司2025年度致远3号第一期定向资产支持商业票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'国投泰康信托有限公司2025年度致远3号第一期定向资产支持商业票据'
+✓ 找到产品 TrustId=33562, TrustName=国投泰康信托有限公司2025年度致远3号第一期定向资产支持商业票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 国投泰康信托有限公司2025年度致远3号第一期定向资产支持商业票据
+
+================================================================================
+处理进度: 29/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58Xxq1ifU2bkn7nM0jHMo3Ej7Xohp2sZ940eMEL9jLzMqT5UV%2BHkiBo5%2FRfE8EjAGJLA%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58Xxq1ifU2bkn7nM0jHMo3Ej7Xohp2sZ940eMEL9jLzMqT5UV%2BHkiBo5%2FRfE8EjAGJLA%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+华能贵诚信托有限公司2025年度恒信1号第一期定向资产支持商业票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'华能贵诚信托有限公司2025年度恒信1号第一期定向资产支持商业票据'
+✓ 找到产品 TrustId=33561, TrustName=华能贵诚信托有限公司2025年度恒信1号第一期定向资产支持商业票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 华能贵诚信托有限公司2025年度恒信1号第一期定向资产支持商业票据
+
+================================================================================
+处理进度: 30/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X4yhbu8M4YQqj6lg%2FnX%2F26qmChiv4iyMR75GOLNwKPG7RGyTts40RaIChpCbx6mPOw%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X4yhbu8M4YQqj6lg%2FnX%2F26qmChiv4iyMR75GOLNwKPG7RGyTts40RaIChpCbx6mPOw%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+国投泰康信托有限公司2025年度致远4号第一期定向资产支持商业票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'国投泰康信托有限公司2025年度致远4号第一期定向资产支持商业票据'
+✓ 找到产品 TrustId=33563, TrustName=国投泰康信托有限公司2025年度致远4号第一期定向资产支持商业票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 国投泰康信托有限公司2025年度致远4号第一期定向资产支持商业票据
+
+================================================================================
+处理进度: 31/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X%2B88o0c9vyC4FZy3aI7ojF3y%2FBl2YcRdKnwfKppwCxaGtHtCb3uskQH6sQx4q%2BRwaA%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X%2B88o0c9vyC4FZy3aI7ojF3y%2FBl2YcRdKnwfKppwCxaGtHtCb3uskQH6sQx4q%2BRwaA%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+林州市城乡供热有限公司2025年度第一期定向资产支持票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'林州市城乡供热有限公司2025年度第一期定向资产支持票据'
+✓ 找到产品 TrustId=33574, TrustName=林州市城乡供热有限公司2025年度第一期定向资产支持票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 林州市城乡供热有限公司2025年度第一期定向资产支持票据
+
+================================================================================
+处理进度: 32/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X0l8LaAVgHk1yDTKGeBgzoPdCy%2FgsOmZtjL34CKAz7m3SA0WB6MCwGDPgK0wiR07Vw%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X0l8LaAVgHk1yDTKGeBgzoPdCy%2FgsOmZtjL34CKAz7m3SA0WB6MCwGDPgK0wiR07Vw%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+北方华创科技集团股份有限公司2025年度1号第二期定向资产支持商业票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'北方华创科技集团股份有限公司2025年度1号第二期定向资产支持商业票据'
+✓ 找到产品 TrustId=33575, TrustName=北方华创科技集团股份有限公司2025年度1号第二期定向资产支持商业票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 北方华创科技集团股份有限公司2025年度1号第二期定向资产支持商业票据
+
+================================================================================
+处理进度: 33/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X%2FQE3AJPsnX0Xa%2F35Z0Ov6bMR79u5eE%2F61KouTLRBSGU0AgfJYd3Oq0DgPHxKeslnw%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X%2FQE3AJPsnX0Xa%2F35Z0Ov6bMR79u5eE%2F61KouTLRBSGU0AgfJYd3Oq0DgPHxKeslnw%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+深圳前海联易融商业保理有限公司2025年度第四期招信供应链定向资产支持票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'深圳前海联易融商业保理有限公司2025年度第四期招信供应链定向资产支持票据'
+✓ 找到产品 TrustId=33578, TrustName=深圳前海联易融商业保理有限公司2025年度第四期招信供应链定向资产支持票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 深圳前海联易融商业保理有限公司2025年度第四期招信供应链定向资产支持票据
+
+================================================================================
+处理进度: 34/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58XyYCumsWK8SyDiHbx%2FIQf1UatFSZSEdphyH%2FQ%2BqEhI%2BBRpXanQLoBYXhTFHVNjpkog%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58XyYCumsWK8SyDiHbx%2FIQf1UatFSZSEdphyH%2FQ%2BqEhI%2BBRpXanQLoBYXhTFHVNjpkog%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+厦门建发股份有限公司2025年度第二期应收账款定向资产支持票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'厦门建发股份有限公司2025年度第二期应收账款定向资产支持票据'
+✓ 找到产品 TrustId=33577, TrustName=厦门建发股份有限公司2025年度第二期应收账款定向资产支持票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 厦门建发股份有限公司2025年度第二期应收账款定向资产支持票据
+
+================================================================================
+处理进度: 35/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X67dw2IRMYgk7GAV6kSGRlErytLY8chrK8WfsWSwUMb3Dw9n8Y7GMJl2T3OF8euZYw%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X67dw2IRMYgk7GAV6kSGRlErytLY8chrK8WfsWSwUMb3Dw9n8Y7GMJl2T3OF8euZYw%3D%3D
+发行类型: 银行间市场投资人 -> PublicOffering
+前联2025年度第五期华发优生活六号资产支持票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'前联2025年度第五期华发优生活六号资产支持票据'
+✓ 找到产品 TrustId=33582, TrustName=前联2025年度第五期华发优生活六号资产支持票据
+✓ 公开发行产品，开始处理文档...
+getting file list for 前联2025年度第五期华发优生活六号资产支持票据
+Attempting to get token without proxy...
+Response status: 200
+data = {'sign': 'Q/d8solfMh3GOoMI5WmGUaZA1ukiCpO5sMwap9ByMZnt4tsJZeSkX6Wq1v3lRrKsnQLcWdAPun00\nLsYa5AtcTZpCs2CvuKf8xTKL5JKkAphGIIEbpsADAhjeg2dCZIBVMUOFd2LaiLvRLJLML9AfJTc/\nI44XV2MvFkyyEBuTLsA=\n', 'UT': 'UECJOiMK0y4uEq3r25Ynk7CVPHG6EiCN5T0lBeE09bUAWnRVc/at4ZYbfPgYW1vOXW8M5lWS/X/E\nnA2vJipBJTHRScSWsyfBh1MAAAvjZkSTYBayqtkOF2azvghQY/Y83EQ+Gk9uqV8eR9oz/XCFGC8H\nmvSBAozsJGmIrApf9eo=\n'}
+获取Cookie: {'AlteonP10': 'AxBwYCw/F6wPr4Y2fOdEXw$$'}
+Attempting to fetch file list without proxy...
+rs.status = 200
+搜索结果总数: 10
+pageItems数量: 10
+有效PDF文档数: 10
+产品发行文档(q1): [[3237617, '前联2025年度第五期华发优生活六号资产支持票据发行情况公告', '2025-11-21 00:00:00.000'], [3234240, '前联2025年度第五期华发优生活六号资产支持票据募集说明书', '2025-11-18 00:00:00.000'], [3234246, '前联2025年度第五期华发优生活六号资产支持票据发行方案(渤海银行)', '2025-11-18 00:00:00.000'], [3234244, '前联2025年度第五期华发优生活六号资产支持票据发行方案及承诺函(国泰海通)', '2025-11-18 00:00:00.000'], [3234243, '前联2025年度第五期华发优生活六号资产支持票据发行方案及承诺函(华能信托)', '2025-11-18 00:00:00.000'], [3234242, '前联2025年度第五期华发优生活六号资产支持票据发行方案及承诺函(华飞保理）', '2025-11-18 00:00:00.000']]
+运营报告文档(q2): []
+[33582, 'HuaFaYouShengHuo6ABN2025-5', '前联2025年度第五期华发优生活六号资产支持票据']
+creating folder for 前联2025年度第五期华发优生活六号资产支持票据
+Listing directory: /Products/资产支持票据
+Found 1410 items in /Products/资产支持票据
+前联2025年度第五期华发优生活六号资产支持票据 already exists in /Products/资产支持票据 on FTP
+Listing directory: /增量文档
+Found 35 items in /增量文档
+12 already exists in /增量文档 on FTP
+Listing directory: /增量文档/12
+Found 39 items in /增量文档/12
+HuaFaYouShengHuo6ABN2025-5 already exists in /增量文档/12 on FTP
+Listing directory: /增量文档/12/HuaFaYouShengHuo6ABN2025-5
+Found 1 items in /增量文档/12/HuaFaYouShengHuo6ABN2025-5
+ProductReleaseInstructions already exists in /增量文档/12/HuaFaYouShengHuo6ABN2025-5 on FTP
+[3237617, '前联2025年度第五期华发优生活六号资产支持票据发行情况公告', '2025-11-21 00:00:00.000']
+downloading file from url: https://www.chinamoney.com.cn/dqs/cm-s-notice-query/fileDownLoad.do?mode=open&contentId=3237617&priority=0
+Attempting to download without proxy first...
+Download successful without proxy
+✓ PDF下载成功: 前联2025年度第五期华发优生活六号资产支持票据发行情况公告.pdf
+Listing directory: /Products/资产支持票据
+Found 1410 items in /Products/资产支持票据
+前联2025年度第五期华发优生活六号资产支持票据 already exists in /Products/资产支持票据 on FTP
+Listing directory: /Products/资产支持票据/前联2025年度第五期华发优生活六号资产支持票据
+Found 0 items in /Products/资产支持票据/前联2025年度第五期华发优生活六号资产支持票据
+Writing PDF to /Products/资产支持票据/前联2025年度第五期华发优生活六号资产支持票据/前联2025年度第五期华发优生活六号资产支持票据发行情况公告.pdf =====>
+Listing directory: /增量文档
+Found 35 items in /增量文档
+12 already exists in /增量文档 on FTP
+Listing directory: /增量文档/12
+Found 39 items in /增量文档/12
+HuaFaYouShengHuo6ABN2025-5 already exists in /增量文档/12 on FTP
+Listing directory: /增量文档/12/HuaFaYouShengHuo6ABN2025-5
+Found 1 items in /增量文档/12/HuaFaYouShengHuo6ABN2025-5
+ProductReleaseInstructions already exists in /增量文档/12/HuaFaYouShengHuo6ABN2025-5 on FTP
+Listing directory: /增量文档/12/HuaFaYouShengHuo6ABN2025-5/ProductReleaseInstructions
+Found 0 items in /增量文档/12/HuaFaYouShengHuo6ABN2025-5/ProductReleaseInstructions
+Writing PDF to /增量文档/12/HuaFaYouShengHuo6ABN2025-5/ProductReleaseInstructions/前联2025年度第五期华发优生活六号资产支持票据发行情况公告.pdf =====>
+[3234240, '前联2025年度第五期华发优生活六号资产支持票据募集说明书', '2025-11-18 00:00:00.000']
+downloading file from url: https://www.chinamoney.com.cn/dqs/cm-s-notice-query/fileDownLoad.do?mode=open&contentId=3234240&priority=0
+Attempting to download without proxy first...
+Download successful without proxy
+✓ PDF下载成功: 前联2025年度第五期华发优生活六号资产支持票据募集说明书.pdf
+Listing directory: /Products/资产支持票据
+Found 1410 items in /Products/资产支持票据
+前联2025年度第五期华发优生活六号资产支持票据 already exists in /Products/资产支持票据 on FTP
+Listing directory: /Products/资产支持票据/前联2025年度第五期华发优生活六号资产支持票据
+Found 1 items in /Products/资产支持票据/前联2025年度第五期华发优生活六号资产支持票据
+Writing PDF to /Products/资产支持票据/前联2025年度第五期华发优生活六号资产支持票据/前联2025年度第五期华发优生活六号资产支持票据募集说明书.pdf =====>
+Listing directory: /增量文档
+Found 35 items in /增量文档
+12 already exists in /增量文档 on FTP
+Listing directory: /增量文档/12
+Found 39 items in /增量文档/12
+HuaFaYouShengHuo6ABN2025-5 already exists in /增量文档/12 on FTP
+Listing directory: /增量文档/12/HuaFaYouShengHuo6ABN2025-5
+Found 1 items in /增量文档/12/HuaFaYouShengHuo6ABN2025-5
+ProductReleaseInstructions already exists in /增量文档/12/HuaFaYouShengHuo6ABN2025-5 on FTP
+Listing directory: /增量文档/12/HuaFaYouShengHuo6ABN2025-5/ProductReleaseInstructions
+Found 1 items in /增量文档/12/HuaFaYouShengHuo6ABN2025-5/ProductReleaseInstructions
+Writing PDF to /增量文档/12/HuaFaYouShengHuo6ABN2025-5/ProductReleaseInstructions/前联2025年度第五期华发优生活六号资产支持票据募集说明书.pdf =====>
+[3234246, '前联2025年度第五期华发优生活六号资产支持票据发行方案(渤海银行)', '2025-11-18 00:00:00.000']
+downloading file from url: https://www.chinamoney.com.cn/dqs/cm-s-notice-query/fileDownLoad.do?mode=open&contentId=3234246&priority=0
+Attempting to download without proxy first...
+Download successful without proxy
+✓ PDF下载成功: 前联2025年度第五期华发优生活六号资产支持票据发行方案(渤海银行).pdf
+Listing directory: /Products/资产支持票据
+Found 1410 items in /Products/资产支持票据
+前联2025年度第五期华发优生活六号资产支持票据 already exists in /Products/资产支持票据 on FTP
+Listing directory: /Products/资产支持票据/前联2025年度第五期华发优生活六号资产支持票据
+Found 2 items in /Products/资产支持票据/前联2025年度第五期华发优生活六号资产支持票据
+Writing PDF to /Products/资产支持票据/前联2025年度第五期华发优生活六号资产支持票据/前联2025年度第五期华发优生活六号资产支持票据发行方案(渤海银行).pdf =====>
+Listing directory: /增量文档
+Found 35 items in /增量文档
+12 already exists in /增量文档 on FTP
+Listing directory: /增量文档/12
+Found 39 items in /增量文档/12
+HuaFaYouShengHuo6ABN2025-5 already exists in /增量文档/12 on FTP
+Listing directory: /增量文档/12/HuaFaYouShengHuo6ABN2025-5
+Found 1 items in /增量文档/12/HuaFaYouShengHuo6ABN2025-5
+ProductReleaseInstructions already exists in /增量文档/12/HuaFaYouShengHuo6ABN2025-5 on FTP
+Listing directory: /增量文档/12/HuaFaYouShengHuo6ABN2025-5/ProductReleaseInstructions
+Found 2 items in /增量文档/12/HuaFaYouShengHuo6ABN2025-5/ProductReleaseInstructions
+Writing PDF to /增量文档/12/HuaFaYouShengHuo6ABN2025-5/ProductReleaseInstructions/前联2025年度第五期华发优生活六号资产支持票据发行方案(渤海银行).pdf =====>
+[3234244, '前联2025年度第五期华发优生活六号资产支持票据发行方案及承诺函(国泰海通)', '2025-11-18 00:00:00.000']
+downloading file from url: https://www.chinamoney.com.cn/dqs/cm-s-notice-query/fileDownLoad.do?mode=open&contentId=3234244&priority=0
+Attempting to download without proxy first...
+Download successful without proxy
+✓ PDF下载成功: 前联2025年度第五期华发优生活六号资产支持票据发行方案及承诺函(国泰海通).pdf
+Listing directory: /Products/资产支持票据
+Found 1410 items in /Products/资产支持票据
+前联2025年度第五期华发优生活六号资产支持票据 already exists in /Products/资产支持票据 on FTP
+Listing directory: /Products/资产支持票据/前联2025年度第五期华发优生活六号资产支持票据
+Found 3 items in /Products/资产支持票据/前联2025年度第五期华发优生活六号资产支持票据
+Writing PDF to /Products/资产支持票据/前联2025年度第五期华发优生活六号资产支持票据/前联2025年度第五期华发优生活六号资产支持票据发行方案及承诺函(国泰海通).pdf =====>
+Listing directory: /增量文档
+Found 35 items in /增量文档
+12 already exists in /增量文档 on FTP
+Listing directory: /增量文档/12
+Found 39 items in /增量文档/12
+HuaFaYouShengHuo6ABN2025-5 already exists in /增量文档/12 on FTP
+Listing directory: /增量文档/12/HuaFaYouShengHuo6ABN2025-5
+Found 1 items in /增量文档/12/HuaFaYouShengHuo6ABN2025-5
+ProductReleaseInstructions already exists in /增量文档/12/HuaFaYouShengHuo6ABN2025-5 on FTP
+Listing directory: /增量文档/12/HuaFaYouShengHuo6ABN2025-5/ProductReleaseInstructions
+Found 3 items in /增量文档/12/HuaFaYouShengHuo6ABN2025-5/ProductReleaseInstructions
+Writing PDF to /增量文档/12/HuaFaYouShengHuo6ABN2025-5/ProductReleaseInstructions/前联2025年度第五期华发优生活六号资产支持票据发行方案及承诺函(国泰海通).pdf =====>
+[3234243, '前联2025年度第五期华发优生活六号资产支持票据发行方案及承诺函(华能信托)', '2025-11-18 00:00:00.000']
+downloading file from url: https://www.chinamoney.com.cn/dqs/cm-s-notice-query/fileDownLoad.do?mode=open&contentId=3234243&priority=0
+Attempting to download without proxy first...
+Download successful without proxy
+✓ PDF下载成功: 前联2025年度第五期华发优生活六号资产支持票据发行方案及承诺函(华能信托).pdf
+Listing directory: /Products/资产支持票据
+Found 1410 items in /Products/资产支持票据
+前联2025年度第五期华发优生活六号资产支持票据 already exists in /Products/资产支持票据 on FTP
+Listing directory: /Products/资产支持票据/前联2025年度第五期华发优生活六号资产支持票据
+Found 4 items in /Products/资产支持票据/前联2025年度第五期华发优生活六号资产支持票据
+Writing PDF to /Products/资产支持票据/前联2025年度第五期华发优生活六号资产支持票据/前联2025年度第五期华发优生活六号资产支持票据发行方案及承诺函(华能信托).pdf =====>
+Listing directory: /增量文档
+Found 35 items in /增量文档
+12 already exists in /增量文档 on FTP
+Listing directory: /增量文档/12
+Found 39 items in /增量文档/12
+HuaFaYouShengHuo6ABN2025-5 already exists in /增量文档/12 on FTP
+Listing directory: /增量文档/12/HuaFaYouShengHuo6ABN2025-5
+Found 1 items in /增量文档/12/HuaFaYouShengHuo6ABN2025-5
+ProductReleaseInstructions already exists in /增量文档/12/HuaFaYouShengHuo6ABN2025-5 on FTP
+Listing directory: /增量文档/12/HuaFaYouShengHuo6ABN2025-5/ProductReleaseInstructions
+Found 4 items in /增量文档/12/HuaFaYouShengHuo6ABN2025-5/ProductReleaseInstructions
+Writing PDF to /增量文档/12/HuaFaYouShengHuo6ABN2025-5/ProductReleaseInstructions/前联2025年度第五期华发优生活六号资产支持票据发行方案及承诺函(华能信托).pdf =====>
+[3234242, '前联2025年度第五期华发优生活六号资产支持票据发行方案及承诺函(华飞保理）', '2025-11-18 00:00:00.000']
+downloading file from url: https://www.chinamoney.com.cn/dqs/cm-s-notice-query/fileDownLoad.do?mode=open&contentId=3234242&priority=0
+Attempting to download without proxy first...
+Download successful without proxy
+✓ PDF下载成功: 前联2025年度第五期华发优生活六号资产支持票据发行方案及承诺函(华飞保理）.pdf
+Listing directory: /Products/资产支持票据
+Found 1410 items in /Products/资产支持票据
+前联2025年度第五期华发优生活六号资产支持票据 already exists in /Products/资产支持票据 on FTP
+Listing directory: /Products/资产支持票据/前联2025年度第五期华发优生活六号资产支持票据
+Found 5 items in /Products/资产支持票据/前联2025年度第五期华发优生活六号资产支持票据
+Writing PDF to /Products/资产支持票据/前联2025年度第五期华发优生活六号资产支持票据/前联2025年度第五期华发优生活六号资产支持票据发行方案及承诺函(华飞保理）.pdf =====>
+Listing directory: /增量文档
+Found 35 items in /增量文档
+12 already exists in /增量文档 on FTP
+Listing directory: /增量文档/12
+Found 39 items in /增量文档/12
+HuaFaYouShengHuo6ABN2025-5 already exists in /增量文档/12 on FTP
+Listing directory: /增量文档/12/HuaFaYouShengHuo6ABN2025-5
+Found 1 items in /增量文档/12/HuaFaYouShengHuo6ABN2025-5
+ProductReleaseInstructions already exists in /增量文档/12/HuaFaYouShengHuo6ABN2025-5 on FTP
+Listing directory: /增量文档/12/HuaFaYouShengHuo6ABN2025-5/ProductReleaseInstructions
+Found 5 items in /增量文档/12/HuaFaYouShengHuo6ABN2025-5/ProductReleaseInstructions
+Writing PDF to /增量文档/12/HuaFaYouShengHuo6ABN2025-5/ProductReleaseInstructions/前联2025年度第五期华发优生活六号资产支持票据发行方案及承诺函(华飞保理）.pdf =====>
+Listing directory: /增量文档
+Found 11 items in /增量文档
+12 already exists in /增量文档 on FTP
+Listing directory: /增量文档/12
+Found 32 items in /增量文档/12
+HuaFaYouShengHuo6ABN2025-5 already exists in /增量文档/12 on FTP
+Listing directory: /DealViewer/TrustAssociatedDoc
+Found 5305 items in /DealViewer/TrustAssociatedDoc
+HuaFaYouShengHuo6ABN2025-5 already exists in /DealViewer/TrustAssociatedDoc on FTP
+Listing directory: /增量文档/12/HuaFaYouShengHuo6ABN2025-5
+Found 1 items in /增量文档/12/HuaFaYouShengHuo6ABN2025-5
+Creating directory: /DealViewer/TrustAssociatedDoc/HuaFaYouShengHuo6ABN2025-5/ProductReleaseInstructions
+Listing directory: /增量文档/12/HuaFaYouShengHuo6ABN2025-5/ProductReleaseInstructions
+Found 6 items in /增量文档/12/HuaFaYouShengHuo6ABN2025-5/ProductReleaseInstructions
+Transferring file: /增量文档/12/HuaFaYouShengHuo6ABN2025-5/ProductReleaseInstructions/前联2025年度第五期华发优生活六号资产支持票据募集说明书.pdf to /DealViewer/TrustAssociatedDoc/HuaFaYouShengHuo6ABN2025-5/ProductReleaseInstructions/前联2025年度第五期华发优生活六号资产支持票据募集说明书.pdf
+Transferring file: /增量文档/12/HuaFaYouShengHuo6ABN2025-5/ProductReleaseInstructions/前联2025年度第五期华发优生活六号资产支持票据发行情况公告.pdf to /DealViewer/TrustAssociatedDoc/HuaFaYouShengHuo6ABN2025-5/ProductReleaseInstructions/前联2025年度第五期华发优生活六号资产支持票据发行情况公告.pdf
+Transferring file: /增量文档/12/HuaFaYouShengHuo6ABN2025-5/ProductReleaseInstructions/前联2025年度第五期华发优生活六号资产支持票据发行方案(渤海银行).pdf to /DealViewer/TrustAssociatedDoc/HuaFaYouShengHuo6ABN2025-5/ProductReleaseInstructions/前联2025年度第五期华发优生活六号资产支持票据发行方案(渤海银行).pdf
+Transferring file: /增量文档/12/HuaFaYouShengHuo6ABN2025-5/ProductReleaseInstructions/前联2025年度第五期华发优生活六号资产支持票据发行方案及承诺函(华能信托).pdf to /DealViewer/TrustAssociatedDoc/HuaFaYouShengHuo6ABN2025-5/ProductReleaseInstructions/前联2025年度第五期华发优生活六号资产支持票据发行方案及承诺函(华能信托).pdf
+Transferring file: /增量文档/12/HuaFaYouShengHuo6ABN2025-5/ProductReleaseInstructions/前联2025年度第五期华发优生活六号资产支持票据发行方案及承诺函(华飞保理）.pdf to /DealViewer/TrustAssociatedDoc/HuaFaYouShengHuo6ABN2025-5/ProductReleaseInstructions/前联2025年度第五期华发优生活六号资产支持票据发行方案及承诺函(华飞保理）.pdf
+Transferring file: /增量文档/12/HuaFaYouShengHuo6ABN2025-5/ProductReleaseInstructions/前联2025年度第五期华发优生活六号资产支持票据发行方案及承诺函(国泰海通).pdf to /DealViewer/TrustAssociatedDoc/HuaFaYouShengHuo6ABN2025-5/ProductReleaseInstructions/前联2025年度第五期华发优生活六号资产支持票据发行方案及承诺函(国泰海通).pdf
+开始处理 6 个产品发行文档...
+  处理文档 1/6: 前联2025年度第五期华发优生活六号资产支持票据发行情况公告
+insert into DV.TrustAssociatedDocument(Trustid,FileCategory,SubCategory,FilePath,FileName,FileType,Created,Creator) values(33582, 'ProductReleaseInstructions','NULL','DealViewer/TrustAssociatedDoc/HuaFaYouShengHuo6ABN2025-5/ProductReleaseInstructions/',N'前联2025年度第五期华发优生活六号资产支持票据发行情况公告.pdf','pdf','2025-12-09 20:31:45','goldenstand')
+asd
+[3237617, '前联2025年度第五期华发优生活六号资产支持票据发行情况公告', '2025-11-21 00:00:00.000']
+前联2025年度第五期华发优生活六号资产支持票据发行情况公告
+asd
+single insert done
+  处理文档 2/6: 前联2025年度第五期华发优生活六号资产支持票据募集说明书
+insert into DV.TrustAssociatedDocument(Trustid,FileCategory,SubCategory,FilePath,FileName,FileType,Created,Creator) values(33582, 'ProductReleaseInstructions','NULL','DealViewer/TrustAssociatedDoc/HuaFaYouShengHuo6ABN2025-5/ProductReleaseInstructions/',N'前联2025年度第五期华发优生活六号资产支持票据募集说明书.pdf','pdf','2025-12-09 20:31:45','goldenstand')
+asd
+[3234240, '前联2025年度第五期华发优生活六号资产支持票据募集说明书', '2025-11-18 00:00:00.000']
+前联2025年度第五期华发优生活六号资产支持票据募集说明书
+asd
+insert into PortfolioManagement.dbo.DisclosureOfInformation values(33582, 'HuaFaYouShengHuo6ABN2025-5', N'前联2025年度第五期华发优生活六号资产支持票据募集说明书', '2025-12-09 20:31:45', 1)
+查询TrustDocumentID SQL: select TrustDocumentID from DV.TrustAssociatedDocument where filename=N'前联2025年度第五期华发优生活六号资产支持票据募集说明书.pdf'
+✓ 找到TrustDocumentID=81132
+插入ProductsStateInformation SQL: insert into TaskCollection.dbo.ProductsStateInformation(Trustid,TrustDocumentID,FileType,StateType) values(33582, 81132, 1, 9)
+✓ ProductsStateInformation插入成功: TrustDocumentID=81132
+single insert done
+    ✓ 包含'说明书'关键词
+  处理文档 3/6: 前联2025年度第五期华发优生活六号资产支持票据发行方案(渤海银行)
+insert into DV.TrustAssociatedDocument(Trustid,FileCategory,SubCategory,FilePath,FileName,FileType,Created,Creator) values(33582, 'ProductReleaseInstructions','NULL','DealViewer/TrustAssociatedDoc/HuaFaYouShengHuo6ABN2025-5/ProductReleaseInstructions/',N'前联2025年度第五期华发优生活六号资产支持票据发行方案(渤海银行).pdf','pdf','2025-12-09 20:31:46','goldenstand')
+asd
+[3234246, '前联2025年度第五期华发优生活六号资产支持票据发行方案(渤海银行)', '2025-11-18 00:00:00.000']
+前联2025年度第五期华发优生活六号资产支持票据发行方案(渤海银行)
+asd
+single insert done
+  处理文档 4/6: 前联2025年度第五期华发优生活六号资产支持票据发行方案及承诺函(国泰海通)
+insert into DV.TrustAssociatedDocument(Trustid,FileCategory,SubCategory,FilePath,FileName,FileType,Created,Creator) values(33582, 'ProductReleaseInstructions','NULL','DealViewer/TrustAssociatedDoc/HuaFaYouShengHuo6ABN2025-5/ProductReleaseInstructions/',N'前联2025年度第五期华发优生活六号资产支持票据发行方案及承诺函(国泰海通).pdf','pdf','2025-12-09 20:31:47','goldenstand')
+asd
+[3234244, '前联2025年度第五期华发优生活六号资产支持票据发行方案及承诺函(国泰海通)', '2025-11-18 00:00:00.000']
+前联2025年度第五期华发优生活六号资产支持票据发行方案及承诺函(国泰海通)
+asd
+single insert done
+  处理文档 5/6: 前联2025年度第五期华发优生活六号资产支持票据发行方案及承诺函(华能信托)
+insert into DV.TrustAssociatedDocument(Trustid,FileCategory,SubCategory,FilePath,FileName,FileType,Created,Creator) values(33582, 'ProductReleaseInstructions','NULL','DealViewer/TrustAssociatedDoc/HuaFaYouShengHuo6ABN2025-5/ProductReleaseInstructions/',N'前联2025年度第五期华发优生活六号资产支持票据发行方案及承诺函(华能信托).pdf','pdf','2025-12-09 20:31:47','goldenstand')
+asd
+[3234243, '前联2025年度第五期华发优生活六号资产支持票据发行方案及承诺函(华能信托)', '2025-11-18 00:00:00.000']
+前联2025年度第五期华发优生活六号资产支持票据发行方案及承诺函(华能信托)
+asd
+single insert done
+  处理文档 6/6: 前联2025年度第五期华发优生活六号资产支持票据发行方案及承诺函(华飞保理）
+insert into DV.TrustAssociatedDocument(Trustid,FileCategory,SubCategory,FilePath,FileName,FileType,Created,Creator) values(33582, 'ProductReleaseInstructions','NULL','DealViewer/TrustAssociatedDoc/HuaFaYouShengHuo6ABN2025-5/ProductReleaseInstructions/',N'前联2025年度第五期华发优生活六号资产支持票据发行方案及承诺函(华飞保理）.pdf','pdf','2025-12-09 20:31:47','goldenstand')
+asd
+[3234242, '前联2025年度第五期华发优生活六号资产支持票据发行方案及承诺函(华飞保理）', '2025-11-18 00:00:00.000']
+前联2025年度第五期华发优生活六号资产支持票据发行方案及承诺函(华飞保理）
+asd
+single insert done
+✓ 其他类型产品: 前联2025年度第五期华发优生活六号资产支持票据
+
+================================================================================
+处理进度: 36/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58Xwg3ro0GusrDuilonRWV3TPHevsUTc6Y2FS%2F4hjtwT1l0433Uy3rSz%2FOaiR1xyBCFw%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58Xwg3ro0GusrDuilonRWV3TPHevsUTc6Y2FS%2F4hjtwT1l0433Uy3rSz%2FOaiR1xyBCFw%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+睿哲2025年度第一期定向资产支持票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'睿哲2025年度第一期定向资产支持票据'
+✓ 找到产品 TrustId=33581, TrustName=睿哲2025年度第一期定向资产支持票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 睿哲2025年度第一期定向资产支持票据
+
+================================================================================
+处理进度: 37/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58XztZx12PwAAZMNuj5i03pZrnDwFPjPwZdvZnfF3kqcvoR2btf24%2BSwNmOdYp0hVUNg%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58XztZx12PwAAZMNuj5i03pZrnDwFPjPwZdvZnfF3kqcvoR2btf24%2BSwNmOdYp0hVUNg%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+电投融和新能源发展有限公司2025年度新能源1号第二期绿色定向资产支持商业票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'电投融和新能源发展有限公司2025年度新能源1号第二期绿色定向资产支持商业票据'
+✓ 找到产品 TrustId=33580, TrustName=电投融和新能源发展有限公司2025年度新能源1号第二期绿色定向资产支持商业票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 电投融和新能源发展有限公司2025年度新能源1号第二期绿色定向资产支持商业票据
+
+================================================================================
+处理进度: 38/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X8%2Be6ZwIB8sfxt4ofNdiVsl%2FPs8FhUgUsrwnU2Z4Zyfnjkks4UwLs5eY48LQWqU5VA%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X8%2Be6ZwIB8sfxt4ofNdiVsl%2FPs8FhUgUsrwnU2Z4Zyfnjkks4UwLs5eY48LQWqU5VA%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+京能国际能源发展(北京)有限公司2025年度2号第四期定向资产支持商业票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'京能国际能源发展(北京)有限公司2025年度2号第四期定向资产支持商业票据'
+✓ 找到产品 TrustId=33579, TrustName=京能国际能源发展(北京)有限公司2025年度2号第四期定向资产支持商业票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 京能国际能源发展(北京)有限公司2025年度2号第四期定向资产支持商业票据
+
+================================================================================
+处理进度: 39/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X7o1i5aqxnifSxpsckxsCiz7i30gyDq74VGvU1qIM0uKuhvt1bQe9e6goRtNH5h6gg%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X7o1i5aqxnifSxpsckxsCiz7i30gyDq74VGvU1qIM0uKuhvt1bQe9e6goRtNH5h6gg%3D%3D
+发行类型: 银行间市场投资人 -> PublicOffering
+九州通医药集团股份有限公司2025年度第一期资产支持票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'九州通医药集团股份有限公司2025年度第一期资产支持票据'
+✓ 找到产品 TrustId=33597, TrustName=九州通医药集团股份有限公司2025年度第一期资产支持票据
+✓ 公开发行产品，开始处理文档...
+getting file list for 九州通医药集团股份有限公司2025年度第一期资产支持票据
+Attempting to get token without proxy...
+Response status: 200
+data = {'sign': 'Q/d8solfMh3GOoMI5WmGUaZA1ukiCpO5sMwap9ByMZnt4tsJZeSkX6Wq1v3lRrKsnQLcWdAPun00\nLsYa5AtcTZpCs2CvuKf8xTKL5JKkAphGIIEbpsADAhjeg2dCZIBVMUOFd2LaiLvRLJLML9AfJTc/\nI44XV2MvFkyyEBuTLsA=\n', 'UT': 'NNd/+53BSErbz4cESNUMX9+Wj+5ToSdHsMted4cH7Hmy3lIEP57s2g5nYlUPCWSREsMu4LhoLk1H\nP+XuVAGCqIM0eEcfJeOQm/riYClhGWaTOg8TEcznxKWyX6lSc+XDvyKpCRnYMdDmVVbwbFJjwHSQ\n1BFF8KtKIgMxaX1GmyM=\n'}
+获取Cookie: {'AlteonP10': 'AvOpGyw/F6we0U5cH/W8PQ$$'}
+Attempting to fetch file list without proxy...
+rs.status = 200
+搜索结果总数: 11
+pageItems数量: 11
+  跳过(paths=2): 九州通医药集团股份有限公司2025年度第一期资产支持票据发行情况公告
+有效PDF文档数: 10
+产品发行文档(q1): [[3233248, '九州通医药集团股份有限公司2025年度第一期资产支持票据募集说明书', '2025-11-17 00:00:00.000'], [3233252, '九州通医药集团股份有限公司2025年度第一期资产支持票据发行方案(联席主承销商)', '2025-11-17 00:00:00.000'], [3233249, '九州通医药集团股份有限公司2025年度第一期资产支持票据发行方案及承诺函(发起机构)', '2025-11-17 00:00:00.000'], [3233246, '九州通医药集团股份有限公司2025年度第一期资产支持票据发行方案及承诺函(簿记管理人)', '2025-11-17 00:00:00.000'], [3233250, '九州通医药集团股份有限公司2025年度第一期资产支持票据发行方案及承诺函(发行载体管理机构)', '2025-11-17 00:00:00.000']]
+运营报告文档(q2): []
+[33597, 'JiuZhouTongABN2025-1', '九州通医药集团股份有限公司2025年度第一期资产支持票据']
+creating folder for 九州通医药集团股份有限公司2025年度第一期资产支持票据
+Listing directory: /Products/资产支持票据
+Found 1410 items in /Products/资产支持票据
+九州通医药集团股份有限公司2025年度第一期资产支持票据 already exists in /Products/资产支持票据 on FTP
+Listing directory: /增量文档
+Found 35 items in /增量文档
+12 already exists in /增量文档 on FTP
+Listing directory: /增量文档/12
+Found 39 items in /增量文档/12
+JiuZhouTongABN2025-1 already exists in /增量文档/12 on FTP
+Listing directory: /增量文档/12/JiuZhouTongABN2025-1
+Found 1 items in /增量文档/12/JiuZhouTongABN2025-1
+ProductReleaseInstructions already exists in /增量文档/12/JiuZhouTongABN2025-1 on FTP
+[3233248, '九州通医药集团股份有限公司2025年度第一期资产支持票据募集说明书', '2025-11-17 00:00:00.000']
+downloading file from url: https://www.chinamoney.com.cn/dqs/cm-s-notice-query/fileDownLoad.do?mode=open&contentId=3233248&priority=0
+Attempting to download without proxy first...
+Download successful without proxy
+✓ PDF下载成功: 九州通医药集团股份有限公司2025年度第一期资产支持票据募集说明书.pdf
+Listing directory: /Products/资产支持票据
+Found 1410 items in /Products/资产支持票据
+九州通医药集团股份有限公司2025年度第一期资产支持票据 already exists in /Products/资产支持票据 on FTP
+Listing directory: /Products/资产支持票据/九州通医药集团股份有限公司2025年度第一期资产支持票据
+Found 0 items in /Products/资产支持票据/九州通医药集团股份有限公司2025年度第一期资产支持票据
+Writing PDF to /Products/资产支持票据/九州通医药集团股份有限公司2025年度第一期资产支持票据/九州通医药集团股份有限公司2025年度第一期资产支持票据募集说明书.pdf =====>
+Listing directory: /增量文档
+Found 35 items in /增量文档
+12 already exists in /增量文档 on FTP
+Listing directory: /增量文档/12
+Found 39 items in /增量文档/12
+JiuZhouTongABN2025-1 already exists in /增量文档/12 on FTP
+Listing directory: /增量文档/12/JiuZhouTongABN2025-1
+Found 1 items in /增量文档/12/JiuZhouTongABN2025-1
+ProductReleaseInstructions already exists in /增量文档/12/JiuZhouTongABN2025-1 on FTP
+Listing directory: /增量文档/12/JiuZhouTongABN2025-1/ProductReleaseInstructions
+Found 0 items in /增量文档/12/JiuZhouTongABN2025-1/ProductReleaseInstructions
+Writing PDF to /增量文档/12/JiuZhouTongABN2025-1/ProductReleaseInstructions/九州通医药集团股份有限公司2025年度第一期资产支持票据募集说明书.pdf =====>
+[3233252, '九州通医药集团股份有限公司2025年度第一期资产支持票据发行方案(联席主承销商)', '2025-11-17 00:00:00.000']
+downloading file from url: https://www.chinamoney.com.cn/dqs/cm-s-notice-query/fileDownLoad.do?mode=open&contentId=3233252&priority=0
+Attempting to download without proxy first...
+Download successful without proxy
+✓ PDF下载成功: 九州通医药集团股份有限公司2025年度第一期资产支持票据发行方案(联席主承销商).pdf
+Listing directory: /Products/资产支持票据
+Found 1410 items in /Products/资产支持票据
+九州通医药集团股份有限公司2025年度第一期资产支持票据 already exists in /Products/资产支持票据 on FTP
+Listing directory: /Products/资产支持票据/九州通医药集团股份有限公司2025年度第一期资产支持票据
+Found 1 items in /Products/资产支持票据/九州通医药集团股份有限公司2025年度第一期资产支持票据
+Writing PDF to /Products/资产支持票据/九州通医药集团股份有限公司2025年度第一期资产支持票据/九州通医药集团股份有限公司2025年度第一期资产支持票据发行方案(联席主承销商).pdf =====>
+Listing directory: /增量文档
+Found 35 items in /增量文档
+12 already exists in /增量文档 on FTP
+Listing directory: /增量文档/12
+Found 39 items in /增量文档/12
+JiuZhouTongABN2025-1 already exists in /增量文档/12 on FTP
+Listing directory: /增量文档/12/JiuZhouTongABN2025-1
+Found 1 items in /增量文档/12/JiuZhouTongABN2025-1
+ProductReleaseInstructions already exists in /增量文档/12/JiuZhouTongABN2025-1 on FTP
+Listing directory: /增量文档/12/JiuZhouTongABN2025-1/ProductReleaseInstructions
+Found 1 items in /增量文档/12/JiuZhouTongABN2025-1/ProductReleaseInstructions
+Writing PDF to /增量文档/12/JiuZhouTongABN2025-1/ProductReleaseInstructions/九州通医药集团股份有限公司2025年度第一期资产支持票据发行方案(联席主承销商).pdf =====>
+[3233249, '九州通医药集团股份有限公司2025年度第一期资产支持票据发行方案及承诺函(发起机构)', '2025-11-17 00:00:00.000']
+downloading file from url: https://www.chinamoney.com.cn/dqs/cm-s-notice-query/fileDownLoad.do?mode=open&contentId=3233249&priority=0
+Attempting to download without proxy first...
+Download successful without proxy
+✓ PDF下载成功: 九州通医药集团股份有限公司2025年度第一期资产支持票据发行方案及承诺函(发起机构).pdf
+Listing directory: /Products/资产支持票据
+Found 1410 items in /Products/资产支持票据
+九州通医药集团股份有限公司2025年度第一期资产支持票据 already exists in /Products/资产支持票据 on FTP
+Listing directory: /Products/资产支持票据/九州通医药集团股份有限公司2025年度第一期资产支持票据
+Found 2 items in /Products/资产支持票据/九州通医药集团股份有限公司2025年度第一期资产支持票据
+Writing PDF to /Products/资产支持票据/九州通医药集团股份有限公司2025年度第一期资产支持票据/九州通医药集团股份有限公司2025年度第一期资产支持票据发行方案及承诺函(发起机构).pdf =====>
+Listing directory: /增量文档
+Found 35 items in /增量文档
+12 already exists in /增量文档 on FTP
+Listing directory: /增量文档/12
+Found 39 items in /增量文档/12
+JiuZhouTongABN2025-1 already exists in /增量文档/12 on FTP
+Listing directory: /增量文档/12/JiuZhouTongABN2025-1
+Found 1 items in /增量文档/12/JiuZhouTongABN2025-1
+ProductReleaseInstructions already exists in /增量文档/12/JiuZhouTongABN2025-1 on FTP
+Listing directory: /增量文档/12/JiuZhouTongABN2025-1/ProductReleaseInstructions
+Found 2 items in /增量文档/12/JiuZhouTongABN2025-1/ProductReleaseInstructions
+Writing PDF to /增量文档/12/JiuZhouTongABN2025-1/ProductReleaseInstructions/九州通医药集团股份有限公司2025年度第一期资产支持票据发行方案及承诺函(发起机构).pdf =====>
+[3233246, '九州通医药集团股份有限公司2025年度第一期资产支持票据发行方案及承诺函(簿记管理人)', '2025-11-17 00:00:00.000']
+downloading file from url: https://www.chinamoney.com.cn/dqs/cm-s-notice-query/fileDownLoad.do?mode=open&contentId=3233246&priority=0
+Attempting to download without proxy first...
+Download successful without proxy
+✓ PDF下载成功: 九州通医药集团股份有限公司2025年度第一期资产支持票据发行方案及承诺函(簿记管理人).pdf
+Listing directory: /Products/资产支持票据
+Found 1410 items in /Products/资产支持票据
+九州通医药集团股份有限公司2025年度第一期资产支持票据 already exists in /Products/资产支持票据 on FTP
+Listing directory: /Products/资产支持票据/九州通医药集团股份有限公司2025年度第一期资产支持票据
+Found 3 items in /Products/资产支持票据/九州通医药集团股份有限公司2025年度第一期资产支持票据
+Writing PDF to /Products/资产支持票据/九州通医药集团股份有限公司2025年度第一期资产支持票据/九州通医药集团股份有限公司2025年度第一期资产支持票据发行方案及承诺函(簿记管理人).pdf =====>
+Listing directory: /增量文档
+Found 35 items in /增量文档
+12 already exists in /增量文档 on FTP
+Listing directory: /增量文档/12
+Found 39 items in /增量文档/12
+JiuZhouTongABN2025-1 already exists in /增量文档/12 on FTP
+Listing directory: /增量文档/12/JiuZhouTongABN2025-1
+Found 1 items in /增量文档/12/JiuZhouTongABN2025-1
+ProductReleaseInstructions already exists in /增量文档/12/JiuZhouTongABN2025-1 on FTP
+Listing directory: /增量文档/12/JiuZhouTongABN2025-1/ProductReleaseInstructions
+Found 3 items in /增量文档/12/JiuZhouTongABN2025-1/ProductReleaseInstructions
+Writing PDF to /增量文档/12/JiuZhouTongABN2025-1/ProductReleaseInstructions/九州通医药集团股份有限公司2025年度第一期资产支持票据发行方案及承诺函(簿记管理人).pdf =====>
+[3233250, '九州通医药集团股份有限公司2025年度第一期资产支持票据发行方案及承诺函(发行载体管理机构)', '2025-11-17 00:00:00.000']
+downloading file from url: https://www.chinamoney.com.cn/dqs/cm-s-notice-query/fileDownLoad.do?mode=open&contentId=3233250&priority=0
+Attempting to download without proxy first...
+Download successful without proxy
+✓ PDF下载成功: 九州通医药集团股份有限公司2025年度第一期资产支持票据发行方案及承诺函(发行载体管理机构).pdf
+Listing directory: /Products/资产支持票据
+Found 1410 items in /Products/资产支持票据
+九州通医药集团股份有限公司2025年度第一期资产支持票据 already exists in /Products/资产支持票据 on FTP
+Listing directory: /Products/资产支持票据/九州通医药集团股份有限公司2025年度第一期资产支持票据
+Found 4 items in /Products/资产支持票据/九州通医药集团股份有限公司2025年度第一期资产支持票据
+Writing PDF to /Products/资产支持票据/九州通医药集团股份有限公司2025年度第一期资产支持票据/九州通医药集团股份有限公司2025年度第一期资产支持票据发行方案及承诺函(发行载体管理机构).pdf =====>
+Listing directory: /增量文档
+Found 35 items in /增量文档
+12 already exists in /增量文档 on FTP
+Listing directory: /增量文档/12
+Found 39 items in /增量文档/12
+JiuZhouTongABN2025-1 already exists in /增量文档/12 on FTP
+Listing directory: /增量文档/12/JiuZhouTongABN2025-1
+Found 1 items in /增量文档/12/JiuZhouTongABN2025-1
+ProductReleaseInstructions already exists in /增量文档/12/JiuZhouTongABN2025-1 on FTP
+Listing directory: /增量文档/12/JiuZhouTongABN2025-1/ProductReleaseInstructions
+Found 4 items in /增量文档/12/JiuZhouTongABN2025-1/ProductReleaseInstructions
+Writing PDF to /增量文档/12/JiuZhouTongABN2025-1/ProductReleaseInstructions/九州通医药集团股份有限公司2025年度第一期资产支持票据发行方案及承诺函(发行载体管理机构).pdf =====>
+Listing directory: /增量文档
+Found 11 items in /增量文档
+12 already exists in /增量文档 on FTP
+Listing directory: /增量文档/12
+Found 32 items in /增量文档/12
+JiuZhouTongABN2025-1 already exists in /增量文档/12 on FTP
+Listing directory: /DealViewer/TrustAssociatedDoc
+Found 5305 items in /DealViewer/TrustAssociatedDoc
+JiuZhouTongABN2025-1 already exists in /DealViewer/TrustAssociatedDoc on FTP
+Listing directory: /增量文档/12/JiuZhouTongABN2025-1
+Found 1 items in /增量文档/12/JiuZhouTongABN2025-1
+Creating directory: /DealViewer/TrustAssociatedDoc/JiuZhouTongABN2025-1/ProductReleaseInstructions
+Listing directory: /增量文档/12/JiuZhouTongABN2025-1/ProductReleaseInstructions
+Found 5 items in /增量文档/12/JiuZhouTongABN2025-1/ProductReleaseInstructions
+Transferring file: /增量文档/12/JiuZhouTongABN2025-1/ProductReleaseInstructions/九州通医药集团股份有限公司2025年度第一期资产支持票据募集说明书.pdf to /DealViewer/TrustAssociatedDoc/JiuZhouTongABN2025-1/ProductReleaseInstructions/九州通医药集团股份有限公司2025年度第一期资产支持票据募集说明书.pdf
+Transferring file: /增量文档/12/JiuZhouTongABN2025-1/ProductReleaseInstructions/九州通医药集团股份有限公司2025年度第一期资产支持票据发行方案(联席主承销商).pdf to /DealViewer/TrustAssociatedDoc/JiuZhouTongABN2025-1/ProductReleaseInstructions/九州通医药集团股份有限公司2025年度第一期资产支持票据发行方案(联席主承销商).pdf
+Transferring file: /增量文档/12/JiuZhouTongABN2025-1/ProductReleaseInstructions/九州通医药集团股份有限公司2025年度第一期资产支持票据发行方案及承诺函(发行载体管理机构).pdf to /DealViewer/TrustAssociatedDoc/JiuZhouTongABN2025-1/ProductReleaseInstructions/九州通医药集团股份有限公司2025年度第一期资产支持票据发行方案及承诺函(发行载体管理机构).pdf
+Transferring file: /增量文档/12/JiuZhouTongABN2025-1/ProductReleaseInstructions/九州通医药集团股份有限公司2025年度第一期资产支持票据发行方案及承诺函(发起机构).pdf to /DealViewer/TrustAssociatedDoc/JiuZhouTongABN2025-1/ProductReleaseInstructions/九州通医药集团股份有限公司2025年度第一期资产支持票据发行方案及承诺函(发起机构).pdf
+Transferring file: /增量文档/12/JiuZhouTongABN2025-1/ProductReleaseInstructions/九州通医药集团股份有限公司2025年度第一期资产支持票据发行方案及承诺函(簿记管理人).pdf to /DealViewer/TrustAssociatedDoc/JiuZhouTongABN2025-1/ProductReleaseInstructions/九州通医药集团股份有限公司2025年度第一期资产支持票据发行方案及承诺函(簿记管理人).pdf
+开始处理 5 个产品发行文档...
+  处理文档 1/5: 九州通医药集团股份有限公司2025年度第一期资产支持票据募集说明书
+insert into DV.TrustAssociatedDocument(Trustid,FileCategory,SubCategory,FilePath,FileName,FileType,Created,Creator) values(33597, 'ProductReleaseInstructions','NULL','DealViewer/TrustAssociatedDoc/JiuZhouTongABN2025-1/ProductReleaseInstructions/',N'九州通医药集团股份有限公司2025年度第一期资产支持票据募集说明书.pdf','pdf','2025-12-09 20:46:04','goldenstand')
+asd
+[3233248, '九州通医药集团股份有限公司2025年度第一期资产支持票据募集说明书', '2025-11-17 00:00:00.000']
+九州通医药集团股份有限公司2025年度第一期资产支持票据募集说明书
+asd
+insert into PortfolioManagement.dbo.DisclosureOfInformation values(33597, 'JiuZhouTongABN2025-1', N'九州通医药集团股份有限公司2025年度第一期资产支持票据募集说明书', '2025-12-09 20:46:04', 1)
+查询TrustDocumentID SQL: select TrustDocumentID from DV.TrustAssociatedDocument where filename=N'九州通医药集团股份有限公司2025年度第一期资产支持票据募集说明书.pdf'
+✓ 找到TrustDocumentID=81143
+插入ProductsStateInformation SQL: insert into TaskCollection.dbo.ProductsStateInformation(Trustid,TrustDocumentID,FileType,StateType) values(33597, 81143, 1, 9)
+✓ ProductsStateInformation插入成功: TrustDocumentID=81143
+single insert done
+    ✓ 包含'说明书'关键词
+  处理文档 2/5: 九州通医药集团股份有限公司2025年度第一期资产支持票据发行方案(联席主承销商)
+insert into DV.TrustAssociatedDocument(Trustid,FileCategory,SubCategory,FilePath,FileName,FileType,Created,Creator) values(33597, 'ProductReleaseInstructions','NULL','DealViewer/TrustAssociatedDoc/JiuZhouTongABN2025-1/ProductReleaseInstructions/',N'九州通医药集团股份有限公司2025年度第一期资产支持票据发行方案(联席主承销商).pdf','pdf','2025-12-09 20:46:05','goldenstand')
+asd
+[3233252, '九州通医药集团股份有限公司2025年度第一期资产支持票据发行方案(联席主承销商)', '2025-11-17 00:00:00.000']
+九州通医药集团股份有限公司2025年度第一期资产支持票据发行方案(联席主承销商)
+asd
+single insert done
+  处理文档 3/5: 九州通医药集团股份有限公司2025年度第一期资产支持票据发行方案及承诺函(发起机构)
+insert into DV.TrustAssociatedDocument(Trustid,FileCategory,SubCategory,FilePath,FileName,FileType,Created,Creator) values(33597, 'ProductReleaseInstructions','NULL','DealViewer/TrustAssociatedDoc/JiuZhouTongABN2025-1/ProductReleaseInstructions/',N'九州通医药集团股份有限公司2025年度第一期资产支持票据发行方案及承诺函(发起机构).pdf','pdf','2025-12-09 20:46:05','goldenstand')
+asd
+[3233249, '九州通医药集团股份有限公司2025年度第一期资产支持票据发行方案及承诺函(发起机构)', '2025-11-17 00:00:00.000']
+九州通医药集团股份有限公司2025年度第一期资产支持票据发行方案及承诺函(发起机构)
+asd
+single insert done
+  处理文档 4/5: 九州通医药集团股份有限公司2025年度第一期资产支持票据发行方案及承诺函(簿记管理人)
+insert into DV.TrustAssociatedDocument(Trustid,FileCategory,SubCategory,FilePath,FileName,FileType,Created,Creator) values(33597, 'ProductReleaseInstructions','NULL','DealViewer/TrustAssociatedDoc/JiuZhouTongABN2025-1/ProductReleaseInstructions/',N'九州通医药集团股份有限公司2025年度第一期资产支持票据发行方案及承诺函(簿记管理人).pdf','pdf','2025-12-09 20:46:06','goldenstand')
+asd
+[3233246, '九州通医药集团股份有限公司2025年度第一期资产支持票据发行方案及承诺函(簿记管理人)', '2025-11-17 00:00:00.000']
+九州通医药集团股份有限公司2025年度第一期资产支持票据发行方案及承诺函(簿记管理人)
+asd
+single insert done
+  处理文档 5/5: 九州通医药集团股份有限公司2025年度第一期资产支持票据发行方案及承诺函(发行载体管理机构)
+insert into DV.TrustAssociatedDocument(Trustid,FileCategory,SubCategory,FilePath,FileName,FileType,Created,Creator) values(33597, 'ProductReleaseInstructions','NULL','DealViewer/TrustAssociatedDoc/JiuZhouTongABN2025-1/ProductReleaseInstructions/',N'九州通医药集团股份有限公司2025年度第一期资产支持票据发行方案及承诺函(发行载体管理机构).pdf','pdf','2025-12-09 20:46:06','goldenstand')
+asd
+[3233250, '九州通医药集团股份有限公司2025年度第一期资产支持票据发行方案及承诺函(发行载体管理机构)', '2025-11-17 00:00:00.000']
+九州通医药集团股份有限公司2025年度第一期资产支持票据发行方案及承诺函(发行载体管理机构)
+asd
+single insert done
+✓ 其他类型产品: 九州通医药集团股份有限公司2025年度第一期资产支持票据
+
+================================================================================
+处理进度: 40/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58XxKcYCucHk0Jba1HEyu47PDRHoiNL%2FPrl%2Fw3hbWuWWjydkxX5jIHO6PJzjc4wqLOfQ%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58XxKcYCucHk0Jba1HEyu47PDRHoiNL%2FPrl%2Fw3hbWuWWjydkxX5jIHO6PJzjc4wqLOfQ%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+中国对外经济贸易信托有限公司2025年度拾穗丰润第四期定向资产支持票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'中国对外经济贸易信托有限公司2025年度拾穗丰润第四期定向资产支持票据'
+❌ 错误: 无法在数据库中找到产品 '中国对外经济贸易信托有限公司2025年度拾穗丰润第四期定向资产支持票据'
+可能原因: 1) 产品名称包含特殊字符 2) 插入失败但未报错 3) 事务未提交
+最近插入的5个产品:
+  TrustId=50148, TrustName=微众银行小微企业贷2021第五期财产权信托
+  TrustId=50147, TrustName=微众银行小微企业贷2021第四期财产权信托
+  TrustId=50146, TrustName=微众银行小微企业贷2021第六期财产权信托
+  TrustId=50145, TrustName=平安银行安悦2021年第一期财产权信托
+  TrustId=50144, TrustName=平安银行安如2021年第三期财产权信托
+⚠️ newProd返回None，跳过此产品
+
+================================================================================
+处理进度: 41/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X7ZuaewMR8hPnEj%2FaNZNg%2Bk%2FgbtZiO9sI2cBFB0ojn%2F10LUFTUjBqN92QBXcs%2BL%2BZQ%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X7ZuaewMR8hPnEj%2FaNZNg%2Bk%2FgbtZiO9sI2cBFB0ojn%2F10LUFTUjBqN92QBXcs%2BL%2BZQ%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+联易盛供应链服务(武汉)有限公司2025年度第一期定向资产支持票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'联易盛供应链服务(武汉)有限公司2025年度第一期定向资产支持票据'
+✓ 找到产品 TrustId=33592, TrustName=联易盛供应链服务(武汉)有限公司2025年度第一期定向资产支持票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 联易盛供应链服务(武汉)有限公司2025年度第一期定向资产支持票据
+
+================================================================================
+处理进度: 42/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X9f%2FDZCbPqaweX%2FTQm0Xs6Bmhpvm7dPx5mfJnoyNAmhrQ6qeamAf4fvFcATiBMhnkg%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X9f%2FDZCbPqaweX%2FTQm0Xs6Bmhpvm7dPx5mfJnoyNAmhrQ6qeamAf4fvFcATiBMhnkg%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+上海申能融资租赁有限公司2025年度申金泰丰第一期绿色定向资产支持商业票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'上海申能融资租赁有限公司2025年度申金泰丰第一期绿色定向资产支持商业票据'
+✓ 找到产品 TrustId=34345, TrustName=上海申能融资租赁有限公司2025年度申金泰丰第一期绿色定向资产支持商业票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 上海申能融资租赁有限公司2025年度申金泰丰第一期绿色定向资产支持商业票据
+
+================================================================================
+处理进度: 43/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X3hk8RoV0wsGCfm5PwL%2BxeEAcrI9ll%2B9HXnzjJOLd%2Bf%2BrQB5p9YaQQEWYcHK9HrerA%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X3hk8RoV0wsGCfm5PwL%2BxeEAcrI9ll%2B9HXnzjJOLd%2Bf%2BrQB5p9YaQQEWYcHK9HrerA%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+深圳能源集团股份有限公司2025年度新能源2号第二期绿色定向资产支持商业票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'深圳能源集团股份有限公司2025年度新能源2号第二期绿色定向资产支持商业票据'
+✓ 找到产品 TrustId=33605, TrustName=深圳能源集团股份有限公司2025年度新能源2号第二期绿色定向资产支持商业票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 深圳能源集团股份有限公司2025年度新能源2号第二期绿色定向资产支持商业票据
+
+================================================================================
+处理进度: 44/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X3wLbtJ2WF7D0w8fG9wKfphYKzIMiRHDOf77dSfMUj9rbx87DB9BwfTDFdMGrElFQQ%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X3wLbtJ2WF7D0w8fG9wKfphYKzIMiRHDOf77dSfMUj9rbx87DB9BwfTDFdMGrElFQQ%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+中国对外经济贸易信托有限公司2025年度奇信1号第二期定向资产支持票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'中国对外经济贸易信托有限公司2025年度奇信1号第二期定向资产支持票据'
+✓ 找到产品 TrustId=33613, TrustName=中国对外经济贸易信托有限公司2025年度奇信1号第二期定向资产支持票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 中国对外经济贸易信托有限公司2025年度奇信1号第二期定向资产支持票据
+
+================================================================================
+处理进度: 45/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X1%2Ff9idfhbWv8oSvbtww%2Fi2uzEn%2FDONhO4ChjOcxBwYz1kTmiMGNSvJjpN%2F%2BU1ghdg%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X1%2Ff9idfhbWv8oSvbtww%2Fi2uzEn%2FDONhO4ChjOcxBwYz1kTmiMGNSvJjpN%2F%2BU1ghdg%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+中信信托有限责任公司2025年度第一期五凌3号绿色定向资产支持票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'中信信托有限责任公司2025年度第一期五凌3号绿色定向资产支持票据'
+❌ 错误: 无法在数据库中找到产品 '中信信托有限责任公司2025年度第一期五凌3号绿色定向资产支持票据'
+可能原因: 1) 产品名称包含特殊字符 2) 插入失败但未报错 3) 事务未提交
+最近插入的5个产品:
+  TrustId=50148, TrustName=微众银行小微企业贷2021第五期财产权信托
+  TrustId=50147, TrustName=微众银行小微企业贷2021第四期财产权信托
+  TrustId=50146, TrustName=微众银行小微企业贷2021第六期财产权信托
+  TrustId=50145, TrustName=平安银行安悦2021年第一期财产权信托
+  TrustId=50144, TrustName=平安银行安如2021年第三期财产权信托
+⚠️ newProd返回None，跳过此产品
+
+================================================================================
+处理进度: 46/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X38xM65qu1bZv7ED9m5teRxoK19YFxGKbaqJnkT%2FBjZuCajbKlGCLCnUgitAZTJw3Q%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X38xM65qu1bZv7ED9m5teRxoK19YFxGKbaqJnkT%2FBjZuCajbKlGCLCnUgitAZTJw3Q%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+中信信托有限责任公司2025年度悦辰第十期定向资产支持票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'中信信托有限责任公司2025年度悦辰第十期定向资产支持票据'
+✓ 找到产品 TrustId=33629, TrustName=中信信托有限责任公司2025年度悦辰第十期定向资产支持票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 中信信托有限责任公司2025年度悦辰第十期定向资产支持票据
+
+================================================================================
+处理进度: 47/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X8FXvaIMhK1h03ErmJVKp60n3kqjGCq93tlZDhOGRqpPQ1scqk72FIZ4xr%2BYBVdd0Q%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X8FXvaIMhK1h03ErmJVKp60n3kqjGCq93tlZDhOGRqpPQ1scqk72FIZ4xr%2BYBVdd0Q%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+中国对外经济贸易信托有限公司2025年度惠满第五期定向资产支持票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'中国对外经济贸易信托有限公司2025年度惠满第五期定向资产支持票据'
+✓ 找到产品 TrustId=33642, TrustName=中国对外经济贸易信托有限公司2025年度惠满第五期定向资产支持票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 中国对外经济贸易信托有限公司2025年度惠满第五期定向资产支持票据
+
+================================================================================
+处理进度: 48/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X%2FegiwWLN1zKnLR3XH6xvcbBVScYywZa3kGnG0JUjr%2Bh33mnCLnM3umuCgP5WlB%2BQg%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X%2FegiwWLN1zKnLR3XH6xvcbBVScYywZa3kGnG0JUjr%2Bh33mnCLnM3umuCgP5WlB%2BQg%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+国升商业保理(深圳)有限公司2025年度山东城发第一期定向资产支持票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'国升商业保理(深圳)有限公司2025年度山东城发第一期定向资产支持票据'
+✓ 找到产品 TrustId=33641, TrustName=国升商业保理(深圳)有限公司2025年度山东城发第一期定向资产支持票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 国升商业保理(深圳)有限公司2025年度山东城发第一期定向资产支持票据
+
+================================================================================
+处理进度: 49/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X26N3PZJhVm3UKU5Eq9w7Iu1c1cLjZrII9rEZFqVSdgQtXOaeJ75L5HD3MDhlgdATg%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X26N3PZJhVm3UKU5Eq9w7Iu1c1cLjZrII9rEZFqVSdgQtXOaeJ75L5HD3MDhlgdATg%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+天津泰达环保有限公司2025年度第一期绿色定向资产支持票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'天津泰达环保有限公司2025年度第一期绿色定向资产支持票据'
+❌ 错误: 无法在数据库中找到产品 '天津泰达环保有限公司2025年度第一期绿色定向资产支持票据'
+可能原因: 1) 产品名称包含特殊字符 2) 插入失败但未报错 3) 事务未提交
+最近插入的5个产品:
+  TrustId=50148, TrustName=微众银行小微企业贷2021第五期财产权信托
+  TrustId=50147, TrustName=微众银行小微企业贷2021第四期财产权信托
+  TrustId=50146, TrustName=微众银行小微企业贷2021第六期财产权信托
+  TrustId=50145, TrustName=平安银行安悦2021年第一期财产权信托
+  TrustId=50144, TrustName=平安银行安如2021年第三期财产权信托
+⚠️ newProd返回None，跳过此产品
+
+================================================================================
+处理进度: 50/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X%2BSg9tYPyRfddpAn9xxuNX2O%2FjX7koo6z420kqoBQkC9Qj546byDKrfVbE6hJAos4A%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X%2BSg9tYPyRfddpAn9xxuNX2O%2FjX7koo6z420kqoBQkC9Qj546byDKrfVbE6hJAos4A%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+华鑫国际信托有限公司2025年度惠创第三期定向资产支持票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'华鑫国际信托有限公司2025年度惠创第三期定向资产支持票据'
+✓ 找到产品 TrustId=33646, TrustName=华鑫国际信托有限公司2025年度惠创第三期定向资产支持票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 华鑫国际信托有限公司2025年度惠创第三期定向资产支持票据
+
+================================================================================
+处理进度: 51/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X3DbkyRhIc1jp7CgF1V%2BxWUMWIDjkxG9pJdzVbAzfZQiE4AWDwKePuh1NnNk%2BRYXVw%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X3DbkyRhIc1jp7CgF1V%2BxWUMWIDjkxG9pJdzVbAzfZQiE4AWDwKePuh1NnNk%2BRYXVw%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+重庆美团三快小额贷款有限公司2025年度美玥第三期定向资产支持票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'重庆美团三快小额贷款有限公司2025年度美玥第三期定向资产支持票据'
+✓ 找到产品 TrustId=33647, TrustName=重庆美团三快小额贷款有限公司2025年度美玥第三期定向资产支持票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 重庆美团三快小额贷款有限公司2025年度美玥第三期定向资产支持票据
+
+================================================================================
+处理进度: 52/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X3uqQt%2Bbj8b8btmxFcBm5Vvf2UizdEWcBbbMlxk7iOsu0tysJsP1b%2F%2Burwne2RNpxQ%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X3uqQt%2Bbj8b8btmxFcBm5Vvf2UizdEWcBbbMlxk7iOsu0tysJsP1b%2F%2Burwne2RNpxQ%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+君创国际融资租赁有限公司2025年度第四期君惠融助力民营企业定向资产支持票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'君创国际融资租赁有限公司2025年度第四期君惠融助力民营企业定向资产支持票据'
+❌ 错误: 无法在数据库中找到产品 '君创国际融资租赁有限公司2025年度第四期君惠融助力民营企业定向资产支持票据'
+可能原因: 1) 产品名称包含特殊字符 2) 插入失败但未报错 3) 事务未提交
+最近插入的5个产品:
+  TrustId=50148, TrustName=微众银行小微企业贷2021第五期财产权信托
+  TrustId=50147, TrustName=微众银行小微企业贷2021第四期财产权信托
+  TrustId=50146, TrustName=微众银行小微企业贷2021第六期财产权信托
+  TrustId=50145, TrustName=平安银行安悦2021年第一期财产权信托
+  TrustId=50144, TrustName=平安银行安如2021年第三期财产权信托
+⚠️ newProd返回None，跳过此产品
+
+================================================================================
+处理进度: 53/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X9rSWO9tcppcYiAfQ8VW9N9Cv%2BfAFhC56ViypFilrF79XgEexeIJRSdamWBVz5e2uQ%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X9rSWO9tcppcYiAfQ8VW9N9Cv%2BfAFhC56ViypFilrF79XgEexeIJRSdamWBVz5e2uQ%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+国家电力投资集团有限公司2025年度新能源4号第四期绿色定向资产支持商业票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'国家电力投资集团有限公司2025年度新能源4号第四期绿色定向资产支持商业票据'
+✓ 找到产品 TrustId=34346, TrustName=国家电力投资集团有限公司2025年度新能源4号第四期绿色定向资产支持商业票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 国家电力投资集团有限公司2025年度新能源4号第四期绿色定向资产支持商业票据
+
+================================================================================
+处理进度: 54/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58Xy2LyOnvvbyouPoIhgnLmAtC6Yefn5%2BY9svJDVoONlXI5WHK0LiYlgZPUil%2BzMygVA%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58Xy2LyOnvvbyouPoIhgnLmAtC6Yefn5%2BY9svJDVoONlXI5WHK0LiYlgZPUil%2BzMygVA%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+厦门建发股份有限公司2025年度第一期应收账款定向资产支持票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'厦门建发股份有限公司2025年度第一期应收账款定向资产支持票据'
+✓ 找到产品 TrustId=33657, TrustName=厦门建发股份有限公司2025年度第一期应收账款定向资产支持票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 厦门建发股份有限公司2025年度第一期应收账款定向资产支持票据
+
+================================================================================
+处理进度: 55/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X9tM91XZZuG%2B6%2FnFi86q5JKia5wi0SnqTHCgmD%2F2OuKQI%2BUAAOaxeoJq2otEbXxnPA%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X9tM91XZZuG%2B6%2FnFi86q5JKia5wi0SnqTHCgmD%2F2OuKQI%2BUAAOaxeoJq2otEbXxnPA%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+中交一公局集团有限公司2025年度7号第一期定向资产支持商业票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'中交一公局集团有限公司2025年度7号第一期定向资产支持商业票据'
+✓ 找到产品 TrustId=33658, TrustName=中交一公局集团有限公司2025年度7号第一期定向资产支持商业票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 中交一公局集团有限公司2025年度7号第一期定向资产支持商业票据
+
+================================================================================
+处理进度: 56/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X4e7Mddm3Wy60PcYUB3nsT%2FSY5XJJYWmbKbSS1onaZYM5TKCuM2DRp3vuAgM8aryGA%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X4e7Mddm3Wy60PcYUB3nsT%2FSY5XJJYWmbKbSS1onaZYM5TKCuM2DRp3vuAgM8aryGA%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+和赢商业保理(深圳)有限公司2025年度第二期易鑫应收账款定向资产支持票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'和赢商业保理(深圳)有限公司2025年度第二期易鑫应收账款定向资产支持票据'
+❌ 错误: 无法在数据库中找到产品 '和赢商业保理(深圳)有限公司2025年度第二期易鑫应收账款定向资产支持票据'
+可能原因: 1) 产品名称包含特殊字符 2) 插入失败但未报错 3) 事务未提交
+最近插入的5个产品:
+  TrustId=50148, TrustName=微众银行小微企业贷2021第五期财产权信托
+  TrustId=50147, TrustName=微众银行小微企业贷2021第四期财产权信托
+  TrustId=50146, TrustName=微众银行小微企业贷2021第六期财产权信托
+  TrustId=50145, TrustName=平安银行安悦2021年第一期财产权信托
+  TrustId=50144, TrustName=平安银行安如2021年第三期财产权信托
+⚠️ newProd返回None，跳过此产品
+
+================================================================================
+处理进度: 57/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X6jRJWA4pbpSgDleZSt6XyixkTnHWNI6afOjyI76F8ttrk46TVRAeQZHbb86PuPxgA%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X6jRJWA4pbpSgDleZSt6XyixkTnHWNI6afOjyI76F8ttrk46TVRAeQZHbb86PuPxgA%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+京能国际能源发展(北京)有限公司2025年度4号第一期绿色定向资产支持商业票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'京能国际能源发展(北京)有限公司2025年度4号第一期绿色定向资产支持商业票据'
+✓ 找到产品 TrustId=33667, TrustName=京能国际能源发展(北京)有限公司2025年度4号第一期绿色定向资产支持商业票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 京能国际能源发展(北京)有限公司2025年度4号第一期绿色定向资产支持商业票据
+
+================================================================================
+处理进度: 58/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X%2BTtXMBhBV2VfQSoxWGxN9wkWzuQJP4SA7XTn7mA0bJF3GUf5os%2BAbbWy83xX0QzGg%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X%2BTtXMBhBV2VfQSoxWGxN9wkWzuQJP4SA7XTn7mA0bJF3GUf5os%2BAbbWy83xX0QzGg%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+象屿保理2025年度第二期供应链定向资产支持票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'象屿保理2025年度第二期供应链定向资产支持票据'
+✓ 找到产品 TrustId=33668, TrustName=象屿保理2025年度第二期供应链定向资产支持票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 象屿保理2025年度第二期供应链定向资产支持票据
+
+================================================================================
+处理进度: 59/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58XwjBWTHPl0xgIdyxGs3wnpkqhd7vSPWk1w%2BNbX%2FryQJlZpkMNlDYAiJ2I0E1Xu4AIA%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58XwjBWTHPl0xgIdyxGs3wnpkqhd7vSPWk1w%2BNbX%2FryQJlZpkMNlDYAiJ2I0E1Xu4AIA%3D%3D
+发行类型: 银行间市场投资人 -> PublicOffering
+南京交通产业集团有限责任公司2025年度第一期绿色资产支持票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'南京交通产业集团有限责任公司2025年度第一期绿色资产支持票据'
+✓ 找到产品 TrustId=33422, TrustName=南京交通产业集团有限责任公司2025年度第一期绿色资产支持票据
+✓ 公开发行产品，开始处理文档...
+getting file list for 南京交通产业集团有限责任公司2025年度第一期绿色资产支持票据
+Attempting to get token without proxy...
+Response status: 200
+data = {'sign': 'Q/d8solfMh3GOoMI5WmGUaZA1ukiCpO5sMwap9ByMZnt4tsJZeSkX6Wq1v3lRrKsnQLcWdAPun00\nLsYa5AtcTZpCs2CvuKf8xTKL5JKkAphGIIEbpsADAhjeg2dCZIBVMUOFd2LaiLvRLJLML9AfJTc/\nI44XV2MvFkyyEBuTLsA=\n', 'UT': 'jqcAPLVAXGTLMYY9/WWauO1Yyz/MTelGh0pIv+xGyVPzbKwy3QYxwWgh9iFqTU1pbmfJ8oRY/zAB\nXacJ2y/V0J5VxYkdT2LkJa3d1CtcWFc5YWNgTagmdGzVJkrZXU5B1cXea/VVeGrKpqErcpIFIcct\n+e4HGAkvBXex7SM2vPw=\n'}
+获取Cookie: {'AlteonP10': 'CU5Weiw/F6xNyjY3s+SbXw$$'}
+Attempting to fetch file list without proxy...
+rs.status = 200
+搜索结果总数: 8
+pageItems数量: 8
+有效PDF文档数: 8
+产品发行文档(q1): [[3222682, '南京交通产业集团有限责任公司2025年度第一期绿色资产支持票据优先级发行情况公告', '2025-10-30 00:00:00.000'], [3222684, '南京交通产业集团有限责任公司2025年度第一期绿色资产支持票据次级发行情况公告', '2025-10-30 00:00:00.000'], [3217308, '南京交通产业集团有限责任公司2025年度第一期绿色资产支持票据发行方案及承诺函', '2025-10-24 00:00:00.000'], [3217304, '南京交通产业集团有限责任公司2025年度第一期绿色资产支持票据募集说明书', '2025-10-24 00:00:00.000']]
+运营报告文档(q2): []
+[33422, 'NanJingJiaoTongABN2025-1', '南京交通产业集团有限责任公司2025年度第一期绿色资产支持票据']
+creating folder for 南京交通产业集团有限责任公司2025年度第一期绿色资产支持票据
+Listing directory: /Products/资产支持票据
+Found 1410 items in /Products/资产支持票据
+南京交通产业集团有限责任公司2025年度第一期绿色资产支持票据 already exists in /Products/资产支持票据 on FTP
+Listing directory: /增量文档
+Found 35 items in /增量文档
+12 already exists in /增量文档 on FTP
+Listing directory: /增量文档/12
+Found 39 items in /增量文档/12
+NanJingJiaoTongABN2025-1 already exists in /增量文档/12 on FTP
+Listing directory: /增量文档/12/NanJingJiaoTongABN2025-1
+Found 1 items in /增量文档/12/NanJingJiaoTongABN2025-1
+ProductReleaseInstructions already exists in /增量文档/12/NanJingJiaoTongABN2025-1 on FTP
+[3222682, '南京交通产业集团有限责任公司2025年度第一期绿色资产支持票据优先级发行情况公告', '2025-10-30 00:00:00.000']
+downloading file from url: https://www.chinamoney.com.cn/dqs/cm-s-notice-query/fileDownLoad.do?mode=open&contentId=3222682&priority=0
+Attempting to download without proxy first...
+Download successful without proxy
+✓ PDF下载成功: 南京交通产业集团有限责任公司2025年度第一期绿色资产支持票据优先级发行情况公告.pdf
+Listing directory: /Products/资产支持票据
+Found 1410 items in /Products/资产支持票据
+南京交通产业集团有限责任公司2025年度第一期绿色资产支持票据 already exists in /Products/资产支持票据 on FTP
+Listing directory: /Products/资产支持票据/南京交通产业集团有限责任公司2025年度第一期绿色资产支持票据
+Found 0 items in /Products/资产支持票据/南京交通产业集团有限责任公司2025年度第一期绿色资产支持票据
+Writing PDF to /Products/资产支持票据/南京交通产业集团有限责任公司2025年度第一期绿色资产支持票据/南京交通产业集团有限责任公司2025年度第一期绿色资产支持票据优先级发行情况公告.pdf =====>
+Listing directory: /增量文档
+Found 35 items in /增量文档
+12 already exists in /增量文档 on FTP
+Listing directory: /增量文档/12
+Found 39 items in /增量文档/12
+NanJingJiaoTongABN2025-1 already exists in /增量文档/12 on FTP
+Listing directory: /增量文档/12/NanJingJiaoTongABN2025-1
+Found 1 items in /增量文档/12/NanJingJiaoTongABN2025-1
+ProductReleaseInstructions already exists in /增量文档/12/NanJingJiaoTongABN2025-1 on FTP
+Listing directory: /增量文档/12/NanJingJiaoTongABN2025-1/ProductReleaseInstructions
+Found 0 items in /增量文档/12/NanJingJiaoTongABN2025-1/ProductReleaseInstructions
+Writing PDF to /增量文档/12/NanJingJiaoTongABN2025-1/ProductReleaseInstructions/南京交通产业集团有限责任公司2025年度第一期绿色资产支持票据优先级发行情况公告.pdf =====>
+[3222684, '南京交通产业集团有限责任公司2025年度第一期绿色资产支持票据次级发行情况公告', '2025-10-30 00:00:00.000']
+downloading file from url: https://www.chinamoney.com.cn/dqs/cm-s-notice-query/fileDownLoad.do?mode=open&contentId=3222684&priority=0
+Attempting to download without proxy first...
+Download successful without proxy
+✓ PDF下载成功: 南京交通产业集团有限责任公司2025年度第一期绿色资产支持票据次级发行情况公告.pdf
+Listing directory: /Products/资产支持票据
+Error listing directory: 200 OK
+Found 0 items in /Products/资产支持票据
+create new folder:  /Products/资产支持票据/南京交通产业集团有限责任公司2025年度第一期绿色资产支持票据
+❌ 处理产品时出错: 550 Directory already exists
+Traceback (most recent call last):
+  File "/root/deal_viewer/ABSDaily/ABS/dome1/ABN2025_products_new.py", line 1820, in <module>
+    res = newProd(url_path)
+  File "/root/deal_viewer/ABSDaily/ABS/dome1/ABN2025_products_new.py", line 1675, in newProd
+    upload_114(product_name, q1, q2)
+  File "/root/deal_viewer/ABSDaily/ABS/dome1/ABN2025_products_new.py", line 1459, in upload_114
+    crawl_pdf(product_name, i, 1)
+  File "/root/deal_viewer/ABSDaily/ABS/dome1/ABN2025_products_new.py", line 1379, in crawl_pdf
+    ftp_folder = create_dir_on_ftp(ftp, "/Products/资产支持票据", product_name[2])
+  File "/root/deal_viewer/ABSDaily/ABS/dome1/ABN2025_products_new.py", line 359, in create_dir_on_ftp
+    ftp.mkd(folder_path)
+  File "/usr/lib/python3.10/ftplib.py", line 637, in mkd
+    resp = self.voidcmd('MKD ' + dirname)
+  File "/usr/lib/python3.10/ftplib.py", line 286, in voidcmd
+    return self.voidresp()
+  File "/usr/lib/python3.10/ftplib.py", line 259, in voidresp
+    resp = self.getresp()
+  File "/usr/lib/python3.10/ftplib.py", line 254, in getresp
+    raise error_perm(resp)
+ftplib.error_perm: 550 Directory already exists
+继续处理下一个产品...
+
+================================================================================
+处理进度: 60/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X0p%2BAIj2eRemmHuY%2FrZaI3fwENeIRlNZbUhBZT%2BtOFLp8CN9Pt8DlCQThNHe%2FhdAtA%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X0p%2BAIj2eRemmHuY%2FrZaI3fwENeIRlNZbUhBZT%2BtOFLp8CN9Pt8DlCQThNHe%2FhdAtA%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+中国对外经济贸易信托有限公司2025年度惠满第四期定向资产支持票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'中国对外经济贸易信托有限公司2025年度惠满第四期定向资产支持票据'
+✓ 找到产品 TrustId=33677, TrustName=中国对外经济贸易信托有限公司2025年度惠满第四期定向资产支持票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 中国对外经济贸易信托有限公司2025年度惠满第四期定向资产支持票据
+
+================================================================================
+处理进度: 61/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X07Kw%2BKLJvq2j5KeMixg6sHAiKmbWieTM7lLn176FofHiVqwb9k%2Fz53pT4hVhgfgog%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X07Kw%2BKLJvq2j5KeMixg6sHAiKmbWieTM7lLn176FofHiVqwb9k%2Fz53pT4hVhgfgog%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+深圳前海联易融商业保理有限公司2025年度第三期招信供应链定向资产支持票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'深圳前海联易融商业保理有限公司2025年度第三期招信供应链定向资产支持票据'
+✓ 找到产品 TrustId=33415, TrustName=深圳前海联易融商业保理有限公司2025年度第三期招信供应链定向资产支持票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 深圳前海联易融商业保理有限公司2025年度第三期招信供应链定向资产支持票据
+
+================================================================================
+处理进度: 62/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58XwGk5zSn9gtysG6iq02mvM%2FYf4USxvrEPng2m4bOY%2BfyYL0ruN7QEgKH5fmMgPmuFQ%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58XwGk5zSn9gtysG6iq02mvM%2FYf4USxvrEPng2m4bOY%2BfyYL0ruN7QEgKH5fmMgPmuFQ%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+浙江能源租赁2025年度浙融绿金1号第二期绿色定向资产支持商业票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'浙江能源租赁2025年度浙融绿金1号第二期绿色定向资产支持商业票据'
+✓ 找到产品 TrustId=33416, TrustName=浙江能源租赁2025年度浙融绿金1号第二期绿色定向资产支持商业票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 浙江能源租赁2025年度浙融绿金1号第二期绿色定向资产支持商业票据
+
+================================================================================
+处理进度: 63/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X7YX78FFVUFvgP5rwe%2BAcQ9hQv8if1lSFB8XjEjKJ5nw3Ikipg1w845%2BxXI41muClw%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58X7YX78FFVUFvgP5rwe%2BAcQ9hQv8if1lSFB8XjEjKJ5nw3Ikipg1w845%2BxXI41muClw%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+北京京东世纪贸易有限公司2025年度东裕5号仲裕京东白条第一期定向资产支持商业票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'北京京东世纪贸易有限公司2025年度东裕5号仲裕京东白条第一期定向资产支持商业票据'
+✓ 找到产品 TrustId=33417, TrustName=北京京东世纪贸易有限公司2025年度东裕5号仲裕京东白条第一期定向资产支持商业票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 北京京东世纪贸易有限公司2025年度东裕5号仲裕京东白条第一期定向资产支持商业票据
+
+================================================================================
+处理进度: 64/64
+================================================================================
+处理URL: /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58XzejfQqzUEIlRLOH2pdhrtAzYnNkSgYG5ltkT%2BP42fqI1b%2B47aV6qgoDVtMuamgCLg%3D%3D
+newProd process /dqs/rest/cm-s-security/dealPath?path=Jnw5ofpjlbE%3DuZ9TuHgZHBAAf1R6YB58XzejfQqzUEIlRLOH2pdhrtAzYnNkSgYG5ltkT%2BP42fqI1b%2B47aV6qgoDVtMuamgCLg%3D%3D
+发行类型: 定向投资人 -> PrivateEquity
+华鑫国际信托有限公司2025年度惠铭第八期定向资产支持票据 数据库已存在
+查询TrustId SQL: select TrustId from TrustManagement.Trust where TrustName = N'华鑫国际信托有限公司2025年度惠铭第八期定向资产支持票据'
+✓ 找到产品 TrustId=33418, TrustName=华鑫国际信托有限公司2025年度惠铭第八期定向资产支持票据
+⊗ 非公开发行产品，跳过文档处理
+✓ 其他类型产品: 华鑫国际信托有限公司2025年度惠铭第八期定向资产支持票据
+
+================================================================================
+更新时间戳到FTP
+================================================================================
+上次时间: 2025-01-01 16:00:00
+本次时间: 2025-12-09 16:00:00
+Writing latest date time 2025-12-09 16:00:00 to /Products_log/更新时间TXT记录/ABN更新时间sms.txt
+✓ 时间戳更新成功！
+
+================================================================================
+✅ 脚本执行完成！
+================================================================================
+处理了 64 个URL
+公募产品: 0, 私募产品: 0, 其他: 54
+================================================================================

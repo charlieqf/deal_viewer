@@ -426,7 +426,9 @@ def update_pdf_new(products):
 
                         # 上传到增量文档 INCREMENT_FOLDER_PATH
                         increment_foler_path = create_dir_on_ftp(ftp, month_folder_path, product_folder)
+                        print("created folder path:", increment_foler_path) 
                         increment_pdf_path = create_dir_on_ftp(ftp, increment_foler_path, pdf_file_name)
+                        print("created pdf path:", increment_pdf_path) 
 
                         print("Uploading PDF to", increment_pdf_path)
                         upload_file_to_ftp(
@@ -439,10 +441,12 @@ def update_pdf_new(products):
 
                         # look for trust_code.txt in the product folder on the FTP server
                         files = list_ftp_directory_with_retry(ftp, product_folder_path)
+                        print("listed files from", product_folder_path)
 
                         for file in files:
                             if ".txt" in file:
                                 trust_code = file.split(".")[0]
+                                print("extracted trust_code", trust_code, "from file", file)
 
                                 ftp_folder_path = create_dir_on_ftp(
                                     ftp2, DV_FOLDER_PATH, trust_code
@@ -700,21 +704,25 @@ def upload_file(
 
 # TrustAssociatedDocument表插入记录(DV页面显示)
 def insert_db_record(trust_code, sqlfilepath, filename):
+    print("insert_db_record)", trust_code, sqlfilepath, filename)
     b1 = conn.cursor()
     try:
         sql = "select Trustid from DV.view_Products where TrustCode='{}'".format(
             trust_code
         )
+        print(sql)
         b1.execute(sql)
         trust_id = b1.fetchone()[0]
 
         sql = f"select count(1) from DV.TrustAssociatedDocument where Trustid={trust_id} and FileName=N'{filename}'"
+        print(sql)
         b1.execute(sql)
 
         if b1.fetchone()[0] == 0:
             sql = "insert into DV.TrustAssociatedDocument(Trustid,FileCategory,SubCategory,FilePath,FileName,FileType,Created,Creator) values({},'AnnouncementOfResults','NULL','{}',N'{}','pdf',GETDATE(),'py')".format(
                 trust_id, sqlfilepath, filename
             )
+            print(sql)
 
             b1.execute(sql)
             conn.commit()

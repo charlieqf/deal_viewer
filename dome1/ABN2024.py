@@ -18,6 +18,8 @@ import chardet
 import threading
 import io
 from dateutil.parser import parse
+import socket
+socket.setdefaulttimeout(600)
 
 # FTP server details
 FTP_HOST = "113.125.202.171"
@@ -166,6 +168,8 @@ def upload_file_to_ftp(ftp, local_file_path, ftp_folder, ftp_file_path, file_nam
 ftp = ftplib.FTP()
 ftp.connect(FTP_HOST, FTP_PORT, timeout=600)
 ftp.login(FTP_USER, FTP_PASS)
+ftp.set_pasv(True)
+# ftp.set_debuglevel(2)
 # ftp.cwd(FTP_HOME_DIR)
 
 
@@ -173,6 +177,8 @@ ftp.login(FTP_USER, FTP_PASS)
 ftp2 = ftplib.FTP()
 ftp2.connect(FTP2_HOST, FTP2_PORT, timeout=600)
 ftp2.login(FTP2_USER, FTP2_PASS)
+ftp2.set_pasv(True)
+# ftp2.set_debuglevel(2)
 enable_utf8(ftp2)
 ftp2.encoding = "utf-8"
 
@@ -520,7 +526,7 @@ def get_html(timestamp):
 
     latestUpdateTime = datetime.strptime('2024-03-01', '%Y-%m-%d')
 
-    for pageIndex in range(12, 16):
+    for pageIndex in range(1, 20):
         print("fetching page", pageIndex)
         params['pageIndex'] = str(pageIndex)
         r = requests.post(baseurl, data=params, headers=headers, verify=False)
@@ -1024,7 +1030,7 @@ def upload_114(product_name, q1, q2):
     #     crawl_pdf(product_name, i, 1)
 
 def newProd(url):
-    print('process', url)
+    print('newProd process', url)
     df = pd.DataFrame()
     url = 'https://www.chinamoney.com.cn' + url
 
@@ -1372,7 +1378,7 @@ def get_url_list1(timestamp):
     # print("status code:", rs.status_code, "status text:", rs.text)
     latestUpdateTime = datetime.strptime('2023-01-01', '%Y-%m-%d')
 
-    for pageIndex in range(5, 11):
+    for pageIndex in range(1, 20):
         query_url = 'https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query'
         url_data = {'sort': 'date',
                     'text': '运营报告',
@@ -1421,6 +1427,8 @@ def get_url_list1(timestamp):
             release_date_ts = int(i['releaseDate']) / 1000
             release_date = datetime.fromtimestamp(release_date_ts)
 
+            print("release_date:", release_date, ", timestamp:", parse(timestamp))
+
             if release_date > parse(timestamp):
                 title = i['title'].replace("<font color='red'>", '').replace('</font>', '')
 
@@ -1431,8 +1439,8 @@ def get_url_list1(timestamp):
 
                 done_file_path = os.path.join(cache_folder, title + '.done')
 
-                # if os.path.exists(done_file_path):
-                #     continue
+                if os.path.exists(done_file_path):
+                    continue
 
                 prod = title.split('票据')[0] + '票据'
                 if '《' in prod:
@@ -1440,10 +1448,13 @@ def get_url_list1(timestamp):
                 sub_title = title.split('票据')[1]
                 if '年度' not in sub_title and '第' in sub_title and '期' in sub_title:
                     sql = "select trustid,trustcode from TrustManagement.Trust where trustname = N'{}'".format(prod)
+                    print(sql)
                     cur.execute(sql)
                     res = cur.fetchone()
                     if res:
-                        sqlQ = "select 1 from DV.TrustAssociatedDocument where filename = N'{}'".format(title)
+                        sqlQ = "select 1 from DV.TrustAssociatedDocument where filename = N'{}.pdf'".format(title)
+                        print(sqlQ)
+
                         cur.execute(sqlQ)
                         resQ = cur.fetchone()
                         if resQ:
@@ -1475,8 +1486,9 @@ def get_url_list1(timestamp):
                         # 插入三张表的记录
                         if '关于' in title or '更新' in title or '更正' in title:
                             updateFile.append(title)
-                        elif not checkDate(tid):
-                            updateFile.append(title)
+                        # elif not checkDate(tid):
+                        #     print("updateFile.append(", title, ")")
+                        #     updateFile.append(title)
                         else:
                             insertDB(tid, product_code, title)
                             print(prod, title, ' 114增量处理完毕')
@@ -1505,6 +1517,7 @@ def checkDate(id):
     cur.execute(sql)
     res = cur.fetchone()[0]
     if res and datetime.now() < res:
+        print(datetime.now(), "<", res)
         return False
     return True
 
@@ -1517,12 +1530,15 @@ def insertDB(id, code, filename):
            " ({}	,'{}',N'{}',	getdate(),	2)".format(id, code, filename)
     try:
         cur = conn.cursor()
+        print(sql1)
         cur.execute(sql1)
+        print(sql2)
         cur.execute(sql2)
         cur.execute("select trustdocumentid from DV.TrustAssociatedDocument where filename=N'{}.pdf'".format(filename))
         tid = cur.fetchone()[0]
         sql3 = "insert into TaskCollection.dbo.ProductsStateInformation(Trustid,TrustDocumentID,FileType,StateType)" \
                " values ({},{},2,9)".format(id, tid)
+        print(sql3)
         cur.execute(sql3)
         conn.commit()
     except:
@@ -1549,6 +1565,8 @@ def upload_file(path, file_name, session, target_dir=None, callback=None):
 
 
 def crawl_pdf1(product_name, product_code, filename, fid):
+    print("crawl_pdf1", product_name, product_code, filename, fid)
+
     pdf_file_name = filename + '.pdf'
     cache_pdf_path = os.path.join(cache_folder, pdf_file_name)
 
@@ -1556,7 +1574,7 @@ def crawl_pdf1(product_name, product_code, filename, fid):
 
     # if 'product_title.success' in cache folder, skip
     if os.path.exists(success_file_path):
-        #print(product["title"], "already processed")
+        print(success_file_path, "exists, skip")
         return
 
     file_exists = os.path.exists(cache_pdf_path)
@@ -1586,12 +1604,14 @@ def crawl_pdf1(product_name, product_code, filename, fid):
         ftp_folder = create_dir_on_ftp(ftp, '/Products/资产支持票据', product_name)
         ftp_file_path = os.path.join(ftp_folder, pdf_file_name)
 
+        print("uploading file to ftp:", ftp_file_path)
         upload_file_to_ftp(ftp, cache_pdf_path, ftp_folder, ftp_file_path, pdf_file_name)
 
         folder = create_dir_on_ftp(ftp, '/增量文档', month)
         folder = create_dir_on_ftp(ftp, folder, product_code)
         ftp_folder = create_dir_on_ftp(ftp, folder, 'TrusteeReport')
         ftp_file_path = os.path.join(ftp_folder, pdf_file_name)
+        print("uploading file to ftp:", ftp_file_path)
         upload_file_to_ftp(ftp, cache_pdf_path, ftp_folder, ftp_file_path, pdf_file_name)
 
         # with open(r'\\172.16.7.114\/Products/资产支持票据\{}\{}.pdf'.format(product_name, filename), 'wb') as f:
@@ -1698,6 +1718,8 @@ if __name__ == '__main__':
     #     timestamp = int(f.read())
     # print(timestamp)
 
+    '''
+    
     firstTimestamp, urls = get_html(timestamp)
     
     # with open('abn_urls.txt', 'r') as f:
@@ -1738,6 +1760,8 @@ if __name__ == '__main__':
     # if urls:
     #     with open(r'E:\脚本\ABN每周跑批入库\lastTime_sms.txt', 'w') as f:
     #         f.write(str(firstTimestamp))
+    
+    '''
     
     # yybg
     timestamp = read_ftp_file(ftp, UPDATE_LOG_PATH_YYBG)

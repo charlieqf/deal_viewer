@@ -238,6 +238,7 @@ def use_selenium(proxies):
     response_data = response.json()
 
     products = []
+    latest_date_time = last_date  # Initialize with the last date in case no new data is found
     if response_data["success"]:
         list_data = response_data["data"]["data"]["list"]
 
@@ -847,10 +848,10 @@ def create_new_product(product_name):
         conversion_nper = conversion(nper)
         s_trust_code = s + "-" + str(conversion_nper)
 
-        trust_code_1 = s_trust_code.split("2024")[0]
-        trust_code_2 = s_trust_code.split("2024")[-1]
+        trust_code_1 = s_trust_code.split("2025")[0]
+        trust_code_2 = s_trust_code.split("2025")[-1]
 
-        trust_code = trust_code_1 + "_" + FCode + "2024" + trust_code_2
+        trust_code = trust_code_1 + "_" + FCode + "2025" + trust_code_2
         print(trust_code)
 
         if "更正" in product_name or "更新" in product_name:
