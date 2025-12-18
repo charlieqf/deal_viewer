@@ -21,7 +21,8 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.proxy import Proxy, ProxyType
 from urllib.parse import urljoin
-from urllib.parse import quote
+import traceback
+from urllib.parse import quote, urljoin
 import threading
 
 # FTP server details
@@ -434,6 +435,43 @@ proxies = {
 now_time = str(datetime.now())
 
 
+def get_pdf_paths_from_html(doc_url, proxies):
+    print(f"Fetching detail page: {doc_url}")
+    try:
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36",
+        }
+        response = requests.get(doc_url, headers=headers, proxies=proxies, timeout=30)
+        if response.status_code != 200:
+            print(f"Failed to fetch detail page. Status: {response.status_code}")
+            return []
+        
+        soup = BeautifulSoup(response.content, "html.parser")
+        # Find the file box
+        file_box = soup.find("div", class_="allDetailFileBox")
+        if not file_box:
+            print("Could not find div.allDetailFileBox in detail page.")
+            return []
+            
+        pdf_paths = []
+        # Find all links ending in .pdf
+        for link in file_box.find_all("a"):
+            href = link.get("href")
+            text = link.get_text(strip=True)
+            if href and href.lower().endswith(".pdf"):
+                # Resolve relative URL
+                absolute_url = urljoin(doc_url, href)
+                pdf_paths.append((absolute_url, text))
+                print(f"Found PDF via scrape: {text}")
+                
+        return pdf_paths
+
+    except Exception as e:
+        print(f"Error scraping detail page: {e}")
+        traceback.print_exc()
+        return []
+
+
 def use_selenium(proxies):
     # test_url = "https://ip.smartproxy.com/json"
 
@@ -473,24 +511,35 @@ def use_selenium(proxies):
     last_date = read_ftp_file(ftp, UPDATE_LOG_PATH)
     print("上次更新的日期为 " + last_date)
 
-    url = "https://www.chinabond.com.cn/cbiw/trs/getDocsByConditions"
+    url = "https://www.chinabond.com.cn/cbiw/trs/getContentByConditions"
     data = {
-        "childChnlName": "发行结果",
-        "keywords": "",
-        "pageNum": 1,
-        "isHasAppendix": 1,
-        "pageSize": 50,
-        "parentChnlId": 948,
-        "noticeYear": "",
-        "fxrId": "",
-        "zcxsId": "",
-    }
+            "parentChnlName": "zqzl_zjzzczj",
+            "excludeChnlNames": [],
+            "childChnlDesc": "发行结果",
+            "hasAppendix": True,
+            "siteName": "chinaBond",
+            "pageSize": 50,
+            "pageNum": 1,
+            "queryParam": {
+                "keywords": "",
+                "startDate": "",
+                "endDate": "",
+                "reportType": "",
+                "reportYear": "",
+                "ratingAgency": ""
+            }
+        }
 
     # Define headers for the request
+    # Define headers for the request
     headers = {
-        "Content-Type": "application/x-www-form-urlencoded",
         "Accept": "application/json, text/javascript, */*; q=0.01",
+        "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+        "Content-Type": "application/json",
+        "X-Requested-With": "XMLHttpRequest",
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36",
+        "Origin": "https://www.chinabond.com.cn",
+        "Referer": "https://www.chinabond.com.cn/xxpl/ywzc_fxyfxdh/fxyfxdh_zqzl/zqzl_zjzzczj/",
     }
 
     # Configure the proxy
@@ -500,36 +549,54 @@ def use_selenium(proxies):
     }
 
     # Send the POST request
-    response = requests.post(url, data=data, headers=headers, proxies=proxies)
+    # Send the POST request
+    response = requests.post(url, json=data, headers=headers, proxies=proxies)
     # print(response.status_code, response.reason, response.text, response.headers)
     response_data = response.json()
 
     products = []
     latest_date_time = last_date  # Initialize with the last date in case no new data is found
     if response_data["success"]:
-        list_data = response_data["data"]["data"]["list"]
+        list_data = response_data["data"]["list"]
         latest_date_time = max(
-            [parse(item["ShengXiaoShiJian"]) for item in list_data]
+            [parse(item["shengXiaoShiJian"]) for item in list_data]
         ).strftime("%Y-%m-%d %H:%M:%S")
         print(list_data)  # Inspect the structure of the list_data
         for item in list_data:
             """
-            {'DOCCONTENT': '', 'ShengXiaoShiJian': '2024-06-04 10:05:37', 'DocTitle': '工元至诚2024年第一期不良资产支持证券簿记建档发行结果公告', 'docid': 853810682, 'FaXingQiShu': 'null'
-            , 'DOCPUBURL': 'https://www.chinabond.com.cn/xxpl/ywzc_fxyfxdh/fxyfxdh_zqzl/zqzl_zjzzczj/zjzczq_ABS/ABS_fxjg_ath/202406/t20240604_853810682.html'
-            , 'MetaDataId': 853810682, 'OriginDocId': 853810682, 'recid': 1047046
-            , 'appendixIds': '1415317=P020240604363380159323.pdf=工元至诚2024年第一期不良资产支持证券簿记建档发行结果公告.pdf'
-            , 'FaXingNianFen': '2024'}
-
-            pdf path = https://www.chinabond.com.cn/xxpl/ywzc_fxyfxdh/fxyfxdh_zqzl/zqzl_zjzzczj/zjzczq_ABS/ABS_fxjg_ath/202406/P020240604363380159323.pdf
-            pdf_path = DOCPUBURL remove the bits after the last /, then add part of appendixIds
+            New Structure:
+            {
+                "docContent": 0,
+                "shengXiaoShiJian": "2024-06-04 10:05:37",
+                "docTitle": "工元至诚2024年第一期不良资产支持证券簿记建档发行结果公告",
+                "docid": 853810682,
+                "docPubUrl": "https://www.chinabond.com.cn/xxpl/ywzc_fxyfxdh/fxyfxdh_zqzl/zqzl_zjzzczj/zjzczq_ABS/ABS_fxjg_ath/202406/t20240604_853810682.html",
+                "appendixIds": "1415317=P020240604363380159323.pdf=工元至诚2024年第一期不良资产支持证券簿记建档发行结果公告.pdf"
+            }
             """
-            issue_time = item.get("ShengXiaoShiJian", "")
-            doc_title = item.get("DocTitle", "")
-            doc_url = item.get("DOCPUBURL", "")
+            issue_time = item.get("shengXiaoShiJian", "")
+            doc_title = item.get("docTitle", "")
+            doc_url = item.get("docPubUrl", "")
             appendix_ids = item.get("appendixIds", "")
 
             pdf_path_home = doc_url.rsplit("/", 1)[0]
-            pdf_path = f"{pdf_path_home}/{appendix_ids.split('=')[1]}"
+            
+            # Use scraper if appendix_ids is missing
+            if appendix_ids:
+                 try:
+                    pdf_name = appendix_ids.split('=')[1]
+                    pdf_path = f"{pdf_path_home}/{pdf_name}"
+                 except:
+                    print(f"Failed to parse appendixIds: {appendix_ids}")
+                    continue
+            else:
+                 print(f"No appendixIds for {doc_title}, attempting to scrape detail page...")
+                 found_pdfs = get_pdf_paths_from_html(doc_url, proxies)
+                 if found_pdfs:
+                     pdf_path = found_pdfs[0][0]
+                 else:
+                     print(f"No PDFs found for {doc_title}")
+                     continue
 
             # save the data to products
 

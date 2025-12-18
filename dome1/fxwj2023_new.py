@@ -17,6 +17,7 @@ import pymssql
 import ftplib
 import pyodbc
 import chardet
+import traceback
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -341,6 +342,63 @@ proxies = {
     "https": proxy_url,
 }
 
+import re
+
+def get_pdf_paths_from_html(doc_url, proxies):
+    print(f"Fetching detail page: {doc_url}")
+    try:
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36",
+        }
+        response = requests.get(doc_url, headers=headers, proxies=proxies, timeout=30)
+        if response.status_code != 200:
+            print(f"Failed to fetch detail page. Status: {response.status_code}")
+            return []
+        
+        soup = BeautifulSoup(response.content, "html.parser")
+        # Find the file box
+        file_box = soup.find("div", class_="allDetailFileBox")
+        
+        pdf_paths = []
+        if file_box:
+            # Find all links ending in .pdf
+            for link in file_box.find_all("a"):
+                href = link.get("href")
+                text = link.get_text(strip=True)
+                if href and href.lower().endswith(".pdf"):
+                    # Resolve relative URL
+                    absolute_url = urljoin(doc_url, href)
+                    pdf_paths.append((absolute_url, text))
+                    print(f"Found PDF via scrape: {text}")
+        
+        if not pdf_paths:
+            print("BeautifulSoup found no PDFs. Attempting regex fallback...")
+            content = response.text
+            # Regex for double quotes
+            pdf_pattern = r'<a[^>]+href="([^"]+\.pdf)"[^>]*>([^<]+)</a>'
+            matches = re.findall(pdf_pattern, content, re.IGNORECASE)
+            
+            # Regex for single quotes
+            pdf_pattern_sq = r"<a[^>]+href='([^']+\.pdf)'[^>]*>([^<]+)</a>"
+            matches_sq = re.findall(pdf_pattern_sq, content, re.IGNORECASE)
+            
+            all_matches = matches + matches_sq
+            
+            for href, text in all_matches:
+                text = text.strip()
+                absolute_url = urljoin(doc_url, href)
+                # Deduplicate based on text if needed, but list append is fine for now
+                if (absolute_url, text) not in pdf_paths:
+                    pdf_paths.append((absolute_url, text))
+                    print(f"Found PDF via regex: {text}")
+                
+        return pdf_paths
+
+    except Exception as e:
+        print(f"Error scraping detail page: {e}")
+        traceback.print_exc()
+        return []
+
 def use_selenium(proxies):
     # proxy test
     print("testing proxies")
@@ -362,24 +420,32 @@ def use_selenium(proxies):
     last_date = read_ftp_file(ftp, UPDATE_LOG_PATH)
     print("上次更新的日期为 " + last_date)
 
-    url = "https://www.chinabond.com.cn/cbiw/trs/getDocsByConditions"
+    url = "https://www.chinabond.com.cn/cbiw/trs/getContentByConditions"
     data = {
-        "childChnlName": "发行文件",
-        "keywords": "",
-        "pageNum": 1,
-        "isHasAppendix": 1,
+        "parentChnlName": "zqzl_zjzzczj",
+        "excludeParentChnlNames": [],
+        "childChnlDesc": "发行文件",
+        "hasAppendix": True,
+        "siteName": "chinaBond",
         "pageSize": 50,
-        "parentChnlId": 948,
-        "noticeYear": "",
-        "fxrId": "",
-        "zcxsId": "",
+        "pageNum": 1,
+        "queryParam": {
+            "keywords": "",
+            "startDate": "",
+            "endDate": "",
+            "reportType": "",
+            "reportYear": "",
+            "ratingAgency": ""
+        }
     }
 
     # Define headers for the request
     headers = {
-        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Type": "application/json",
         "Accept": "application/json, text/javascript, */*; q=0.01",
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36",
+        "X-Requested-With": "XMLHttpRequest",
+        "Referer": "https://www.chinabond.com.cn/xxpl/ywzc_fxyfxdh/fxyfxdh_zqzl/zqzl_zjzzczj/"
     }
 
     # Configure the proxy
@@ -389,7 +455,7 @@ def use_selenium(proxies):
     }
 
     # Send the POST request
-    response = requests.post(url, data=data, headers=headers, proxies=proxies)
+    response = requests.post(url, json=data, headers=headers, proxies=proxies)
     # print(response.status_code, response.reason, response.text, response.headers)
     response_data = response.json()
 
@@ -397,50 +463,51 @@ def use_selenium(proxies):
     # 初始化latest_date_time变量，避免UnboundLocalError
     latest_date_time = last_date
     if response_data.get("success"):
-        list_data = response_data["data"]["data"]["list"]
+        list_data = response_data["data"]["list"]
 
-        # get the latest ShengXiaoShiJian from all items in list_data (parse the date string to datetime object)
+        # get the latest shengXiaoShiJian from all items in list_data (parse the date string to datetime object)
         latest_date_time = max(
-            [parse(item["ShengXiaoShiJian"]) for item in list_data]
+            [parse(item["shengXiaoShiJian"]) for item in list_data]
         ).strftime("%Y-%m-%d %H:%M:%S")
 
-        # iterate through the list_data where DocTitle contains '发行文件'
-        for item in [item for item in list_data if "发行文件" in item["DocTitle"]]:
+        # iterate through the list_data where docTitle contains '发行文件'
+        for item in [item for item in list_data if "发行文件" in item["docTitle"]]:
             """
             {
-                "DOCCONTENT": "",
-                "ShengXiaoShiJian": "2024-06-05 11:20:59",
-                "DocTitle": "兴瑞2024年第三期不良资产支持证券发行文件",
+                "docContent": 0,
+                "shengXiaoShiJian": "2024-06-05 11:20:59",
+                "docTitle": "兴瑞2024年第三期不良资产支持证券发行文件",
                 "docid": 853811574,
-                "FaXingQiShu": "null",
-                "DOCPUBURL": "https://www.chinabond.com.cn/xxpl/ywzc_fxyfxdh/fxyfxdh_zqzl/zqzl_zjzzczj/zjzczq_ABS/ABS_fxwj_ath/202406/t20240605_853811574.html",
-                "MetaDataId": 853811574,
-                "OriginDocId": 853811574,
-                "recid": 1047962,
-                "appendixIds": "1416267=P020240605408595602651.pdf=兴瑞2024年第三期不良资产支持证券承销团成员名单.pdf,1416268=P020240605408595801526.pdf=兴瑞2024年第三期不良资产支持证券发行办法.pdf,1416269=P020240605408595913336.pdf=兴瑞2024年第三期不良资产支持证券发行公告.pdf,1416270=P020240605408596015054.pdf=兴瑞2024年第三期不良资产支持证券发行说明书.pdf,1416271=P020240605408596262846.pdf=兴瑞2024年第三期不良资产支持证券信托公告.pdf,1416272=P020240605408596445818.pdf=兴瑞2024年第三期不良资产支持证券《中债资信信用评级报告》.pdf,1416273=P020240605408596747644.pdf=兴瑞2024年第三期不良资产支持证券 《惠誉博华信用评级报告》.pdf",
-                "FaXingNianFen": "2023"
-            },
-            there are multiple pdf files in the appendixIds, we need to extract the pdf path from DOCPUBURL and appendixIds
-            each pdf path = https://www.chinabond.com.cn/xxpl/ywzc_fxyfxdh/fxyfxdh_zqzl/zqzl_zjzzczj/zjzczq_ABS/ABS_fxjg_ath/202406/P020240604363380159323.pdf
-            pdf_path = DOCPUBURL remove the bits after the last /, then add part of appendixIds
+                "docPubUrl": "https://www.chinabond.com.cn/xxpl/ywzc_fxyfxdh/fxyfxdh_zqzl/zqzl_zjzzczj/zjzczq_ABS/ABS_fxwj_ath/202406/t20240605_853811574.html",
+                "originDocId": 853811574,
+                "appendixIds": null
+            }
             """
-            issue_time = item.get("ShengXiaoShiJian", "")
-            doc_title = item.get("DocTitle", "")
-            doc_url = item.get("DOCPUBURL", "")
+            issue_time = item.get("shengXiaoShiJian", "")
+            doc_title = item.get("docTitle", "")
+            doc_url = item.get("docPubUrl", "")
             appendix_ids = item.get("appendixIds", "")
 
             pdf_path_home = doc_url.rsplit("/", 1)[0]
             print("pdf_path_home =", pdf_path_home)
             # get multiple pdf paths
-            appendix_ids = appendix_ids.split(",")
             pdf_paths = []
 
-            for appendix_id in appendix_ids:
-                # 1416267=P020240605408595602651.pdf=兴瑞2024年第三期不良资产支持证券承销团成员名单.pdf
-                pdf_name = appendix_id.split("=")[1]
-                target_pdf_name = appendix_id.split("=")[2]
-                pdf_path = f"{pdf_path_home}/{pdf_name}"
-                pdf_paths.append((pdf_path, target_pdf_name))
+            # Handle appendix_ids being None or empty
+            if appendix_ids:
+                appendix_ids_list = appendix_ids.split(",")
+                for appendix_id in appendix_ids_list:
+                    # 1416267=P020240605408595602651.pdf=兴瑞2024年第三期不良资产支持证券承销团成员名单.pdf
+                    parts = appendix_id.split("=")
+                    if len(parts) >= 3:
+                        pdf_name = parts[1]
+                        target_pdf_name = parts[2]
+                        pdf_path = f"{pdf_path_home}/{pdf_name}"
+                        pdf_paths.append((pdf_path, target_pdf_name))
+            else:
+                 print(f"No appendixIds for {doc_title}, attempting to scrape detail page...")
+                 pdf_paths = get_pdf_paths_from_html(doc_url, proxies)
+
 
             # save the data to products
 
@@ -560,7 +627,7 @@ def update_pdf_new(products):
         success_file = os.path.join(cache_folder, f"{product_name}.success")
 
         if os.path.exists(success_file):
-            #print("Product already processed:", product_name)
+            print(f"Skipping {product_name} because cache file exists: {success_file}")
             continue
 
         # if parse(web_date) < datetime.strptime('2024-06-12', "%Y-%m-%d") and parse(web_date) >= datetime.strptime('2024-06-14', "%Y-%m-%d"):
@@ -704,8 +771,9 @@ def update_pdf_new(products):
                         f.write("success")
 
 
-        except:
+        except Exception:
             print(trust_code, "披露信息插入失败!")
+            traceback.print_exc()
 
         print('产品新建完成')
 
@@ -1199,8 +1267,13 @@ def insert_task_info(trust_code, web_date):
 
     sql = f"select TrustDocumentID,FileName from PortfolioManagement.DV.TrustAssociatedDocument where TrustId={trust_id} and FileName like N'%说明书%'"
     print(sql)
+    print(sql)
     b1.execute(sql)
-    TrustDocumentID, FileName = b1.fetchone()
+    result = b1.fetchone()
+    if not result:
+        print(f"Warning: No '说明书' found for TrustCode {trust_code}. Skipping task insertion.")
+        return
+    TrustDocumentID, FileName = result
     print("TrustDocumentID:", TrustDocumentID, ", FileName:", FileName)
     FileName = FileName[:-4]
 

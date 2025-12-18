@@ -1,0 +1,529 @@
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+<title>
+    浦鑫归航2025年第九期不良资产支持证券发行文件
+</title>
+<link rel="stylesheet" type="text/css" href="../../../../../../../images/customer_v2.css" />
+<link rel="stylesheet" href="../../../../../../../images/video-js.css" />
+<link rel="stylesheet" type="text/css" href="../../../../../../../images/css_v2_zjy.css" />
+<link rel="stylesheet" type="text/css" href="../../../../../../../images/layer.css">
+<script type="text/javascript" src="../../../../../../../images/jquery-3.7.1.min.js"></script>
+<script type="text/javascript" src="../../../../../../../images/video.js"></script>
+<!-- videojs-contrib-hls 用于在电脑端播放 如果只需手机播放可以不引入 -->
+<script type="text/javascript" src="../../../../../../../images/videojs-contrib-hls.min.js"></script>
+<script type="text/javascript" src="../../../../../../../images/jquery.cookie.js"></script>
+<script type="text/javascript" src="../../../../../../../images/common.js"></script>
+<script type="text/javascript" src="../../../../../../../images/crypto-js.min.js"></script>
+<script type="text/javascript" src="../../../../../../../images/layer.js"></SCRIPT>
+<script>
+    var myLocation = '首页>信息披露>信息披露查询>债券种类>资产支持证券>ABS>发行文件';
+</script>
+
+
+<style>
+    .video-js .vjs-tech {
+        position: relative !important;
+    }
+
+    .biaoti {
+        width: 600px;
+        white-space: normal;
+    }
+
+    table {
+        border-collapse: collapse;
+        width: 100% !important;
+    }
+
+    .File .rightFileImport {
+        width: 72%;
+    }
+</style>
+<!-- </head> -->
+
+<script type="text/javascript">
+
+    function sendstr(url) {
+        var xmlObj = null;
+        if (window.XMLHttpRequest) {
+            xmlObj = new XMLHttpRequest();
+        } else if (window.ActiveXObject) {
+            xmlObj = new ActiveXObject("Microsoft.XMLHTTP");
+        } else {
+            return;
+        }
+
+        xmlObj.onreadystatechange = function () {
+
+        }
+        xmlObj.open("get", url, true);
+        xmlObj.send();
+
+    }
+</script>
+
+<body>
+
+<!-- 公共栏目导航 -->
+<div class="common_header"></div>
+<div class="common_logo_login"></div>
+<div class="common_header_nav"></div>
+<script>
+    $(".common_header").load("https://www.chinabond.com.cn/common/common_header/", function() {
+        $(function () {
+            $(".common_footer").load("https://www.chinabond.com.cn/common/common_footer/");
+        });
+    });
+    $(".common_logo_login").load("https://www.chinabond.com.cn/common/common_logo_login/");
+    $(".common_header_nav").load("https://www.chinabond.com.cn/common/common_header_nav/");
+</script>
+
+<div class="newsContent">
+    <div class="mapBox" style="text-align:left;">
+            <span>
+                <span>
+                    当前位置:
+                    <script>
+                        if ('信息披露' == "首页") {
+                            document.write('<a href="../../../../../../" title="信息披露" class="CurrChnlCls">信息披露</a>&nbsp;&gt;&nbsp;<a href="../../../../../" title="信息披露查询" class="CurrChnlCls">信息披露查询</a>&nbsp;&gt;&nbsp;<a href="../../../../" title="债券种类" class="CurrChnlCls">债券种类</a>&nbsp;&gt;&nbsp;<a href="../../../" title="资产支持证券" class="CurrChnlCls">资产支持证券</a>&nbsp;&gt;&nbsp;<a href="../../" title="ABS" class="CurrChnlCls">ABS</a>&nbsp;&gt;&nbsp;<a href="../" title="发行文件" class="CurrChnlCls">发行文件</a>');
+                        } else {
+                            document.write('<a href="../../../../../../../" title="首页" class="CurrChnlCls">首页</a>&nbsp;&gt;&nbsp;<a href="../../../../../../" title="信息披露" class="CurrChnlCls">信息披露</a>&nbsp;&gt;&nbsp;<a href="../../../../../" title="信息披露查询" class="CurrChnlCls">信息披露查询</a>&nbsp;&gt;&nbsp;<a href="../../../../" title="债券种类" class="CurrChnlCls">债券种类</a>&nbsp;&gt;&nbsp;<a href="../../../" title="资产支持证券" class="CurrChnlCls">资产支持证券</a>&nbsp;&gt;&nbsp;<a href="../../" title="ABS" class="CurrChnlCls">ABS</a>&nbsp;&gt;&nbsp;<a href="../" title="发行文件" class="CurrChnlCls">发行文件</a>');
+                        }
+                    </script>
+                </span>
+            </span>
+    </div>
+</div>
+<div class="allDetailBox">
+    <div class="allDeatilCon">
+
+        <p class="allDetailTitle" id="title"
+           style="font-size:24px;word-wrap: break-word;white-space: pre-line;line-height:35px">
+                <span class="biaoti">
+                    浦鑫归航2025年第九期不良资产支持证券发行文件
+                </span>
+        </p>
+        <p class="allDeatilTwoTitle">
+            
+        </p>
+
+        <p class="allDeatilAuthor">
+            
+        </p>
+    </div>
+
+
+    <div class="picBox">
+        <img onclick="submit()" id="sczy_img" style="display:black;width: 394px;height: 220px;margin: 0 auto;" src='' />
+        <div id="sczy_avi" style="display:none;height:220px;width:394px;margin: auto; position: relative;">
+            <img onclick="aviDisplay()" src="../../../../../../../images/icon_guanbi_14.png" style="position: absolute;top: 15px;right: 15px;z-index: 9999;width:15px" />
+            <video id="myVideo" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="none"
+                   data-setup='{}' style="width: 100%; height: 100%;">
+                <source id="source"
+                        src=''
+                        type="application/x-mpegURL">
+                </source>
+                <source
+                        src=''
+                        type="video/mp4">
+                </source>
+                <source
+                        src=''
+                        type="video/ogg">
+                </source>
+            </video>
+        </div>
+    </div>
+
+    <script>
+
+        var doclink = '';
+        if (doclink) {
+            $("#myVideo source").attr("src", doclink);
+        }
+        count = 0;
+        $("#myVideo source").each(function () {
+            if ($(this).attr("src").trim() == "") count++;
+            if (count == 2) $(".picBox").hide();
+        })
+    </script>
+
+    <!-- 文章正文内容 -->
+    <div style="width:69%; clear:both;margin:0px auto;">
+
+
+        <div class="zw_main3" id="hiddenContent" name="hiddenContent"
+             style="text-align:left;font-size:16px;line-height: 24px">
+            
+        </div>
+
+        <span style="line-height:normal;">
+
+            </span>
+
+    </div>
+    <span class="collectDetailBox" style="border-color:#fff;">
+
+            <head>
+                <style type="text/css" media="screen">
+                    body {
+                        margin: 0px;
+                    }
+
+                    a {
+                        text-decoration: none;
+                    }
+
+                    #collection .add-favor-shoucang {
+                        font-weight: normal;
+                        font-size: 14px;
+                        vertical-align: middle;
+                        background: url(../../../../../../../images/shoucang_off.gif) no-repeat;
+                        display: block;
+                        width: 68px;
+                        height: 22px;
+                    }
+
+                    #collection .add-favor-yishoucang {
+                        font-weight: normal;
+                        font-size: 14px;
+                        vertical-align: middle;
+                        background: url(../../../../../../../images/shoucang_on.png) no-repeat;
+                        display: block;
+                        width: 68px;
+                        height: 22px;
+                    }
+                </style>
+                <script>
+                    var status = 0;
+                    var clicktag = 0;
+                    var userId = '';
+                    var userName = '';
+
+                    $(function () {
+                        $.cookie('keyid') ? userId = encrypt2(decrypt($.cookie('keyid'))) : "";
+                        $.cookie('key') ? userName = encrypt2(decrypt($.cookie('key'))) : "";
+                        let infoid = '854860929';
+                        if (!userId || !userName) {
+                            $("#collection").append("<span class='add-favor-shoucang'></span>");
+                            status = 0;
+                        } else {
+                            jQuery.ajax({
+                                type: "post",
+                                url: "/cbiw/center/onlineStore",
+                                dataType: "json",
+                                data: JSON.stringify({
+                                    type: "collection",
+                                    infoid: infoid + '',
+                                    status: "init",
+                                    req_time: encrypt2(new Date().getTime() + ""),
+                                    userId: userId,
+                                    userCode: userName
+                                }),
+                                contentType: 'application/json',
+                                success: function (data) {
+                                    if (data.code == 4003 || data.List[0] == "false") {
+                                        $("#collection").append("<span class='add-favor-shoucang'></span>");
+                                        status = 0;
+                                    } else if (data.List[0] == "true") {
+                                        $("#collection").append("<span class='add-favor-yishoucang'></span>");
+                                        status = 1;
+                                    }
+                                },
+                                error: function (err) {
+                                    console.log('请求失败了。。。。。')
+                                }
+                            });
+                        }
+
+                    });
+
+                    //收藏
+                    function collection() {
+                        if (clicktag == 0) {
+                            clicktag = 1;
+                            setTimeout(function () { clicktag = 0 }, 5000);
+                            if (status == 1) {
+                                jQuery.ajax({
+                                    type: "post",
+                                    url: "/cbiw/center/onlineStore",
+                                    dataType: "JSON",
+                                    async: true,
+                                    data: JSON.stringify({
+                                        "type": "collection",
+                                        "infoid": '854860929',
+                                        "infotype": "static",
+                                        "status": "true",
+                                        "req_time": encrypt2(new Date().getTime() + ""),
+                                        "userId": userId,
+                                        "userCode": userName
+                                    }),
+                                    contentType: 'application/json',
+                                    success: function (data) {
+                                        if(data == "not login"){
+                                            var url = document.referrer;
+                                            top.location.href = "/ucenter/#/center/home" + "?url=" + url;
+                                        }else{
+                                            $("#collection>span").remove();
+                                            $("#collection").append("<span class='add-favor-shoucang'></span>");
+                                            status = 0;
+                                            layer.msg('已取消收藏!', { icon: 5, offset: '50%' });
+                                        }
+                                    }
+                                });
+                            } else {
+                                jQuery.ajax({
+                                    type: "post",
+                                    url: "/cbiw/center/onlineStore",
+                                    dataType: "JSON",
+                                    async: true,
+                                    data: JSON.stringify({
+                                        "type": "collection",
+                                        "infoid": '854860929',
+                                        "infotype": "static",
+                                        "status": "false",
+                                        "req_time": encrypt2(new Date().getTime() + ""),
+                                        "userId": userId,
+                                        "userCode": userName
+                                    }),
+                                    contentType: 'application/json',
+                                    success: function (data) {
+                                        if (data.code == 4003 || data.List[0] == "false") {
+                                            var url = document.referrer;
+
+                                            top.location.href = "/ucenter/#/center/home" + "?url=" + url;
+                                        } else if (data.List[0] == "true") {
+                                            $("#collection>span").remove();
+                                            $("#collection").append("<span class='add-favor-yishoucang'></span>");
+                                            status = 1;
+                                            layer.msg('收藏成功!', { icon: 6, offset: '50%' });
+                                        }
+                                    }
+                                });
+                            }
+
+                        } else {
+                            layer.msg('请勿频繁点击！', { icon: 0, offset: '50%' });
+                        }
+                    }
+                </script>
+            </head>
+
+            <body><a id="collection" onclick="collection()" style=" position: absolute;right:11px;bottom: 19px;"></a></body>
+        </span>
+
+    
+            <div class="allDetailFileBox">
+                <div class="allFileTitle"> 附件列表</div>
+                <div class="rightListTitle">
+                    <span>编号</span>
+                    <span class="marketL40_P">标题</span>
+                    <span class="marketL35_P">发布时间</span>
+                </div>
+                <ul>
+                    
+                        <li class="File fileList">
+                            <div class="rightListContent">
+                                    <span class="marketL6_P">
+                                        1
+                                    </span>
+                                <span class="rightFileImport" style="text-align:left;">
+                                        <font color="red">
+                                            <a href='./P020251216385390124699.pdf'
+                                               sourceName='P020251216385390124699.pdf'
+                                               download='浦鑫归航2025年第九期不良资产证券化信托之信托公告.pdf'>
+                                                浦鑫归航2025年第九期不良资产证券化信托之信托公告.pdf
+                                            </a>
+                                        </font>
+                                    </span>
+                                <span class="rightListTime">
+                                        2025.12.16
+                                    </span>
+                            </div>
+                        </li>
+                    
+                        <li class="File fileList">
+                            <div class="rightListContent">
+                                    <span class="marketL6_P">
+                                        2
+                                    </span>
+                                <span class="rightFileImport" style="text-align:left;">
+                                        <font color="red">
+                                            <a href='./P020251216385390349602.pdf'
+                                               sourceName='P020251216385390349602.pdf'
+                                               download='浦鑫归航2025年第九期不良资产支持证券承销团成员名单.pdf'>
+                                                浦鑫归航2025年第九期不良资产支持证券承销团成员名单.pdf
+                                            </a>
+                                        </font>
+                                    </span>
+                                <span class="rightListTime">
+                                        2025.12.16
+                                    </span>
+                            </div>
+                        </li>
+                    
+                        <li class="File fileList">
+                            <div class="rightListContent">
+                                    <span class="marketL6_P">
+                                        3
+                                    </span>
+                                <span class="rightFileImport" style="text-align:left;">
+                                        <font color="red">
+                                            <a href='./P020251216385390476893.pdf'
+                                               sourceName='P020251216385390476893.pdf'
+                                               download='浦鑫归航2025年第九期不良资产支持证券发行办法.pdf'>
+                                                浦鑫归航2025年第九期不良资产支持证券发行办法.pdf
+                                            </a>
+                                        </font>
+                                    </span>
+                                <span class="rightListTime">
+                                        2025.12.16
+                                    </span>
+                            </div>
+                        </li>
+                    
+                        <li class="File fileList">
+                            <div class="rightListContent">
+                                    <span class="marketL6_P">
+                                        4
+                                    </span>
+                                <span class="rightFileImport" style="text-align:left;">
+                                        <font color="red">
+                                            <a href='./P020251216385390584584.pdf'
+                                               sourceName='P020251216385390584584.pdf'
+                                               download='浦鑫归航2025年第九期不良资产支持证券发行公告.pdf'>
+                                                浦鑫归航2025年第九期不良资产支持证券发行公告.pdf
+                                            </a>
+                                        </font>
+                                    </span>
+                                <span class="rightListTime">
+                                        2025.12.16
+                                    </span>
+                            </div>
+                        </li>
+                    
+                        <li class="File fileList">
+                            <div class="rightListContent">
+                                    <span class="marketL6_P">
+                                        5
+                                    </span>
+                                <span class="rightFileImport" style="text-align:left;">
+                                        <font color="red">
+                                            <a href='./P020251216385390699989.pdf'
+                                               sourceName='P020251216385390699989.pdf'
+                                               download='浦鑫归航2025年第九期不良资产支持证券发行说明书.pdf'>
+                                                浦鑫归航2025年第九期不良资产支持证券发行说明书.pdf
+                                            </a>
+                                        </font>
+                                    </span>
+                                <span class="rightListTime">
+                                        2025.12.16
+                                    </span>
+                            </div>
+                        </li>
+                    
+                        <li class="File fileList">
+                            <div class="rightListContent">
+                                    <span class="marketL6_P">
+                                        6
+                                    </span>
+                                <span class="rightFileImport" style="text-align:left;">
+                                        <font color="red">
+                                            <a href='./P020251216385390950449.pdf'
+                                               sourceName='P020251216385390950449.pdf'
+                                               download='浦鑫归航2025年第九期不良资产支持证券信用评级报告(中诚信国际).pdf'>
+                                                浦鑫归航2025年第九期不良资产支持证券信用评级报告(中诚信国际).pdf
+                                            </a>
+                                        </font>
+                                    </span>
+                                <span class="rightListTime">
+                                        2025.12.16
+                                    </span>
+                            </div>
+                        </li>
+                    
+                        <li class="File fileList">
+                            <div class="rightListContent">
+                                    <span class="marketL6_P">
+                                        7
+                                    </span>
+                                <span class="rightFileImport" style="text-align:left;">
+                                        <font color="red">
+                                            <a href='./P020251216385391176738.pdf'
+                                               sourceName='P020251216385391176738.pdf'
+                                               download='浦鑫归航2025年第九期不良资产支持证券信用评级报告(中债资信).pdf'>
+                                                浦鑫归航2025年第九期不良资产支持证券信用评级报告(中债资信).pdf
+                                            </a>
+                                        </font>
+                                    </span>
+                                <span class="rightListTime">
+                                        2025.12.16
+                                    </span>
+                            </div>
+                        </li>
+                    
+                </ul>
+            </div>
+        
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+    <script>
+        // 动态为附件列表移除download属性，pdf如果加了download属性会直接下载，应该直接打开
+        $(".fileList a").each(function () {
+            var sourceName = $(this).attr("sourceName");
+            if (sourceName.indexOf(".pdf") != -1) {
+                $(this).removeAttr("download");
+            }
+        })
+    </script>
+    
+    <!-- 附件列表 -->
+
+    <!-- 发布日期 -->
+    <p class="detailTime">发布时间：
+        2025年12月16日
+    </p>
+</div>
+
+<!-- 通用页尾 开始 Base indent -->
+<div class="common_footer"></div>
+</body>
+
+
+<script type="text/javascript">
+
+    //videojs 简单使用
+    var myVideo = videojs('myVideo', {
+        bigPlayButton: true,
+        textTrackDisplay: false,
+        posterImage: false,
+        errorDisplay: false,
+    })
+
+
+    function submit() {
+
+        document.getElementById("sczy_avi").style.display = "block";
+        document.getElementById("sczy_img").style.display = "none";
+        myVideo.play();
+    }
+    function aviDisplay() {
+        document.getElementById("sczy_avi").style.display = "none";
+        document.getElementById("sczy_img").style.display = "block";
+        myVideo.pause() // 视频暂停
+
+    }
+</script>
+
+</html>
