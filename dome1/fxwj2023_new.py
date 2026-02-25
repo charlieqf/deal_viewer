@@ -639,7 +639,7 @@ def update_pdf_new(products):
         print("处理产品:", product_name)
 
         # 在数据库中新建产品（如尚不存在）
-        trust_code = create_new_product(product_name)
+        trust_code = create_new_product(product_name, web_date)
 
         print("TrustCode:", trust_code)
 
@@ -955,8 +955,8 @@ def conversion(str):
         return num
 
 
-# Trust表插入新产品数据
-def create_new_product(product_name):
+# Trust表插入 new 产品数据
+def create_new_product(product_name, web_date=None):
     global trust_code
     if "消费贷款" in product_name:
         FCode = "ConsumerLoan"
@@ -966,11 +966,7 @@ def create_new_product(product_name):
         FCode = "CreditLoan"
     elif "住房抵押贷款" in product_name:
         FCode = "RMBS"
-    elif "汽车抵押贷款" in product_name:
-        FCode = "AUTO"
-    elif "汽车贷款" in product_name:
-        FCode = "AUTO"
-    elif "汽车分期贷款" in product_name:
+    elif "汽车抵押贷款" in product_name or "汽车贷款" in product_name or "汽车分期贷款" in product_name:
         FCode = "AUTO"
     elif "微小企业贷款" in product_name:
         FCode = "SmallLoan"
@@ -987,31 +983,54 @@ def create_new_product(product_name):
         trust_name = "华驭第十六期汽车抵押贷款支持证券"
     else:
         try:
-            s = ""
-            for i in pypinyin.pinyin(product_name, style=pypinyin.NORMAL):
-                i = i[0].title()
-                s += "".join(i)
+            # 基础拼音转换（仅对“第”字之前的部分）
+            brand_name = product_name.split("第")[0]
+            s_brand = ""
+            for i in pypinyin.pinyin(brand_name, style=pypinyin.NORMAL):
+                s_brand += i[0].title()
 
-            s = s.split("Nian")[0]
-
+            # 获取期数
             sp_filename = product_name.split("第")[1]
-            nper = sp_filename.split("期")[0]
-            conversion_nper = conversion(nper)
-            s_trust_code = s + "-" + str(conversion_nper)
+            nper_str = sp_filename.split("期")[0]
+            conversion_nper = conversion(nper_str)
 
-            trust_code_1 = s_trust_code.split("2025")[0]
-            trust_code_2 = s_trust_code.split("2025")[-1]
+            # 获取年份
+            year_str = "2025" # 默认
+            if web_date:
+                try:
+                    year_str = str(parse(str(web_date)).year)
+                except:
+                    pass
+            elif "2024" in product_name:
+                year_str = "2024"
+            elif "2026" in product_name:
+                year_str = "2026"
 
-            trust_code = trust_code_1 + "_" + FCode + "2025" + trust_code_2
-            print(trust_code)
+            # 兼容性判断：原逻辑如果拼音中含2025则按原逻辑拆分
+            full_s = ""
+            for i in pypinyin.pinyin(product_name, style=pypinyin.NORMAL):
+                full_s += i[0].title()
+            
+            if year_str in full_s:
+                # 保持原逻辑以防副作用
+                s = full_s.split("Nian")[0]
+                s_trust_code = s + "-" + str(conversion_nper)
+                trust_code_1 = s_trust_code.split(year_str)[0]
+                trust_code_2 = s_trust_code.split(year_str)[-1]
+                trust_code = trust_code_1 + "_" + FCode + year_str + trust_code_2
+            else:
+                # 新逻辑：名称不含年份时，强制使用识别出的年份
+                trust_code = s_brand + "_" + FCode + year_str + "-" + str(conversion_nper)
+
+            print("Generated TrustCode:", trust_code)
 
             if "更正" in product_name or "更新" in product_name:
                 return
             splitname = product_name.split("年")[0]
-            trust_name_short = splitname + "-" + str(conversion_nper)
+            trust_name_short = (brand_name if "年" not in product_name else splitname) + "-" + str(conversion_nper)
             trust_name = product_name.split("发行文件")[0]
-        except:
-            print("TrustCode\TrustName获取失败")
+        except Exception as e:
+            print("TrustCode\TrustName获取失败:", e)
             return
 
     # if Product_name=='华驭第十四期汽车抵押贷款支持证券发行文件':

@@ -1,0 +1,1190 @@
+
+(venv) root@kamateraubuntu:~/deal_viewer/ABSDaily/ABS/dome1# python ABN2025_new.py
+UTF-8 encoding enabled on the FTP server.
+got connection.
+上次更新的日期为 2026-01-01 16:00:01
+上次更新的日期为 2025-12-28 21:11:55
+代理配置: http://2506034iYZQ-resi_region-CN_Guangdong_Guangzhou-ip-7193938:rUGciFpmX7CwT12@in.proxy-jet.io:1010
+获取新的token...
+Attempting to get token without proxy...
+Response status: 200
+data = {'sign': 'Q/d8solfMh3GOoMI5WmGUaZA1ukiCpO5sMwap9ByMZnt4tsJZeSkX6Wq1v3lRrKsnQLcWdAPun00\nLsYa5AtcTZpCs2CvuKf8xTKL5JKkAphGIIEbpsADAhjeg2dCZIBVMUOFd2LaiLvRLJLML9AfJTc/\nI44XV2MvFkyyEBuTLsA=\n', 'UT': 'QfWEaz8JJD6dsL4WJWxR+WKHXwbI4KuYd0QvJVi4rqKk6OPjrjfSJ3ibK+WrhS9n2Kobs5d/u9YF\n94oMlF90juU7HTWviBNSolsl/Z2zgbtNLdUgYlrtzAQ6gOKL/6bkVxW6ELwPD4/gFVDk/WlzTop+\nAXa9Lo4P7j7k3JOz3eE=\n'}
+token is {'sign': 'Q/d8solfMh3GOoMI5WmGUaZA1ukiCpO5sMwap9ByMZnt4tsJZeSkX6Wq1v3lRrKsnQLcWdAPun00\nLsYa5AtcTZpCs2CvuKf8xTKL5JKkAphGIIEbpsADAhjeg2dCZIBVMUOFd2LaiLvRLJLML9AfJTc/\nI44XV2MvFkyyEBuTLsA=\n', 'UT': 'QfWEaz8JJD6dsL4WJWxR+WKHXwbI4KuYd0QvJVi4rqKk6OPjrjfSJ3ibK+WrhS9n2Kobs5d/u9YF\n94oMlF90juU7HTWviBNSolsl/Z2zgbtNLdUgYlrtzAQ6gOKL/6bkVxW6ELwPD4/gFVDk/WlzTop+\nAXa9Lo4P7j7k3JOz3eE=\n'}
+info_level: QfWEaz8JJD6dsL4WJWxR+WKHXwbI4KuYd0QvJVi4rqKk6OPjrj...
+sign: Q/d8solfMh3GOoMI5WmGUaZA1ukiCpO5sMwap9ByMZnt4tsJZe...
+使用的info_level长度: 175
+使用的sign长度: 175
+访问主页获取Cookie...
+主页访问状态: 200
+获取到的Cookie: {'AlteonP10': 'Bw9AICw/F6zNOwgt0CziLQ$$'}
+Response headers: {'Server': 'openresty', 'Date': 'Thu, 22 Jan 2026 06:27:23 GMT', 'Content-Type': 'text/html', 'Content-Length': '3736', 'Connection': 'keep-alive', 'Set-Cookie': 'AlteonP10=Bw9AICw/F6zNOwgt0CziLQ$$; Path=/; Secure', 'Last-Modified': 'Fri, 28 Jul 2023 08:28:30 GMT', 'ETag': '"e98-60187dd9e3924"', 'Accept-Ranges': 'bytes', 'X-Frame-Options': 'SAMEORIGIN', 'X-Content-Type-Options': ': nosniff', 'X-XSS-Protection': '1; mode=block', 'Content-Security-Policy': "default-src * 'unsafe-eval' 'unsafe-inline'; img-src * data:;", 'Via': '1.1 ID-7203207600254104 uproxy-13, [14,zone-sh-putuo2-cache-54.in.ctcdn.cn], [160,zone-us-losangeles1-cache-05.in.ctcdn.cn], [290,edge-us-miami1-cache-06.in.ctcdn.cn]', 'Request-Id': 'd7956971c34b626034718381ee348716'}
+[分页参数] pageIndex=1, op=top, searchAfter=''
+
+================================================================================
+准备请求第 1 页
+pageIndex参数: 1
+================================================================================
+Attempting to post to https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query without proxy...
+HTTP Status Code: 200
+完整请求URL: https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query?sort=date&text=%E8%BF%90%E8%90%A5%E6%8A%A5%E5%91%8A&date=all&field=title&start=&end=&pageIndex=1&pageSize=15&public=false&infoLevel=QfWEaz8JJD6dsL4WJWxR%2BWKHXwbI4KuYd0QvJVi4rqKk6OPjrjfSJ3ibK%2BWrhS9n2Kobs5d%2Fu9YF%0A94oMlF90juU7HTWviBNSolsl%2FZ2zgbtNLdUgYlrtzAQ6gOKL%2F6bkVxW6ELwPD4%2FgFVDk%2FWlzTop%2B%0AAXa9Lo4P7j7k3JOz3eE%3D%0A&sign=Q%2Fd8solfMh3GOoMI5WmGUaZA1ukiCpO5sMwap9ByMZnt4tsJZeSkX6Wq1v3lRrKsnQLcWdAPun00%0ALsYa5AtcTZpCs2CvuKf8xTKL5JKkAphGIIEbpsADAhjeg2dCZIBVMUOFd2LaiLvRLJLML9AfJTc%2F%0AI44XV2MvFkyyEBuTLsA%3D%0A&channelIdStr=2496%2C2556%2C2632%2C2663%2C2589%2C2850%2C3300%2C&nodeLevel=1&op=top&searchAfter=
+
+[调试] 响应结构:
+  data keys: dict_keys(['result'])
+  result keys: dict_keys(['total', 'duration', 'birth', 'pageIndex', 'pageSize', 'pageItems', 'queryItems', 'queryId', 'sortPrev', 'sortNext', 'info'])
+[分页] 从sortNext获取到searchAfter: '1768551060000,8.6312275,3269672'
+  sortNext数组: [1768551060000, 8.6312275, 3269672]
+
+================================================================================
+第 1 页返回了 15 条记录
+================================================================================
+
+本页所有标题列表:
+  1. 2025年度江西省国有资本运营控股集团有限公司信用评级报告
+  2. 先锋国际融资租赁有限公司2025年度德宝天元第一期资产支持票据(债券通)信托资产运营报告(第3期)
+  3. 广州广汽租赁有限公司2023年度第一期绿色资产支持票据信托资产运营报告(第33期)
+  4. 广州广汽融资租赁有限公司2023年度第二期绿色资产支持票据信托资产运营报告(第29期)
+  5. 广州越秀融资租赁有限公司2024年度第二期小微资产支持票据信托资产运营报告第6期
+  6. 广州越秀融资租赁有限公司2024年度第一期资产支持票据信托资产运营报告第4期
+  7. 中联重科股份有限公司2025年度第一期保供稳链资产支持票据(科创票据)信托资产运营报告第4期
+  8. 天津国有资本投资运营有限公司2025年主体信用评级报告
+  9. 北京市海淀区国有资本运营有限公司2026年度第一期中期票据信用评级报告
+  10. 一汽租赁有限公司2023年度第三期绿色资产支持票据信托资产运营报告(第29期)
+  11. 一汽租赁有限公司2023年度第五期资产支持票据信托资产运营报告(第26期)
+  12. 一汽租赁有限公司2024年度第一期资产支持票据信托资产运营报告(第18期)
+  13. 一汽租赁有限公司2024年度第二期绿色资产支持票据信托资产运营报告(第16期)
+  14. 月华一方2025年度第一期供应链资产支持票据信托资产运营报告(第一期)
+  15. 中联重科股份有限公司2024年度第一期保供稳链资产支持票据(乡村振兴科创票据)信托资产运营报告第5期
+
+开始逐条处理第 1 页的记录...
+
+
+--- 条目 1/15 ---
+标题: 2025年度江西省国有资本运营控股集团有限公司信用评级报告
+发布时间: 2026-01-21 16:51:26
+时间戳阈值: 2025-12-28 21:11:55
+✓ 时间检查通过 (发布时间 > 阈值)
+[处理条目] 标题: 2025年度江西省国有资本运营控股集团有限公司信用评级报告
+
+--- 条目 2/15 ---
+标题: 先锋国际融资租赁有限公司2025年度德宝天元第一期资产支持票据(债券通)信托资产运营报告(第3期)
+发布时间: 2026-01-20 21:11:55
+时间戳阈值: 2025-12-28 21:11:55
+✓ 时间检查通过 (发布时间 > 阈值)
+[处理条目] 标题: 先锋国际融资租赁有限公司2025年度德宝天元第一期资产支持票据(债券通)信托资产运营报告(第3期)
+先锋国际融资租赁有限公司2025年度德宝天元第一期资产支持票据(债券通)信托资产运营报告(第3期)
+  ❌ 跳过: .done文件已存在 (/root/deal_viewer/ABSDaily/ABS/dome1/abn_file_cache/先锋国际融资租赁有限公司2025年度德宝天元第一期资产支持票据(债券通)信托资产运营报告(第3期).done)
+
+--- 条目 3/15 ---
+标题: 广州广汽租赁有限公司2023年度第一期绿色资产支持票据信托资产运营报告(第33期)
+发布时间: 2026-01-20 18:00:00
+时间戳阈值: 2025-12-28 21:11:55
+✓ 时间检查通过 (发布时间 > 阈值)
+[处理条目] 标题: 广州广汽租赁有限公司2023年度第一期绿色资产支持票据信托资产运营报告(第33期)
+广州广汽租赁有限公司2023年度第一期绿色资产支持票据信托资产运营报告(第33期)
+  ❌ 跳过: .done文件已存在 (/root/deal_viewer/ABSDaily/ABS/dome1/abn_file_cache/广州广汽租赁有限公司2023年度第一期绿色资产支持票据信托资产运营报告(第33期).done)
+
+--- 条目 4/15 ---
+标题: 广州广汽融资租赁有限公司2023年度第二期绿色资产支持票据信托资产运营报告(第29期)
+发布时间: 2026-01-20 18:00:00
+时间戳阈值: 2025-12-28 21:11:55
+✓ 时间检查通过 (发布时间 > 阈值)
+[处理条目] 标题: 广州广汽融资租赁有限公司2023年度第二期绿色资产支持票据信托资产运营报告(第29期)
+广州广汽融资租赁有限公司2023年度第二期绿色资产支持票据信托资产运营报告(第29期)
+  ❌ 跳过: .done文件已存在 (/root/deal_viewer/ABSDaily/ABS/dome1/abn_file_cache/广州广汽融资租赁有限公司2023年度第二期绿色资产支持票据信托资产运营报告(第29期).done)
+
+--- 条目 5/15 ---
+标题: 广州越秀融资租赁有限公司2024年度第二期小微资产支持票据信托资产运营报告第6期
+发布时间: 2026-01-20 16:31:12
+时间戳阈值: 2025-12-28 21:11:55
+✓ 时间检查通过 (发布时间 > 阈值)
+[处理条目] 标题: 广州越秀融资租赁有限公司2024年度第二期小微资产支持票据信托资产运营报告第6期
+广州越秀融资租赁有限公司2024年度第二期小微资产支持票据信托资产运营报告第6期
+  ❌ 跳过: .done文件已存在 (/root/deal_viewer/ABSDaily/ABS/dome1/abn_file_cache/广州越秀融资租赁有限公司2024年度第二期小微资产支持票据信托资产运营报告第6期.done)
+
+--- 条目 6/15 ---
+标题: 广州越秀融资租赁有限公司2024年度第一期资产支持票据信托资产运营报告第4期
+发布时间: 2026-01-20 16:31:11
+时间戳阈值: 2025-12-28 21:11:55
+✓ 时间检查通过 (发布时间 > 阈值)
+[处理条目] 标题: 广州越秀融资租赁有限公司2024年度第一期资产支持票据信托资产运营报告第4期
+广州越秀融资租赁有限公司2024年度第一期资产支持票据信托资产运营报告第4期
+  产品名称: 广州越秀融资租赁有限公司2024年度第一期资产支持票据
+  副标题: 信托资产运营报告第4期
+  ✓ 副标题符合条件（不含'年度'，包含'第'和'期'）
+select trustid,trustcode from TrustManagement.Trust where trustname = N'广州越秀融资租赁有限公司2024年度第一期资产支持票据'
+  ❌ 数据库中没有找到对应产品
+广州越秀融资租赁有限公司2024年度第一期资产支持票据信托资产运营报告第4期  没有找到对应产品
+  添加到failFile列表
+
+--- 条目 7/15 ---
+标题: 中联重科股份有限公司2025年度第一期保供稳链资产支持票据(科创票据)信托资产运营报告第4期
+发布时间: 2026-01-20 01:20:48
+时间戳阈值: 2025-12-28 21:11:55
+✓ 时间检查通过 (发布时间 > 阈值)
+[处理条目] 标题: 中联重科股份有限公司2025年度第一期保供稳链资产支持票据(科创票据)信托资产运营报告第4期
+中联重科股份有限公司2025年度第一期保供稳链资产支持票据(科创票据)信托资产运营报告第4期
+  产品名称: 中联重科股份有限公司2025年度第一期保供稳链资产支持票据(科创票据
+  副标题: )信托资产运营报告第4期
+  ✓ 副标题符合条件（不含'年度'，包含'第'和'期'）
+select trustid,trustcode from TrustManagement.Trust where trustname = N'中联重科股份有限公司2025年度第一期保供稳链资产支持票据(科创票据'
+  ⚠ 未找到产品，尝试去掉括号: 中联重科股份有限公司2025年度第一期保供稳链资产支持票据(科创票据
+select trustid,trustcode from TrustManagement.Trust where trustname = N'中联重科股份有限公司2025年度第一期保供稳链资产支持票据(科创票据'
+  ❌ 数据库中没有找到对应产品
+中联重科股份有限公司2025年度第一期保供稳链资产支持票据(科创票据)信托资产运营报告第4期  没有找到对应产品
+  添加到failFile列表
+
+--- 条目 8/15 ---
+标题: 天津国有资本投资运营有限公司2025年主体信用评级报告
+发布时间: 2026-01-19 21:53:49
+时间戳阈值: 2025-12-28 21:11:55
+✓ 时间检查通过 (发布时间 > 阈值)
+[处理条目] 标题: 天津国有资本投资运营有限公司2025年主体信用评级报告
+
+--- 条目 9/15 ---
+标题: 北京市海淀区国有资本运营有限公司2026年度第一期中期票据信用评级报告
+发布时间: 2026-01-19 16:55:15
+时间戳阈值: 2025-12-28 21:11:55
+✓ 时间检查通过 (发布时间 > 阈值)
+[处理条目] 标题: 北京市海淀区国有资本运营有限公司2026年度第一期中期票据信用评级报告
+北京市海淀区国有资本运营有限公司2026年度第一期中期票据信用评级报告
+  产品名称: 北京市海淀区国有资本运营有限公司2026年度第一期中期票据
+  副标题: 信用评级报告
+  ❌ 跳过: 副标题不符合条件（需要不含'年度'，且包含'第'和'期'）
+
+--- 条目 10/15 ---
+标题: 一汽租赁有限公司2023年度第三期绿色资产支持票据信托资产运营报告(第29期)
+发布时间: 2026-01-18 17:12:00
+时间戳阈值: 2025-12-28 21:11:55
+✓ 时间检查通过 (发布时间 > 阈值)
+[处理条目] 标题: 一汽租赁有限公司2023年度第三期绿色资产支持票据信托资产运营报告(第29期)
+一汽租赁有限公司2023年度第三期绿色资产支持票据信托资产运营报告(第29期)
+  ❌ 跳过: .done文件已存在 (/root/deal_viewer/ABSDaily/ABS/dome1/abn_file_cache/一汽租赁有限公司2023年度第三期绿色资产支持票据信托资产运营报告(第29期).done)
+
+--- 条目 11/15 ---
+标题: 一汽租赁有限公司2023年度第五期资产支持票据信托资产运营报告(第26期)
+发布时间: 2026-01-18 17:10:00
+时间戳阈值: 2025-12-28 21:11:55
+✓ 时间检查通过 (发布时间 > 阈值)
+[处理条目] 标题: 一汽租赁有限公司2023年度第五期资产支持票据信托资产运营报告(第26期)
+一汽租赁有限公司2023年度第五期资产支持票据信托资产运营报告(第26期)
+  ❌ 跳过: .done文件已存在 (/root/deal_viewer/ABSDaily/ABS/dome1/abn_file_cache/一汽租赁有限公司2023年度第五期资产支持票据信托资产运营报告(第26期).done)
+
+--- 条目 12/15 ---
+标题: 一汽租赁有限公司2024年度第一期资产支持票据信托资产运营报告(第18期)
+发布时间: 2026-01-18 17:07:00
+时间戳阈值: 2025-12-28 21:11:55
+✓ 时间检查通过 (发布时间 > 阈值)
+[处理条目] 标题: 一汽租赁有限公司2024年度第一期资产支持票据信托资产运营报告(第18期)
+一汽租赁有限公司2024年度第一期资产支持票据信托资产运营报告(第18期)
+  ❌ 跳过: .done文件已存在 (/root/deal_viewer/ABSDaily/ABS/dome1/abn_file_cache/一汽租赁有限公司2024年度第一期资产支持票据信托资产运营报告(第18期).done)
+
+--- 条目 13/15 ---
+标题: 一汽租赁有限公司2024年度第二期绿色资产支持票据信托资产运营报告(第16期)
+发布时间: 2026-01-18 17:03:00
+时间戳阈值: 2025-12-28 21:11:55
+✓ 时间检查通过 (发布时间 > 阈值)
+[处理条目] 标题: 一汽租赁有限公司2024年度第二期绿色资产支持票据信托资产运营报告(第16期)
+一汽租赁有限公司2024年度第二期绿色资产支持票据信托资产运营报告(第16期)
+  ❌ 跳过: .done文件已存在 (/root/deal_viewer/ABSDaily/ABS/dome1/abn_file_cache/一汽租赁有限公司2024年度第二期绿色资产支持票据信托资产运营报告(第16期).done)
+
+--- 条目 14/15 ---
+标题: 月华一方2025年度第一期供应链资产支持票据信托资产运营报告(第一期)
+发布时间: 2026-01-18 17:00:00
+时间戳阈值: 2025-12-28 21:11:55
+✓ 时间检查通过 (发布时间 > 阈值)
+[处理条目] 标题: 月华一方2025年度第一期供应链资产支持票据信托资产运营报告(第一期)
+月华一方2025年度第一期供应链资产支持票据信托资产运营报告(第一期)
+  ❌ 跳过: .done文件已存在 (/root/deal_viewer/ABSDaily/ABS/dome1/abn_file_cache/月华一方2025年度第一期供应链资产支持票据信托资产运营报告(第一期).done)
+
+--- 条目 15/15 ---
+标题: 中联重科股份有限公司2024年度第一期保供稳链资产支持票据(乡村振兴科创票据)信托资产运营报告第5期
+发布时间: 2026-01-16 00:11:00
+时间戳阈值: 2025-12-28 21:11:55
+✓ 时间检查通过 (发布时间 > 阈值)
+[处理条目] 标题: 中联重科股份有限公司2024年度第一期保供稳链资产支持票据(乡村振兴科创票据)信托资产运营报告第5期
+中联重科股份有限公司2024年度第一期保供稳链资产支持票据(乡村振兴科创票据)信托资产运营报告第5期
+  产品名称: 中联重科股份有限公司2024年度第一期保供稳链资产支持票据(乡村振兴科创票据
+  副标题: )信托资产运营报告第5期
+  ✓ 副标题符合条件（不含'年度'，包含'第'和'期'）
+select trustid,trustcode from TrustManagement.Trust where trustname = N'中联重科股份有限公司2024年度第一期保供稳链资产支持票据(乡村振兴科创票据'
+  ⚠ 未找到产品，尝试去掉括号: 中联重科股份有限公司2024年度第一期保供稳链资产支持票据(乡村振兴科创票据
+select trustid,trustcode from TrustManagement.Trust where trustname = N'中联重科股份有限公司2024年度第一期保供稳链资产支持票据(乡村振兴科创票据'
+  ❌ 数据库中没有找到对应产品
+中联重科股份有限公司2024年度第一期保供稳链资产支持票据(乡村振兴科创票据)信托资产运营报告第5期  没有找到对应产品
+  添加到failFile列表
+[分页参数] pageIndex=2, op=next, searchAfter='1768551060000,8.6312275,3269672'
+Waiting 4.81 seconds before next request...
+
+================================================================================
+准备请求第 2 页
+pageIndex参数: 2
+================================================================================
+Attempting to post to https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query without proxy...
+HTTP Status Code: 200
+完整请求URL: https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query?sort=date&text=%E8%BF%90%E8%90%A5%E6%8A%A5%E5%91%8A&date=all&field=title&start=&end=&pageIndex=2&pageSize=15&public=false&infoLevel=QfWEaz8JJD6dsL4WJWxR%2BWKHXwbI4KuYd0QvJVi4rqKk6OPjrjfSJ3ibK%2BWrhS9n2Kobs5d%2Fu9YF%0A94oMlF90juU7HTWviBNSolsl%2FZ2zgbtNLdUgYlrtzAQ6gOKL%2F6bkVxW6ELwPD4%2FgFVDk%2FWlzTop%2B%0AAXa9Lo4P7j7k3JOz3eE%3D%0A&sign=Q%2Fd8solfMh3GOoMI5WmGUaZA1ukiCpO5sMwap9ByMZnt4tsJZeSkX6Wq1v3lRrKsnQLcWdAPun00%0ALsYa5AtcTZpCs2CvuKf8xTKL5JKkAphGIIEbpsADAhjeg2dCZIBVMUOFd2LaiLvRLJLML9AfJTc%2F%0AI44XV2MvFkyyEBuTLsA%3D%0A&channelIdStr=2496%2C2556%2C2632%2C2663%2C2589%2C2850%2C3300%2C&nodeLevel=1&op=next&searchAfter=1768551060000%2C8.6312275%2C3269672
+
+[调试] 响应结构:
+  data keys: dict_keys(['result'])
+  result keys: dict_keys(['total', 'duration', 'birth', 'pageIndex', 'pageSize', 'pageItems', 'queryItems', 'queryId', 'sortPrev', 'sortNext', 'info'])
+[分页] 从sortNext获取到searchAfter: '1766711439000,8.992025,3258933'
+  sortNext数组: [1766711439000, 8.992025, 3258933]
+
+================================================================================
+第 2 页返回了 15 条记录
+================================================================================
+
+本页所有标题列表:
+  1. 中联重科股份有限公司2023年度第二期保供稳链资产支持票据(科创票据)资产运营报告第9期
+  2. 中联重科股份有限公司2025年度第一期保供稳链资产支持票据(科创票据)信托资产运营报告第4期
+  3. 东营市财金投资集团有限公司2023年度第一期资产支持票据资产运营报告第05期
+  4. 广西国控资本运营集团有限责任公司2025年主体信用评级报告
+  5. 深圳市世纪海翔投资集团有限公司2018年度第一期资产支持票据资产运营报告第九期
+  6. 光大嘉宝2018年度第一期资产支持票据信托资产运营报告(第十六期)
+  7. 弘创融资租赁有限公司2023年度第一期资产支持票据资产运营报告第8期
+  8. 国信证券股份有限公司关于绍兴市上虞区国有资本投资运营有限公司子公司股权及部分资产无偿划转的临时债权代理事务报告
+  9. 天津国有资本投资运营有限公司2025年主体信用评级报告
+  10. 深圳弗迪融资租赁有限公司2025年度第一期绿色资产支持票据信托资产运营报告第1期
+  11. 2025年度江西省国有资本运营控股集团有限公司信用评级报告
+  12. 2025年度北京市海淀区国有资本运营有限公司信用评级报告
+  13. 广州市自来水有限公司2025年度2号第一期绿色资产支持票据信托资产运营报告第2期
+  14. 中国国际金融股份有限公司关于桐乡市国有资本投资运营有限公司取消监事会及变更法定代表人之临时债权代理事务报告
+  15. 九州通医药集团股份有限公司2024年度第一期资产支持票据信托资产运营报告
+
+开始逐条处理第 2 页的记录...
+
+
+--- 条目 1/15 ---
+标题: 中联重科股份有限公司2023年度第二期保供稳链资产支持票据(科创票据)资产运营报告第9期
+发布时间: 2026-01-15 18:00:00
+时间戳阈值: 2025-12-28 21:11:55
+✓ 时间检查通过 (发布时间 > 阈值)
+[处理条目] 标题: 中联重科股份有限公司2023年度第二期保供稳链资产支持票据(科创票据)资产运营报告第9期
+中联重科股份有限公司2023年度第二期保供稳链资产支持票据(科创票据)资产运营报告第9期
+  产品名称: 中联重科股份有限公司2023年度第二期保供稳链资产支持票据(科创票据
+  副标题: )资产运营报告第9期
+  ✓ 副标题符合条件（不含'年度'，包含'第'和'期'）
+select trustid,trustcode from TrustManagement.Trust where trustname = N'中联重科股份有限公司2023年度第二期保供稳链资产支持票据(科创票据'
+  ⚠ 未找到产品，尝试去掉括号: 中联重科股份有限公司2023年度第二期保供稳链资产支持票据(科创票据
+select trustid,trustcode from TrustManagement.Trust where trustname = N'中联重科股份有限公司2023年度第二期保供稳链资产支持票据(科创票据'
+  ❌ 数据库中没有找到对应产品
+中联重科股份有限公司2023年度第二期保供稳链资产支持票据(科创票据)资产运营报告第9期  没有找到对应产品
+  添加到failFile列表
+
+--- 条目 2/15 ---
+标题: 中联重科股份有限公司2025年度第一期保供稳链资产支持票据(科创票据)信托资产运营报告第4期
+发布时间: 2026-01-15 17:00:00
+时间戳阈值: 2025-12-28 21:11:55
+✓ 时间检查通过 (发布时间 > 阈值)
+[处理条目] 标题: 中联重科股份有限公司2025年度第一期保供稳链资产支持票据(科创票据)信托资产运营报告第4期
+中联重科股份有限公司2025年度第一期保供稳链资产支持票据(科创票据)信托资产运营报告第4期
+  产品名称: 中联重科股份有限公司2025年度第一期保供稳链资产支持票据(科创票据
+  副标题: )信托资产运营报告第4期
+  ✓ 副标题符合条件（不含'年度'，包含'第'和'期'）
+select trustid,trustcode from TrustManagement.Trust where trustname = N'中联重科股份有限公司2025年度第一期保供稳链资产支持票据(科创票据'
+  ⚠ 未找到产品，尝试去掉括号: 中联重科股份有限公司2025年度第一期保供稳链资产支持票据(科创票据
+select trustid,trustcode from TrustManagement.Trust where trustname = N'中联重科股份有限公司2025年度第一期保供稳链资产支持票据(科创票据'
+  ❌ 数据库中没有找到对应产品
+中联重科股份有限公司2025年度第一期保供稳链资产支持票据(科创票据)信托资产运营报告第4期  没有找到对应产品
+  添加到failFile列表
+
+--- 条目 3/15 ---
+标题: 东营市财金投资集团有限公司2023年度第一期资产支持票据资产运营报告第05期
+发布时间: 2026-01-14 19:00:00
+时间戳阈值: 2025-12-28 21:11:55
+✓ 时间检查通过 (发布时间 > 阈值)
+[处理条目] 标题: 东营市财金投资集团有限公司2023年度第一期资产支持票据资产运营报告第05期
+东营市财金投资集团有限公司2023年度第一期资产支持票据资产运营报告第05期
+  ❌ 跳过: .done文件已存在 (/root/deal_viewer/ABSDaily/ABS/dome1/abn_file_cache/东营市财金投资集团有限公司2023年度第一期资产支持票据资产运营报告第05期.done)
+
+--- 条目 4/15 ---
+标题: 广西国控资本运营集团有限责任公司2025年主体信用评级报告
+发布时间: 2026-01-14 17:00:05
+时间戳阈值: 2025-12-28 21:11:55
+✓ 时间检查通过 (发布时间 > 阈值)
+[处理条目] 标题: 广西国控资本运营集团有限责任公司2025年主体信用评级报告
+
+--- 条目 5/15 ---
+标题: 深圳市世纪海翔投资集团有限公司2018年度第一期资产支持票据资产运营报告第九期
+发布时间: 2026-01-13 01:16:58
+时间戳阈值: 2025-12-28 21:11:55
+✓ 时间检查通过 (发布时间 > 阈值)
+[处理条目] 标题: 深圳市世纪海翔投资集团有限公司2018年度第一期资产支持票据资产运营报告第九期
+深圳市世纪海翔投资集团有限公司2018年度第一期资产支持票据资产运营报告第九期
+  ❌ 跳过: .done文件已存在 (/root/deal_viewer/ABSDaily/ABS/dome1/abn_file_cache/深圳市世纪海翔投资集团有限公司2018年度第一期资产支持票据资产运营报告第九期.done)
+
+--- 条目 6/15 ---
+标题: 光大嘉宝2018年度第一期资产支持票据信托资产运营报告(第十六期)
+发布时间: 2026-01-13 00:07:56
+时间戳阈值: 2025-12-28 21:11:55
+✓ 时间检查通过 (发布时间 > 阈值)
+[处理条目] 标题: 光大嘉宝2018年度第一期资产支持票据信托资产运营报告(第十六期)
+光大嘉宝2018年度第一期资产支持票据信托资产运营报告(第十六期)
+  ❌ 跳过: .done文件已存在 (/root/deal_viewer/ABSDaily/ABS/dome1/abn_file_cache/光大嘉宝2018年度第一期资产支持票据信托资产运营报告(第十六期).done)
+
+--- 条目 7/15 ---
+标题: 弘创融资租赁有限公司2023年度第一期资产支持票据资产运营报告第8期
+发布时间: 2026-01-12 01:39:48
+时间戳阈值: 2025-12-28 21:11:55
+✓ 时间检查通过 (发布时间 > 阈值)
+[处理条目] 标题: 弘创融资租赁有限公司2023年度第一期资产支持票据资产运营报告第8期
+弘创融资租赁有限公司2023年度第一期资产支持票据资产运营报告第8期
+  ❌ 跳过: .done文件已存在 (/root/deal_viewer/ABSDaily/ABS/dome1/abn_file_cache/弘创融资租赁有限公司2023年度第一期资产支持票据资产运营报告第8期.done)
+
+--- 条目 8/15 ---
+标题: 国信证券股份有限公司关于绍兴市上虞区国有资本投资运营有限公司子公司股权及部分资产无偿划转的临时债权代理事务报告
+发布时间: 2026-01-11 19:13:55
+时间戳阈值: 2025-12-28 21:11:55
+✓ 时间检查通过 (发布时间 > 阈值)
+[处理条目] 标题: 国信证券股份有限公司关于绍兴市上虞区国有资本投资运营有限公司子公司股权及部分资产无偿划转的临时债权代理事务报告
+
+--- 条目 9/15 ---
+标题: 天津国有资本投资运营有限公司2025年主体信用评级报告
+发布时间: 2026-01-11 17:31:17
+时间戳阈值: 2025-12-28 21:11:55
+✓ 时间检查通过 (发布时间 > 阈值)
+[处理条目] 标题: 天津国有资本投资运营有限公司2025年主体信用评级报告
+
+--- 条目 10/15 ---
+标题: 深圳弗迪融资租赁有限公司2025年度第一期绿色资产支持票据信托资产运营报告第1期
+发布时间: 2026-01-08 22:25:15
+时间戳阈值: 2025-12-28 21:11:55
+✓ 时间检查通过 (发布时间 > 阈值)
+[处理条目] 标题: 深圳弗迪融资租赁有限公司2025年度第一期绿色资产支持票据信托资产运营报告第1期
+深圳弗迪融资租赁有限公司2025年度第一期绿色资产支持票据信托资产运营报告第1期
+  ❌ 跳过: .done文件已存在 (/root/deal_viewer/ABSDaily/ABS/dome1/abn_file_cache/深圳弗迪融资租赁有限公司2025年度第一期绿色资产支持票据信托资产运营报告第1期.done)
+
+--- 条目 11/15 ---
+标题: 2025年度江西省国有资本运营控股集团有限公司信用评级报告
+发布时间: 2026-01-05 18:36:35
+时间戳阈值: 2025-12-28 21:11:55
+✓ 时间检查通过 (发布时间 > 阈值)
+[处理条目] 标题: 2025年度江西省国有资本运营控股集团有限公司信用评级报告
+
+--- 条目 12/15 ---
+标题: 2025年度北京市海淀区国有资本运营有限公司信用评级报告
+发布时间: 2026-01-05 16:17:25
+时间戳阈值: 2025-12-28 21:11:55
+✓ 时间检查通过 (发布时间 > 阈值)
+[处理条目] 标题: 2025年度北京市海淀区国有资本运营有限公司信用评级报告
+
+--- 条目 13/15 ---
+标题: 广州市自来水有限公司2025年度2号第一期绿色资产支持票据信托资产运营报告第2期
+发布时间: 2026-01-04 16:11:42
+时间戳阈值: 2025-12-28 21:11:55
+✓ 时间检查通过 (发布时间 > 阈值)
+[处理条目] 标题: 广州市自来水有限公司2025年度2号第一期绿色资产支持票据信托资产运营报告第2期
+广州市自来水有限公司2025年度2号第一期绿色资产支持票据信托资产运营报告第2期
+  产品名称: 广州市自来水有限公司2025年度2号第一期绿色资产支持票据
+  副标题: 信托资产运营报告第2期
+  ✓ 副标题符合条件（不含'年度'，包含'第'和'期'）
+select trustid,trustcode from TrustManagement.Trust where trustname = N'广州市自来水有限公司2025年度2号第一期绿色资产支持票据'
+  ❌ 数据库中没有找到对应产品
+广州市自来水有限公司2025年度2号第一期绿色资产支持票据信托资产运营报告第2期  没有找到对应产品
+  添加到failFile列表
+
+--- 条目 14/15 ---
+标题: 中国国际金融股份有限公司关于桐乡市国有资本投资运营有限公司取消监事会及变更法定代表人之临时债权代理事务报告
+发布时间: 2025-12-26 00:14:15
+时间戳阈值: 2025-12-28 21:11:55
+❌ 时间检查未通过: 发布时间 (2025-12-26 00:14:15) <= 阈值 (2025-12-28 21:11:55)
+停止处理后续记录（因为按时间倒序排列）
+[分页参数] pageIndex=3, op=next, searchAfter='1766711439000,8.992025,3258933'
+Waiting 2.74 seconds before next request...
+
+================================================================================
+准备请求第 3 页
+pageIndex参数: 3
+================================================================================
+Attempting to post to https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query without proxy...
+HTTP Status Code: 200
+完整请求URL: https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query?sort=date&text=%E8%BF%90%E8%90%A5%E6%8A%A5%E5%91%8A&date=all&field=title&start=&end=&pageIndex=3&pageSize=15&public=false&infoLevel=QfWEaz8JJD6dsL4WJWxR%2BWKHXwbI4KuYd0QvJVi4rqKk6OPjrjfSJ3ibK%2BWrhS9n2Kobs5d%2Fu9YF%0A94oMlF90juU7HTWviBNSolsl%2FZ2zgbtNLdUgYlrtzAQ6gOKL%2F6bkVxW6ELwPD4%2FgFVDk%2FWlzTop%2B%0AAXa9Lo4P7j7k3JOz3eE%3D%0A&sign=Q%2Fd8solfMh3GOoMI5WmGUaZA1ukiCpO5sMwap9ByMZnt4tsJZeSkX6Wq1v3lRrKsnQLcWdAPun00%0ALsYa5AtcTZpCs2CvuKf8xTKL5JKkAphGIIEbpsADAhjeg2dCZIBVMUOFd2LaiLvRLJLML9AfJTc%2F%0AI44XV2MvFkyyEBuTLsA%3D%0A&channelIdStr=2496%2C2556%2C2632%2C2663%2C2589%2C2850%2C3300%2C&nodeLevel=1&op=next&searchAfter=1766711439000%2C8.992025%2C3258933
+
+[调试] 响应结构:
+  data keys: dict_keys(['result'])
+  result keys: dict_keys(['total', 'duration', 'birth', 'pageIndex', 'pageSize', 'pageItems', 'queryItems', 'queryId', 'sortPrev', 'sortNext', 'info'])
+[分页] 从sortNext获取到searchAfter: '1765866031000,9.511186,3252952'
+  sortNext数组: [1765866031000, 9.511186, 3252952]
+
+================================================================================
+第 3 页返回了 15 条记录
+================================================================================
+
+本页所有标题列表:
+  1. 广西国控资本运营集团有限责任公司2025年主体信用评级报告
+  2. 先锋国际融资租赁有限公司2025年度德宝天元第一期资产支持票据(债券通)信托资产运营报告(第2期)
+  3. 广州广汽租赁有限公司2023年度第一期绿色资产支持票据信托资产运营报告(第32期)
+  4. 广州广汽融资租赁有限公司2023年度第二期绿色资产支持票据信托资产运营报告(第28期)
+  5. 广西国控资本运营集团有限责任公司2025年主体信用评级报告
+  6. 中铁一局集团有限公司2024年度第二期资产支持票据信托资产运营报告
+  7. 一汽租赁有限公司2023年度第三期绿色资产支持票据信托资产运营报告(第28期)
+  8. 一汽租赁有限公司2023年度第五期资产支持票据信托资产运营报告(第25期)
+  9. 一汽租赁有限公司2024年度第一期资产支持票据信托资产运营报告(第17期)
+  10. 一汽租赁有限公司2024年度第二期绿色资产支持票据信托资产运营报告(第15期)
+  11. 一汽租赁有限公司2020年度第一期资产支持票据信托资产运营报告第44期
+  12. 一汽租赁有限公司2020年度第二期资产支持票据信托资产运营报告(第44期)
+  13. 齐鲁文旅集团有限公司2019年度第一期资产支持票据信托资产运营报告(第12期)
+  14. 银川通联资本投资运营集团有限公司2025年度跟踪评级报告
+  15. 上海广朔实业有限公司2019年第一期光证资产支持票据信托资产运营报告(第十三期)
+
+开始逐条处理第 3 页的记录...
+
+
+--- 条目 1/15 ---
+标题: 广西国控资本运营集团有限责任公司2025年主体信用评级报告
+发布时间: 2025-12-24 18:39:49
+时间戳阈值: 2025-12-28 21:11:55
+❌ 时间检查未通过: 发布时间 (2025-12-24 18:39:49) <= 阈值 (2025-12-28 21:11:55)
+停止处理后续记录（因为按时间倒序排列）
+[分页参数] pageIndex=4, op=next, searchAfter='1765866031000,9.511186,3252952'
+Waiting 2.62 seconds before next request...
+
+================================================================================
+准备请求第 4 页
+pageIndex参数: 4
+================================================================================
+Attempting to post to https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query without proxy...
+HTTP Status Code: 200
+完整请求URL: https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query?sort=date&text=%E8%BF%90%E8%90%A5%E6%8A%A5%E5%91%8A&date=all&field=title&start=&end=&pageIndex=4&pageSize=15&public=false&infoLevel=QfWEaz8JJD6dsL4WJWxR%2BWKHXwbI4KuYd0QvJVi4rqKk6OPjrjfSJ3ibK%2BWrhS9n2Kobs5d%2Fu9YF%0A94oMlF90juU7HTWviBNSolsl%2FZ2zgbtNLdUgYlrtzAQ6gOKL%2F6bkVxW6ELwPD4%2FgFVDk%2FWlzTop%2B%0AAXa9Lo4P7j7k3JOz3eE%3D%0A&sign=Q%2Fd8solfMh3GOoMI5WmGUaZA1ukiCpO5sMwap9ByMZnt4tsJZeSkX6Wq1v3lRrKsnQLcWdAPun00%0ALsYa5AtcTZpCs2CvuKf8xTKL5JKkAphGIIEbpsADAhjeg2dCZIBVMUOFd2LaiLvRLJLML9AfJTc%2F%0AI44XV2MvFkyyEBuTLsA%3D%0A&channelIdStr=2496%2C2556%2C2632%2C2663%2C2589%2C2850%2C3300%2C&nodeLevel=1&op=next&searchAfter=1765866031000%2C9.511186%2C3252952
+
+[调试] 响应结构:
+  data keys: dict_keys(['result'])
+  result keys: dict_keys(['total', 'duration', 'birth', 'pageIndex', 'pageSize', 'pageItems', 'queryItems', 'queryId', 'sortPrev', 'sortNext', 'info'])
+[分页] 从sortNext获取到searchAfter: '1763694103000,9.368177,3236951'
+  sortNext数组: [1763694103000, 9.368177, 3236951]
+
+================================================================================
+第 4 页返回了 15 条记录
+================================================================================
+
+本页所有标题列表:
+  1. 北京市政建设集团有限责任公司2022年度第一期资产支持票据信托资产运营报告第12期
+  2. 北京住总房地产开发有限责任公司2022年度第一期资产支持票据资产运营报告第6期
+  3. 西南证券股份有限公司关于成都市金牛国有资产投资经营集团有限公司关于募投项目运营情况的债权代理事务临时报告
+  4. 新疆绿原国有资本投资运营有限公司2023年审计报告
+  5. 新疆绿原国有资本投资运营有限公司2024年审计报告
+  6. 河北省国有资产控股运营有限公司2025年度信用评级报告
+  7. 五矿二十三冶建设集团有限公司2024年度第一期资产支持票据资产运营报告第3期
+  8. 青岛海发国有资本投资运营集团有限公司2025年度主体信用评级报告
+  9. 天津国有资本投资运营有限公司2025年主体信用评级报告
+  10. 天风证券股份有限公司关于成都温江兴蓉西城市运营集团有限公司控股股东变更和无偿划转资产的临时债权代理事务报告
+  11. 北京中关村电子城建设有限公司2019年度第一期资产支持票据信托资产运营报告(第十二期)
+  12. 五矿二十三冶建设集团有限公司2024年度1号资产支持商业票据信托资产运营报告第2期
+  13. 晋江市国有资本投资运营有限责任公司2025年度信用评级报告
+  14. 青岛海发国有资本投资运营集团有限公司2025年度主体信用评级报告
+  15. 先锋国际融资租赁有限公司2025年度德宝天元第一期资产支持票据(债券通)信托资产运营报告(第1期)
+
+开始逐条处理第 4 页的记录...
+
+
+--- 条目 1/15 ---
+标题: 北京市政建设集团有限责任公司2022年度第一期资产支持票据信托资产运营报告第12期
+发布时间: 2025-12-11 01:20:26
+时间戳阈值: 2025-12-28 21:11:55
+❌ 时间检查未通过: 发布时间 (2025-12-11 01:20:26) <= 阈值 (2025-12-28 21:11:55)
+停止处理后续记录（因为按时间倒序排列）
+[分页参数] pageIndex=5, op=next, searchAfter='1763694103000,9.368177,3236951'
+Waiting 4.62 seconds before next request...
+
+================================================================================
+准备请求第 5 页
+pageIndex参数: 5
+================================================================================
+Attempting to post to https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query without proxy...
+HTTP Status Code: 200
+完整请求URL: https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query?sort=date&text=%E8%BF%90%E8%90%A5%E6%8A%A5%E5%91%8A&date=all&field=title&start=&end=&pageIndex=5&pageSize=15&public=false&infoLevel=QfWEaz8JJD6dsL4WJWxR%2BWKHXwbI4KuYd0QvJVi4rqKk6OPjrjfSJ3ibK%2BWrhS9n2Kobs5d%2Fu9YF%0A94oMlF90juU7HTWviBNSolsl%2FZ2zgbtNLdUgYlrtzAQ6gOKL%2F6bkVxW6ELwPD4%2FgFVDk%2FWlzTop%2B%0AAXa9Lo4P7j7k3JOz3eE%3D%0A&sign=Q%2Fd8solfMh3GOoMI5WmGUaZA1ukiCpO5sMwap9ByMZnt4tsJZeSkX6Wq1v3lRrKsnQLcWdAPun00%0ALsYa5AtcTZpCs2CvuKf8xTKL5JKkAphGIIEbpsADAhjeg2dCZIBVMUOFd2LaiLvRLJLML9AfJTc%2F%0AI44XV2MvFkyyEBuTLsA%3D%0A&channelIdStr=2496%2C2556%2C2632%2C2663%2C2589%2C2850%2C3300%2C&nodeLevel=1&op=next&searchAfter=1763694103000%2C9.368177%2C3236951
+
+[调试] 响应结构:
+  data keys: dict_keys(['result'])
+  result keys: dict_keys(['total', 'duration', 'birth', 'pageIndex', 'pageSize', 'pageItems', 'queryItems', 'queryId', 'sortPrev', 'sortNext', 'info'])
+[分页] 从sortNext获取到searchAfter: '1762822801000,9.329205,3229529'
+  sortNext数组: [1762822801000, 9.329205, 3229529]
+
+================================================================================
+第 5 页返回了 15 条记录
+================================================================================
+
+本页所有标题列表:
+  1. 广州广汽融资租赁有限公司2023年度第二期绿色资产支持票据信托资产运营报告(第27期)
+  2. 广州广汽租赁有限公司2023年度第一期绿色资产支持票据信托资产运营报告(第31期)
+  3. 广州越秀融资租赁有限公司2024年度第一期小微资产支持票据信托资产运营报告第6期
+  4. 广州越秀融资租赁有限公司2023年度第一期小微资产支持票据信托资产运营报告第9期
+  5. 一汽租赁有限公司2023年度第三期绿色资产支持票据信托资产运营报告(第27期)
+  6. 一汽租赁有限公司2023年度第五期资产支持票据信托资产运营报告(第24期)
+  7. 一汽租赁有限公司2024年度第一期资产支持票据信托资产运营报告(第16期)
+  8. 一汽租赁有限公司2024年度第二期绿色资产支持票据信托资产运营报告(第14期)
+  9. 兴业证券股份有限公司关于台州市黄岩国有资本投资运营集团有限公司董事长、总经理发生变动的临时债权代理事务报告
+  10. 前联2024年度第二期华发优生活五号资产支持票据资产运营报告
+  11. 关于杭州上城区国有资本运营集团有限公司总经理发生变动的临时债权代理事务报告
+  12. 天津国有资本投资运营有限公司2025年主体信用评级报告
+  13. 浙江智慧普华融资租赁有限公司2023年度第二期资产支持票据资产运营报告第9期
+  14. 2024年度北京市海淀区国有资本运营有限公司信用评级报告
+  15. 北京市海淀区国有资本运营有限公司2025年度第二期中期票据信用评级报告
+
+开始逐条处理第 5 页的记录...
+
+
+--- 条目 1/15 ---
+标题: 广州广汽融资租赁有限公司2023年度第二期绿色资产支持票据信托资产运营报告(第27期)
+发布时间: 2025-11-20 18:00:00
+时间戳阈值: 2025-12-28 21:11:55
+❌ 时间检查未通过: 发布时间 (2025-11-20 18:00:00) <= 阈值 (2025-12-28 21:11:55)
+停止处理后续记录（因为按时间倒序排列）
+[分页参数] pageIndex=6, op=next, searchAfter='1762822801000,9.329205,3229529'
+Waiting 3.40 seconds before next request...
+
+================================================================================
+准备请求第 6 页
+pageIndex参数: 6
+================================================================================
+Attempting to post to https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query without proxy...
+HTTP Status Code: 200
+完整请求URL: https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query?sort=date&text=%E8%BF%90%E8%90%A5%E6%8A%A5%E5%91%8A&date=all&field=title&start=&end=&pageIndex=6&pageSize=15&public=false&infoLevel=QfWEaz8JJD6dsL4WJWxR%2BWKHXwbI4KuYd0QvJVi4rqKk6OPjrjfSJ3ibK%2BWrhS9n2Kobs5d%2Fu9YF%0A94oMlF90juU7HTWviBNSolsl%2FZ2zgbtNLdUgYlrtzAQ6gOKL%2F6bkVxW6ELwPD4%2FgFVDk%2FWlzTop%2B%0AAXa9Lo4P7j7k3JOz3eE%3D%0A&sign=Q%2Fd8solfMh3GOoMI5WmGUaZA1ukiCpO5sMwap9ByMZnt4tsJZeSkX6Wq1v3lRrKsnQLcWdAPun00%0ALsYa5AtcTZpCs2CvuKf8xTKL5JKkAphGIIEbpsADAhjeg2dCZIBVMUOFd2LaiLvRLJLML9AfJTc%2F%0AI44XV2MvFkyyEBuTLsA%3D%0A&channelIdStr=2496%2C2556%2C2632%2C2663%2C2589%2C2850%2C3300%2C&nodeLevel=1&op=next&searchAfter=1762822801000%2C9.329205%2C3229529
+
+[调试] 响应结构:
+  data keys: dict_keys(['result'])
+  result keys: dict_keys(['total', 'duration', 'birth', 'pageIndex', 'pageSize', 'pageItems', 'queryItems', 'queryId', 'sortPrev', 'sortNext', 'info'])
+[分页] 从sortNext获取到searchAfter: '1761092222000,9.009815,3214848'
+  sortNext数组: [1761092222000, 9.009815, 3214848]
+
+================================================================================
+第 6 页返回了 15 条记录
+================================================================================
+
+本页所有标题列表:
+  1. 杭州市国有资本投资运营有限公司主体信用评级报告
+  2. 中铁一局集团有限公司2023年度第二期资产支持票据信托资产运营报告第2期
+  3. 2025年度吉林省国有资本运营集团有限责任公司信用评级报告
+  4. 中国国际金融股份有限公司关于山东城资国有资产运营(集团)有限公司变更董事及监事的临时受托管理事务报告
+  5. 青岛华通国有资本投资运营集团有限公司2025年主体评级报告
+  6. 2025年度北京国有资本运营管理有限公司信用评级报告
+  7. 北京国有资本运营管理有限公司2025年度第十一期中期票据信用评级报告
+  8. 北京住总房地产开发有限责任公司2019年度第一期资产支持票据信托资产运营报告第13期
+  9. 2025年度丽水市国有资本运营有限公司信用评级报告
+  10. 兴业证券股份有限公司关于淄博市城市资产运营集团有限公司监事变动事项的临时债权代理事务报告
+  11. 中联重科股份有限公司2024年度第一期保供稳链资产支持票据(乡村振兴科创票据)信托资产运营报告第4期
+  12. 阳光城集团股份有限公司2020年度第一期资产支持票据资产运营报告(第十二期)
+  13. 中联重科股份有限公司2025年度第一期保供稳链资产支持票据(科创票据)信托资产运营报告第3期
+  14. 中联重科股份有限公司2023年度第二期保供稳链资产支持票据(科创票据)资产运营报告第8期
+  15. 广州越秀融资租赁有限公司2024年度第二期小微资产支持票据信托资产运营报告第5期
+
+开始逐条处理第 6 页的记录...
+
+
+--- 条目 1/15 ---
+标题: 杭州市国有资本投资运营有限公司主体信用评级报告
+发布时间: 2025-11-06 18:57:57
+时间戳阈值: 2025-12-28 21:11:55
+❌ 时间检查未通过: 发布时间 (2025-11-06 18:57:57) <= 阈值 (2025-12-28 21:11:55)
+停止处理后续记录（因为按时间倒序排列）
+[分页参数] pageIndex=7, op=next, searchAfter='1761092222000,9.009815,3214848'
+Waiting 2.56 seconds before next request...
+
+================================================================================
+准备请求第 7 页
+pageIndex参数: 7
+================================================================================
+Attempting to post to https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query without proxy...
+HTTP Status Code: 200
+完整请求URL: https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query?sort=date&text=%E8%BF%90%E8%90%A5%E6%8A%A5%E5%91%8A&date=all&field=title&start=&end=&pageIndex=7&pageSize=15&public=false&infoLevel=QfWEaz8JJD6dsL4WJWxR%2BWKHXwbI4KuYd0QvJVi4rqKk6OPjrjfSJ3ibK%2BWrhS9n2Kobs5d%2Fu9YF%0A94oMlF90juU7HTWviBNSolsl%2FZ2zgbtNLdUgYlrtzAQ6gOKL%2F6bkVxW6ELwPD4%2FgFVDk%2FWlzTop%2B%0AAXa9Lo4P7j7k3JOz3eE%3D%0A&sign=Q%2Fd8solfMh3GOoMI5WmGUaZA1ukiCpO5sMwap9ByMZnt4tsJZeSkX6Wq1v3lRrKsnQLcWdAPun00%0ALsYa5AtcTZpCs2CvuKf8xTKL5JKkAphGIIEbpsADAhjeg2dCZIBVMUOFd2LaiLvRLJLML9AfJTc%2F%0AI44XV2MvFkyyEBuTLsA%3D%0A&channelIdStr=2496%2C2556%2C2632%2C2663%2C2589%2C2850%2C3300%2C&nodeLevel=1&op=next&searchAfter=1761092222000%2C9.009815%2C3214848
+
+[调试] 响应结构:
+  data keys: dict_keys(['result'])
+  result keys: dict_keys(['total', 'duration', 'birth', 'pageIndex', 'pageSize', 'pageItems', 'queryItems', 'queryId', 'sortPrev', 'sortNext', 'info'])
+[分页] 从sortNext获取到searchAfter: '1760412923000,8.92969,3208785'
+  sortNext数组: [1760412923000, 8.92969, 3208785]
+
+================================================================================
+第 7 页返回了 15 条记录
+================================================================================
+
+本页所有标题列表:
+  1. 广州越秀融资租赁有限公司2024年度第一期资产支持票据信托资产运营报告第3期
+  2. 前联2024年度第一期华发优生活五号资产支持票据资产运营报告
+  3. 广州广汽租赁有限公司2023年度第一期绿色资产支持票据信托资产运营报告(第30期)
+  4. 广州广汽融资租赁有限公司2023年度第二期绿色资产支持票据信托资产运营报告(第26期)
+  5. 北京住总房地产开发有限责任公司2018年度第一期资产支持票据信托资产运营报告第十四期
+  6. 一汽租赁有限公司2024年度第二期绿色资产支持票据信托资产运营报告(第13期)
+  7. 一汽租赁有限公司2024年度第一期资产支持票据信托资产运营报告(第15期)
+  8. 一汽租赁有限公司2023年度第五期资产支持票据信托资产运营报告(第23期)
+  9. 一汽租赁有限公司2023年度第三期绿色资产支持票据信托资产运营报告(第26期)
+  10. 北京金融街资本运营集团有限公司2025年度第一期中期票据信用评级报告
+  11. 宁夏国有资本运营集团有限责任公司主体长期信用评级报告
+  12. 宁夏国有资本运营集团有限责任公司2025年度第一期中期票据信用评级报告
+  13. 新疆可克达拉市国有资本投资运营有限责任公司主体信用评级报告
+  14. 2025年度吉林省国有资本运营集团有限责任公司信用评级报告
+  15. 吉林省国有资本运营集团有限责任公司2025年度第一期中期票据信用评级报告
+
+开始逐条处理第 7 页的记录...
+
+
+--- 条目 1/15 ---
+标题: 广州越秀融资租赁有限公司2024年度第一期资产支持票据信托资产运营报告第3期
+发布时间: 2025-10-21 17:17:01
+时间戳阈值: 2025-12-28 21:11:55
+❌ 时间检查未通过: 发布时间 (2025-10-21 17:17:01) <= 阈值 (2025-12-28 21:11:55)
+停止处理后续记录（因为按时间倒序排列）
+[分页参数] pageIndex=8, op=next, searchAfter='1760412923000,8.92969,3208785'
+Waiting 2.94 seconds before next request...
+
+================================================================================
+准备请求第 8 页
+pageIndex参数: 8
+================================================================================
+Attempting to post to https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query without proxy...
+HTTP Status Code: 200
+完整请求URL: https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query?sort=date&text=%E8%BF%90%E8%90%A5%E6%8A%A5%E5%91%8A&date=all&field=title&start=&end=&pageIndex=8&pageSize=15&public=false&infoLevel=QfWEaz8JJD6dsL4WJWxR%2BWKHXwbI4KuYd0QvJVi4rqKk6OPjrjfSJ3ibK%2BWrhS9n2Kobs5d%2Fu9YF%0A94oMlF90juU7HTWviBNSolsl%2FZ2zgbtNLdUgYlrtzAQ6gOKL%2F6bkVxW6ELwPD4%2FgFVDk%2FWlzTop%2B%0AAXa9Lo4P7j7k3JOz3eE%3D%0A&sign=Q%2Fd8solfMh3GOoMI5WmGUaZA1ukiCpO5sMwap9ByMZnt4tsJZeSkX6Wq1v3lRrKsnQLcWdAPun00%0ALsYa5AtcTZpCs2CvuKf8xTKL5JKkAphGIIEbpsADAhjeg2dCZIBVMUOFd2LaiLvRLJLML9AfJTc%2F%0AI44XV2MvFkyyEBuTLsA%3D%0A&channelIdStr=2496%2C2556%2C2632%2C2663%2C2589%2C2850%2C3300%2C&nodeLevel=1&op=next&searchAfter=1760412923000%2C8.92969%2C3208785
+
+[调试] 响应结构:
+  data keys: dict_keys(['result'])
+  result keys: dict_keys(['total', 'duration', 'birth', 'pageIndex', 'pageSize', 'pageItems', 'queryItems', 'queryId', 'sortPrev', 'sortNext', 'info'])
+[分页] 从sortNext获取到searchAfter: '1758247200000,9.412486,3199222'
+  sortNext数组: [1758247200000, 9.412486, 3199222]
+
+================================================================================
+第 8 页返回了 15 条记录
+================================================================================
+
+本页所有标题列表:
+  1. 浙江省海港投资运营集团有限公司主体信用评级报告及跟踪评级安排
+  2. 弘创融资租赁有限公司2023年度第一期资产支持票据资产运营报告第7期
+  3. 2025年度义乌市国有资本运营有限公司信用评级报告
+  4. 山东高速青岛产业投资有限公司2022年度第一期资产支持票据信托资产运营报告第8期
+  5. 中铁四局集团有限公司2023年度第二期保供稳链资产支持票据(科创票据)信托资产运营报告
+  6. 广州广汽融资租赁有限公司2023年度第二期绿色资产支持票据信托资产运营报告(第25期)
+  7. 广州广汽租赁有限公司2023年度第一期绿色资产支持票据信托资产运营报告(第29期)
+  8. 中铁四局集团有限公司2024年度第三期资产支持票据信托第一期资产运营报告
+  9. 淄博高新城市投资运营集团有限公司2025年度第二期中期票据信用评级报告
+  10. 广州市自来水有限公司2024年度3号第一期资产支持票据(科创票据)资产运营报告
+  11. 九州通医药集团股份有限公司2024年度第二期资产支持票据信托资产运营报告
+  12. 一汽租赁有限公司2024年度第一期资产支持票据信托资产运营报告(第14期)
+  13. 一汽租赁有限公司2023年度第五期资产支持票据信托资产运营报告(第22期)
+  14. 一汽租赁有限公司2024年度第二期绿色资产支持票据信托资产运营报告(第12期)
+  15. 一汽租赁有限公司2023年度第三期绿色资产支持票据信托资产运营报告(第25期)
+
+开始逐条处理第 8 页的记录...
+
+
+--- 条目 1/15 ---
+标题: 浙江省海港投资运营集团有限公司主体信用评级报告及跟踪评级安排
+发布时间: 2025-10-13 18:42:24
+时间戳阈值: 2025-12-28 21:11:55
+❌ 时间检查未通过: 发布时间 (2025-10-13 18:42:24) <= 阈值 (2025-12-28 21:11:55)
+停止处理后续记录（因为按时间倒序排列）
+[分页参数] pageIndex=9, op=next, searchAfter='1758247200000,9.412486,3199222'
+Waiting 3.00 seconds before next request...
+
+================================================================================
+准备请求第 9 页
+pageIndex参数: 9
+================================================================================
+Attempting to post to https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query without proxy...
+HTTP Status Code: 200
+完整请求URL: https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query?sort=date&text=%E8%BF%90%E8%90%A5%E6%8A%A5%E5%91%8A&date=all&field=title&start=&end=&pageIndex=9&pageSize=15&public=false&infoLevel=QfWEaz8JJD6dsL4WJWxR%2BWKHXwbI4KuYd0QvJVi4rqKk6OPjrjfSJ3ibK%2BWrhS9n2Kobs5d%2Fu9YF%0A94oMlF90juU7HTWviBNSolsl%2FZ2zgbtNLdUgYlrtzAQ6gOKL%2F6bkVxW6ELwPD4%2FgFVDk%2FWlzTop%2B%0AAXa9Lo4P7j7k3JOz3eE%3D%0A&sign=Q%2Fd8solfMh3GOoMI5WmGUaZA1ukiCpO5sMwap9ByMZnt4tsJZeSkX6Wq1v3lRrKsnQLcWdAPun00%0ALsYa5AtcTZpCs2CvuKf8xTKL5JKkAphGIIEbpsADAhjeg2dCZIBVMUOFd2LaiLvRLJLML9AfJTc%2F%0AI44XV2MvFkyyEBuTLsA%3D%0A&channelIdStr=2496%2C2556%2C2632%2C2663%2C2589%2C2850%2C3300%2C&nodeLevel=1&op=next&searchAfter=1758247200000%2C9.412486%2C3199222
+
+[调试] 响应结构:
+  data keys: dict_keys(['result'])
+  result keys: dict_keys(['total', 'duration', 'birth', 'pageIndex', 'pageSize', 'pageItems', 'queryItems', 'queryId', 'sortPrev', 'sortNext', 'info'])
+[分页] 从sortNext获取到searchAfter: '1756559385000,8.318254,3188244'
+  sortNext数组: [1756559385000, 8.318254, 3188244]
+
+================================================================================
+第 9 页返回了 15 条记录
+================================================================================
+
+本页所有标题列表:
+  1. 2025年度北京大兴发展国有资本投资运营有限公司信用评级报告
+  2. 中铁一局集团有限公司2023年度第一期绿色资产支持票据信托资产运营报告(第二期)
+  3. 2024年度银川通联资本投资运营集团有限公司信用评级报告
+  4. 关于更正《浙江智慧普华融资租赁有限公司2023年度第一期资产支持票据资产运营报告第10期》的公告及更正后的文件
+  5. 浙江智慧普华融资租赁有限公司2023年度第一期资产支持票据资产运营报告第10期
+  6. 北京市政建设集团有限责任公司2022年度第一期资产支持票据信托资产运营报告第11期
+  7. 2025年度江西省国有资本运营控股集团有限公司信用评级报告
+  8. 财通证券股份有限公司关于云和县国有资本运营有限公司子公司无偿划转的临时债权代理事务报告
+  9. 关于浙江省国有资本运营有限公司2025年度第二期科技创新债券募集资金使用情况的报告
+  10. 中铁四局集团有限公司2024年度第一期资产支持票据信托资产运营报告(2025年半年度)
+  11. 中铁四局集团有限公司2024年度第三期资产支持票据信托资产运营报告(2025年半年度)
+  12. 中铁四局集团有限公司2023年度第二期资产支持票据信托资产运营报告(2025年半年度)
+  13. 中铁四局集团有限公司2025年度第一期资产支持票据信托资产运营报告(2025年半年度)
+  14. 桐乡市国有资本投资运营有限公司公司债券中期报告(2025年)
+  15. 淄博高新城市投资运营集团有限公司公司债券2025年半年度报告
+
+开始逐条处理第 9 页的记录...
+
+
+--- 条目 1/15 ---
+标题: 2025年度北京大兴发展国有资本投资运营有限公司信用评级报告
+发布时间: 2025-09-18 17:48:18
+时间戳阈值: 2025-12-28 21:11:55
+❌ 时间检查未通过: 发布时间 (2025-09-18 17:48:18) <= 阈值 (2025-12-28 21:11:55)
+停止处理后续记录（因为按时间倒序排列）
+[分页参数] pageIndex=10, op=next, searchAfter='1756559385000,8.318254,3188244'
+Waiting 4.71 seconds before next request...
+
+================================================================================
+准备请求第 10 页
+pageIndex参数: 10
+================================================================================
+Attempting to post to https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query without proxy...
+HTTP Status Code: 200
+完整请求URL: https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query?sort=date&text=%E8%BF%90%E8%90%A5%E6%8A%A5%E5%91%8A&date=all&field=title&start=&end=&pageIndex=10&pageSize=15&public=false&infoLevel=QfWEaz8JJD6dsL4WJWxR%2BWKHXwbI4KuYd0QvJVi4rqKk6OPjrjfSJ3ibK%2BWrhS9n2Kobs5d%2Fu9YF%0A94oMlF90juU7HTWviBNSolsl%2FZ2zgbtNLdUgYlrtzAQ6gOKL%2F6bkVxW6ELwPD4%2FgFVDk%2FWlzTop%2B%0AAXa9Lo4P7j7k3JOz3eE%3D%0A&sign=Q%2Fd8solfMh3GOoMI5WmGUaZA1ukiCpO5sMwap9ByMZnt4tsJZeSkX6Wq1v3lRrKsnQLcWdAPun00%0ALsYa5AtcTZpCs2CvuKf8xTKL5JKkAphGIIEbpsADAhjeg2dCZIBVMUOFd2LaiLvRLJLML9AfJTc%2F%0AI44XV2MvFkyyEBuTLsA%3D%0A&channelIdStr=2496%2C2556%2C2632%2C2663%2C2589%2C2850%2C3300%2C&nodeLevel=1&op=next&searchAfter=1756559385000%2C8.318254%2C3188244
+
+[调试] 响应结构:
+  data keys: dict_keys(['result'])
+  result keys: dict_keys(['total', 'duration', 'birth', 'pageIndex', 'pageSize', 'pageItems', 'queryItems', 'queryId', 'sortPrev', 'sortNext', 'info'])
+[分页] 从sortNext获取到searchAfter: '1756461095000,7.434104,3187506'
+  sortNext数组: [1756461095000, 7.434104, 3187506]
+
+================================================================================
+第 10 页返回了 15 条记录
+================================================================================
+
+本页所有标题列表:
+  1. 台州市国有资本运营集团有限公司公司债券中期报告(2025年)
+  2. 湖北光谷东国有资本投资运营集团有限公司公司债券中期报告(2025年)
+  3. 湖北光谷东国有资本投资运营集团有限公司2025年半年度财务报告及附注
+  4. 丽水市国有资本运营有限公司2025年半年度报告
+  5. 北京朝阳国有资本运营管理有限公司2025年半年度报告
+  6. 桐庐县国有资本投资运营控股集团有限公司2025年半年度报告
+  7. 吉林省国有资本运营集团有限责任公司2025年半年度报告
+  8. 杭州上城区国有资本运营集团有限公司公司债券中期报告(2025年)
+  9. 新疆可克达拉市国有资本投资运营有限责任公司2025年半年度报告
+  10. 乐山国有资产投资运营(集团)有限公司2025年半年度报告
+  11. 桐乡市国有资本投资运营有限公司2025年半年度报告
+  12. 晋江市国有资本投资运营有限责任公司2025年半年度报告
+  13. 武汉国有资本投资运营集团有限公司2025年半年度报告
+  14. 益阳市城市建设投资运营集团有限责任公司2025年半年度报告
+  15. 九州通医药集团股份有限公司2024年度第一期资产支持票据信托2025半年度资产运营报告
+
+开始逐条处理第 10 页的记录...
+
+
+--- 条目 1/15 ---
+标题: 台州市国有资本运营集团有限公司公司债券中期报告(2025年)
+发布时间: 2025-08-29 07:10:18
+时间戳阈值: 2025-12-28 21:11:55
+❌ 时间检查未通过: 发布时间 (2025-08-29 07:10:18) <= 阈值 (2025-12-28 21:11:55)
+停止处理后续记录（因为按时间倒序排列）
+[分页参数] pageIndex=11, op=next, searchAfter='1756461095000,7.434104,3187506'
+Waiting 2.62 seconds before next request...
+
+================================================================================
+准备请求第 11 页
+pageIndex参数: 11
+================================================================================
+Attempting to post to https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query without proxy...
+HTTP Status Code: 200
+完整请求URL: https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query?sort=date&text=%E8%BF%90%E8%90%A5%E6%8A%A5%E5%91%8A&date=all&field=title&start=&end=&pageIndex=11&pageSize=15&public=false&infoLevel=QfWEaz8JJD6dsL4WJWxR%2BWKHXwbI4KuYd0QvJVi4rqKk6OPjrjfSJ3ibK%2BWrhS9n2Kobs5d%2Fu9YF%0A94oMlF90juU7HTWviBNSolsl%2FZ2zgbtNLdUgYlrtzAQ6gOKL%2F6bkVxW6ELwPD4%2FgFVDk%2FWlzTop%2B%0AAXa9Lo4P7j7k3JOz3eE%3D%0A&sign=Q%2Fd8solfMh3GOoMI5WmGUaZA1ukiCpO5sMwap9ByMZnt4tsJZeSkX6Wq1v3lRrKsnQLcWdAPun00%0ALsYa5AtcTZpCs2CvuKf8xTKL5JKkAphGIIEbpsADAhjeg2dCZIBVMUOFd2LaiLvRLJLML9AfJTc%2F%0AI44XV2MvFkyyEBuTLsA%3D%0A&channelIdStr=2496%2C2556%2C2632%2C2663%2C2589%2C2850%2C3300%2C&nodeLevel=1&op=next&searchAfter=1756461095000%2C7.434104%2C3187506
+
+[调试] 响应结构:
+  data keys: dict_keys(['result'])
+  result keys: dict_keys(['total', 'duration', 'birth', 'pageIndex', 'pageSize', 'pageItems', 'queryItems', 'queryId', 'sortPrev', 'sortNext', 'info'])
+[分页] 从sortNext获取到searchAfter: '1756456056000,8.848349,3186687'
+  sortNext数组: [1756456056000, 8.848349, 3186687]
+
+================================================================================
+第 11 页返回了 15 条记录
+================================================================================
+
+本页所有标题列表:
+  1. 九州通医药集团股份有限公司2024年度第二期资产支持票据信托2025半年度资产运营报告
+  2. 绍兴市上虞区国有资本投资运营有限公司2025年半年度报告
+  3. 湖北澴川国有资本投资运营集团有限公司2025年半年度报告
+  4. 眉山市国有资本投资运营集团有限公司2025年半年度报告
+  5. 中铁四局集团有限公司2024年度第二期资产支持票据信托资产运营报告(2025年半年度)
+  6. 中铁四局2023年度资产支持票据信托资产运营报告(2025年半年度)
+  7. 台州市椒江区国有资本运营集团有限公司2025年半年度报告
+  8. 厦门国有资本运营有限责任公司2025年半年度报告
+  9. 大连市国有资本管理运营有限公司2025年半年度报告
+  10. 宁夏国有资本运营集团有限责任公司2025年半年度报告
+  11. 青岛海发国有资本投资运营集团有限公司2025年半年度报告
+  12. 绍兴市国有资本运营有限公司2025年半年度报告
+  13. 浙江嘉兴国有资本投资运营有限公司2025年半年度报告
+  14. 衢州市国有资本运营有限公司2025年半年度报告
+  15. 云和县国有资本运营有限公司公司债券中期报告(2025年)
+
+开始逐条处理第 11 页的记录...
+
+
+--- 条目 1/15 ---
+标题: 九州通医药集团股份有限公司2024年度第二期资产支持票据信托2025半年度资产运营报告
+发布时间: 2025-08-29 02:50:21
+时间戳阈值: 2025-12-28 21:11:55
+❌ 时间检查未通过: 发布时间 (2025-08-29 02:50:21) <= 阈值 (2025-12-28 21:11:55)
+停止处理后续记录（因为按时间倒序排列）
+[分页参数] pageIndex=12, op=next, searchAfter='1756456056000,8.848349,3186687'
+Waiting 3.51 seconds before next request...
+
+================================================================================
+准备请求第 12 页
+pageIndex参数: 12
+================================================================================
+Attempting to post to https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query without proxy...
+HTTP Status Code: 200
+完整请求URL: https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query?sort=date&text=%E8%BF%90%E8%90%A5%E6%8A%A5%E5%91%8A&date=all&field=title&start=&end=&pageIndex=12&pageSize=15&public=false&infoLevel=QfWEaz8JJD6dsL4WJWxR%2BWKHXwbI4KuYd0QvJVi4rqKk6OPjrjfSJ3ibK%2BWrhS9n2Kobs5d%2Fu9YF%0A94oMlF90juU7HTWviBNSolsl%2FZ2zgbtNLdUgYlrtzAQ6gOKL%2F6bkVxW6ELwPD4%2FgFVDk%2FWlzTop%2B%0AAXa9Lo4P7j7k3JOz3eE%3D%0A&sign=Q%2Fd8solfMh3GOoMI5WmGUaZA1ukiCpO5sMwap9ByMZnt4tsJZeSkX6Wq1v3lRrKsnQLcWdAPun00%0ALsYa5AtcTZpCs2CvuKf8xTKL5JKkAphGIIEbpsADAhjeg2dCZIBVMUOFd2LaiLvRLJLML9AfJTc%2F%0AI44XV2MvFkyyEBuTLsA%3D%0A&channelIdStr=2496%2C2556%2C2632%2C2663%2C2589%2C2850%2C3300%2C&nodeLevel=1&op=next&searchAfter=1756456056000%2C8.848349%2C3186687
+
+[调试] 响应结构:
+  data keys: dict_keys(['result'])
+  result keys: dict_keys(['total', 'duration', 'birth', 'pageIndex', 'pageSize', 'pageItems', 'queryItems', 'queryId', 'sortPrev', 'sortNext', 'info'])
+[分页] 从sortNext获取到searchAfter: '1756449918000,8.624115,3186097'
+  sortNext数组: [1756449918000, 8.624115, 3186097]
+
+================================================================================
+第 12 页返回了 15 条记录
+================================================================================
+
+本页所有标题列表:
+  1. 浙江省海港投资运营集团有限公司2025年半年度报告
+  2. 北京国有资本运营管理有限公司公司债券中期报告(2025年)
+  3. 江西省国有资本运营控股集团有限公司2025年半年度报告
+  4. 景德镇市国资运营投资控股集团有限责任公司2025年半年度报告
+  5. 安徽省国有资本运营控股集团有限公司2025年半年度报告
+  6. 银川通联资本投资运营集团有限公司2025年半年度报告
+  7. 浙江省国有资本运营有限公司2025年半年度报告
+  8. 温州市国有资本投资运营有限公司2025年半年度报告
+  9. 北京国有资本运营管理有限公司2025年半年度报告
+  10. 天津国有资本投资运营有限公司2025年半年度报告
+  11. 龙港市国有资本运营集团有限公司公司债券中期报告(2025年)
+  12. 山西省国有资本运营有限公司2025年半年度报告
+  13. 苏州工业园区国有资本投资运营控股有限公司2025年半年度报告
+  14. 北京丰台国有资本运营集团有限公司2025年半年度报告
+  15. 常熟市国有资本投资运营集团有限公司2025年半年度报告
+
+开始逐条处理第 12 页的记录...
+
+
+--- 条目 1/15 ---
+标题: 浙江省海港投资运营集团有限公司2025年半年度报告
+发布时间: 2025-08-29 01:18:29
+时间戳阈值: 2025-12-28 21:11:55
+❌ 时间检查未通过: 发布时间 (2025-08-29 01:18:29) <= 阈值 (2025-12-28 21:11:55)
+停止处理后续记录（因为按时间倒序排列）
+[分页参数] pageIndex=13, op=next, searchAfter='1756449918000,8.624115,3186097'
+Waiting 3.74 seconds before next request...
+
+================================================================================
+准备请求第 13 页
+pageIndex参数: 13
+================================================================================
+Attempting to post to https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query without proxy...
+HTTP Status Code: 200
+完整请求URL: https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query?sort=date&text=%E8%BF%90%E8%90%A5%E6%8A%A5%E5%91%8A&date=all&field=title&start=&end=&pageIndex=13&pageSize=15&public=false&infoLevel=QfWEaz8JJD6dsL4WJWxR%2BWKHXwbI4KuYd0QvJVi4rqKk6OPjrjfSJ3ibK%2BWrhS9n2Kobs5d%2Fu9YF%0A94oMlF90juU7HTWviBNSolsl%2FZ2zgbtNLdUgYlrtzAQ6gOKL%2F6bkVxW6ELwPD4%2FgFVDk%2FWlzTop%2B%0AAXa9Lo4P7j7k3JOz3eE%3D%0A&sign=Q%2Fd8solfMh3GOoMI5WmGUaZA1ukiCpO5sMwap9ByMZnt4tsJZeSkX6Wq1v3lRrKsnQLcWdAPun00%0ALsYa5AtcTZpCs2CvuKf8xTKL5JKkAphGIIEbpsADAhjeg2dCZIBVMUOFd2LaiLvRLJLML9AfJTc%2F%0AI44XV2MvFkyyEBuTLsA%3D%0A&channelIdStr=2496%2C2556%2C2632%2C2663%2C2589%2C2850%2C3300%2C&nodeLevel=1&op=next&searchAfter=1756449918000%2C8.624115%2C3186097
+
+[调试] 响应结构:
+  data keys: dict_keys(['result'])
+  result keys: dict_keys(['total', 'duration', 'birth', 'pageIndex', 'pageSize', 'pageItems', 'queryItems', 'queryId', 'sortPrev', 'sortNext', 'info'])
+[分页] 从sortNext获取到searchAfter: '1756438235000,8.665427,3185538'
+  sortNext数组: [1756438235000, 8.665427, 3185538]
+
+================================================================================
+第 13 页返回了 15 条记录
+================================================================================
+
+本页所有标题列表:
+  1. 益阳市交通投资运营集团有限公司2025年半年度报告
+  2. 义乌市国有资本运营有限公司2025年半年度报告
+  3. 晋城市国有资本投资运营有限公司2025年半年度报告
+  4. 无锡市国发资本运营有限公司2025年半年度报告
+  5. 自贡高新国有资本投资运营集团有限公司2025年半年度报告
+  6. 青岛华通国有资本投资运营集团有限公司2025年半年度报告
+  7. 淄博高新城市投资运营集团有限公司2025年半年度报告
+  8. 成都温江兴蓉西城市运营集团有限公司2025年半年度报告
+  9. 台州市国有资本运营集团有限公司2025年半年度报告
+  10. 福州国有资本投资运营集团有限公司2025年半年度报告
+  11. 巴中市国有资本运营集团有限公司2025年半年度报告
+  12. 湖北随州国有资本投资运营集团有限公司2025年半年度报告
+  13. 神木市国有资本投资运营集团有限公司2025年半年度报告
+  14. 湖北长江产业载体运营管理有限公司2025年半年度报告
+  15. 十堰国有资本投资运营集团有限公司2025年半年度报告
+
+开始逐条处理第 13 页的记录...
+
+
+--- 条目 1/15 ---
+标题: 益阳市交通投资运营集团有限公司2025年半年度报告
+发布时间: 2025-08-28 23:42:05
+时间戳阈值: 2025-12-28 21:11:55
+❌ 时间检查未通过: 发布时间 (2025-08-28 23:42:05) <= 阈值 (2025-12-28 21:11:55)
+停止处理后续记录（因为按时间倒序排列）
+[分页参数] pageIndex=14, op=next, searchAfter='1756438235000,8.665427,3185538'
+Waiting 3.80 seconds before next request...
+
+================================================================================
+准备请求第 14 页
+pageIndex参数: 14
+================================================================================
+Attempting to post to https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query without proxy...
+HTTP Status Code: 200
+完整请求URL: https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query?sort=date&text=%E8%BF%90%E8%90%A5%E6%8A%A5%E5%91%8A&date=all&field=title&start=&end=&pageIndex=14&pageSize=15&public=false&infoLevel=QfWEaz8JJD6dsL4WJWxR%2BWKHXwbI4KuYd0QvJVi4rqKk6OPjrjfSJ3ibK%2BWrhS9n2Kobs5d%2Fu9YF%0A94oMlF90juU7HTWviBNSolsl%2FZ2zgbtNLdUgYlrtzAQ6gOKL%2F6bkVxW6ELwPD4%2FgFVDk%2FWlzTop%2B%0AAXa9Lo4P7j7k3JOz3eE%3D%0A&sign=Q%2Fd8solfMh3GOoMI5WmGUaZA1ukiCpO5sMwap9ByMZnt4tsJZeSkX6Wq1v3lRrKsnQLcWdAPun00%0ALsYa5AtcTZpCs2CvuKf8xTKL5JKkAphGIIEbpsADAhjeg2dCZIBVMUOFd2LaiLvRLJLML9AfJTc%2F%0AI44XV2MvFkyyEBuTLsA%3D%0A&channelIdStr=2496%2C2556%2C2632%2C2663%2C2589%2C2850%2C3300%2C&nodeLevel=1&op=next&searchAfter=1756438235000%2C8.665427%2C3185538
+
+[调试] 响应结构:
+  data keys: dict_keys(['result'])
+  result keys: dict_keys(['total', 'duration', 'birth', 'pageIndex', 'pageSize', 'pageItems', 'queryItems', 'queryId', 'sortPrev', 'sortNext', 'info'])
+[分页] 从sortNext获取到searchAfter: '1756429200000,9.275568,3184961'
+  sortNext数组: [1756429200000, 9.275568, 3184961]
+
+================================================================================
+第 14 页返回了 15 条记录
+================================================================================
+
+本页所有标题列表:
+  1. 开封城市运营投资集团有限公司2025年半年度报告
+  2. 广西宏桂资本运营集团有限公司2025年半年度报告
+  3. 重庆市江北区国有资本投资运营管理集团有限公司2025年半年度报告
+  4. 福建石狮国有资本运营集团有限责任公司2025年半年度报告
+  5. 自贡市国有资本投资运营集团有限公司2025年半年度报告
+  6. 漳州市国有资本运营集团有限公司2025年半年度报告
+  7. 北京市海淀区国有资本运营有限公司2025年半年度报告
+  8. 北京金融街资本运营集团有限公司2025年半年度报告
+  9. 广西国控资本运营集团有限责任公司2025年半年度报告
+  10. 无锡产业发展集团有限公司2023年度第十一期中期票据(混合型科创票据可持续挂钩)募集资金使用和基金运营情况专项报告
+  11. 岳阳市城市运营投资集团有限公司2025年半年度报告
+  12. 襄阳高新国有资本投资运营集团有限公司2025年半年度报告
+  13. 乌鲁木齐经济技术开发区建发国有资本投资运营(集团)有限公司2025年半年度报告
+  14. 北京大兴发展国有资本投资运营集团有限公司2025年半年度报告
+  15. 重庆渝富资本运营集团有限公司2025年半年度报告
+
+开始逐条处理第 14 页的记录...
+
+
+--- 条目 1/15 ---
+标题: 开封城市运营投资集团有限公司2025年半年度报告
+发布时间: 2025-08-28 20:25:00
+时间戳阈值: 2025-12-28 21:11:55
+❌ 时间检查未通过: 发布时间 (2025-08-28 20:25:00) <= 阈值 (2025-12-28 21:11:55)
+停止处理后续记录（因为按时间倒序排列）
+[分页参数] pageIndex=15, op=next, searchAfter='1756429200000,9.275568,3184961'
+Waiting 3.82 seconds before next request...
+
+================================================================================
+准备请求第 15 页
+pageIndex参数: 15
+================================================================================
+Attempting to post to https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query without proxy...
+HTTP Status Code: 200
+完整请求URL: https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query?sort=date&text=%E8%BF%90%E8%90%A5%E6%8A%A5%E5%91%8A&date=all&field=title&start=&end=&pageIndex=15&pageSize=15&public=false&infoLevel=QfWEaz8JJD6dsL4WJWxR%2BWKHXwbI4KuYd0QvJVi4rqKk6OPjrjfSJ3ibK%2BWrhS9n2Kobs5d%2Fu9YF%0A94oMlF90juU7HTWviBNSolsl%2FZ2zgbtNLdUgYlrtzAQ6gOKL%2F6bkVxW6ELwPD4%2FgFVDk%2FWlzTop%2B%0AAXa9Lo4P7j7k3JOz3eE%3D%0A&sign=Q%2Fd8solfMh3GOoMI5WmGUaZA1ukiCpO5sMwap9ByMZnt4tsJZeSkX6Wq1v3lRrKsnQLcWdAPun00%0ALsYa5AtcTZpCs2CvuKf8xTKL5JKkAphGIIEbpsADAhjeg2dCZIBVMUOFd2LaiLvRLJLML9AfJTc%2F%0AI44XV2MvFkyyEBuTLsA%3D%0A&channelIdStr=2496%2C2556%2C2632%2C2663%2C2589%2C2850%2C3300%2C&nodeLevel=1&op=next&searchAfter=1756429200000%2C9.275568%2C3184961
+
+[调试] 响应结构:
+  data keys: dict_keys(['result'])
+  result keys: dict_keys(['total', 'duration', 'birth', 'pageIndex', 'pageSize', 'pageItems', 'queryItems', 'queryId', 'sortPrev', 'sortNext', 'info'])
+[分页] 从sortNext获取到searchAfter: '1756349728000,8.967309,3183523'
+  sortNext数组: [1756349728000, 8.967309, 3183523]
+
+================================================================================
+第 15 页返回了 15 条记录
+================================================================================
+
+本页所有标题列表:
+  1. 濮阳市国有资本运营集团有限公司2025年半年度报告
+  2. 无锡产业发展集团有限公司2025年度第二期中期票据(科创票据)募集资金使用和基金运营情况专项报告
+  3. 北京市东城区国有资本运营有限公司2025年半年度报告
+  4. 山东城资国有资产运营(集团)有限公司公司债券中期报告(2025年)
+  5. 杭州市国有资本投资运营有限公司2025年半年度报告
+  6. 河北省国有资产控股运营有限公司2025年半年度报告
+  7. 宣城市国有资本投资运营控股集团有限公司2025年半年度报告
+  8. 无锡市创新投资集团有限公司2025年度第一期科技创新债券募集资金使用和基金运营情况专项报告
+  9. 乳山市国有资本运营有限公司2025年半年度报告
+  10. 蚌埠中城国有资本投资运营有限公司2025年半年度报告
+  11. 深圳市资本运营集团有限公司2025年半年度报告
+  12. 天津津智国有资本投资运营有限公司2025年半年度报告
+  13. 新疆生产建设兵团第七师国有资本投资运营集团有限公司2025年半年度报告
+  14. 浙江安吉城市运营管理集团有限公司2025年半年度报告
+  15. 赤峰国有资本运营(集团)有限公司2025年半年度报告
+
+开始逐条处理第 15 页的记录...
+
+
+--- 条目 1/15 ---
+标题: 濮阳市国有资本运营集团有限公司2025年半年度报告
+发布时间: 2025-08-28 17:57:25
+时间戳阈值: 2025-12-28 21:11:55
+❌ 时间检查未通过: 发布时间 (2025-08-28 17:57:25) <= 阈值 (2025-12-28 21:11:55)
+停止处理后续记录（因为按时间倒序排列）
+[分页参数] pageIndex=16, op=next, searchAfter='1756349728000,8.967309,3183523'
+Waiting 4.27 seconds before next request...
+
+================================================================================
+准备请求第 16 页
+pageIndex参数: 16
+================================================================================
+Attempting to post to https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query without proxy...
+HTTP Status Code: 200
+完整请求URL: https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query?sort=date&text=%E8%BF%90%E8%90%A5%E6%8A%A5%E5%91%8A&date=all&field=title&start=&end=&pageIndex=16&pageSize=15&public=false&infoLevel=QfWEaz8JJD6dsL4WJWxR%2BWKHXwbI4KuYd0QvJVi4rqKk6OPjrjfSJ3ibK%2BWrhS9n2Kobs5d%2Fu9YF%0A94oMlF90juU7HTWviBNSolsl%2FZ2zgbtNLdUgYlrtzAQ6gOKL%2F6bkVxW6ELwPD4%2FgFVDk%2FWlzTop%2B%0AAXa9Lo4P7j7k3JOz3eE%3D%0A&sign=Q%2Fd8solfMh3GOoMI5WmGUaZA1ukiCpO5sMwap9ByMZnt4tsJZeSkX6Wq1v3lRrKsnQLcWdAPun00%0ALsYa5AtcTZpCs2CvuKf8xTKL5JKkAphGIIEbpsADAhjeg2dCZIBVMUOFd2LaiLvRLJLML9AfJTc%2F%0AI44XV2MvFkyyEBuTLsA%3D%0A&channelIdStr=2496%2C2556%2C2632%2C2663%2C2589%2C2850%2C3300%2C&nodeLevel=1&op=next&searchAfter=1756349728000%2C8.967309%2C3183523
+
+[调试] 响应结构:
+  data keys: dict_keys(['result'])
+  result keys: dict_keys(['total', 'duration', 'birth', 'pageIndex', 'pageSize', 'pageItems', 'queryItems', 'queryId', 'sortPrev', 'sortNext', 'info'])
+[分页] 从sortNext获取到searchAfter: '1756083600000,7.7965612,3180198'
+  sortNext数组: [1756083600000, 7.7965612, 3180198]
+
+================================================================================
+第 16 页返回了 15 条记录
+================================================================================
+
+本页所有标题列表:
+  1. 淄博市城市资产运营集团有限公司2025年半年度报告
+  2. 淄博市城市资产运营集团有限公司2024年度第一期中期票据(项目收益)2025年上半年募集资金使用情况报告
+  3. 尚隽商业保理(上海)有限公司2021年度第一期供应链金融资产支持票据2025半年度资产运营报告
+  4. 金乡城建投资运营集团有限公司公司债券中期报告(2025年)
+  5. 淄博市城市资产运营集团有限公司主体长期信用评级报告
+  6. 烟台业达经济发展集团有限公司2023年度第一期资产支持票据2025年半年度资产运营报告
+  7. 深圳市世纪海翔投资集团有限公司2018年度第一期资产支持票据2025年半年度资产运营报告
+  8. 关于浙江省国有资本运营有限公司2025年度第三期科技创新债券募集资金使用情况的专项报告
+  9. 关于浙江省国有资本运营有限公司2024年度第一期中期票据(科创票据)募集资金使用情况的专项报告
+  10. 关于浙江省国有资本运营有限公司2023年度第一期中期票据(科创票据)募集资金使用情况的专项报告
+  11. 阳光城集团股份有限公司2020年度第一期资产支持票据信托资产运营报告(2025年半年度)
+  12. 天津国有资本投资运营有限公司2024年主体信用评级报告
+  13. 徐州市交通控股集团有限公司2023年度第一期绿色资产支持商业票据(碳中和债)信托资产运营报告(第二期)
+  14. 重庆医药(集团)股份有限公司2023年度第一期资产支持票据信托资产运营报告(第3期)
+  15. 五矿二十三冶建设集团有限公司2023年度第一期资产支持票资产运营报告第4期
+
+开始逐条处理第 16 页的记录...
+
+
+--- 条目 1/15 ---
+标题: 淄博市城市资产运营集团有限公司2025年半年度报告
+发布时间: 2025-08-27 19:05:35
+时间戳阈值: 2025-12-28 21:11:55
+❌ 时间检查未通过: 发布时间 (2025-08-27 19:05:35) <= 阈值 (2025-12-28 21:11:55)
+停止处理后续记录（因为按时间倒序排列）
+[分页参数] pageIndex=17, op=next, searchAfter='1756083600000,7.7965612,3180198'
+Waiting 3.70 seconds before next request...
+
+================================================================================
+准备请求第 17 页
+pageIndex参数: 17
+================================================================================
+Attempting to post to https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query without proxy...
+HTTP Status Code: 200
+完整请求URL: https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query?sort=date&text=%E8%BF%90%E8%90%A5%E6%8A%A5%E5%91%8A&date=all&field=title&start=&end=&pageIndex=17&pageSize=15&public=false&infoLevel=QfWEaz8JJD6dsL4WJWxR%2BWKHXwbI4KuYd0QvJVi4rqKk6OPjrjfSJ3ibK%2BWrhS9n2Kobs5d%2Fu9YF%0A94oMlF90juU7HTWviBNSolsl%2FZ2zgbtNLdUgYlrtzAQ6gOKL%2F6bkVxW6ELwPD4%2FgFVDk%2FWlzTop%2B%0AAXa9Lo4P7j7k3JOz3eE%3D%0A&sign=Q%2Fd8solfMh3GOoMI5WmGUaZA1ukiCpO5sMwap9ByMZnt4tsJZeSkX6Wq1v3lRrKsnQLcWdAPun00%0ALsYa5AtcTZpCs2CvuKf8xTKL5JKkAphGIIEbpsADAhjeg2dCZIBVMUOFd2LaiLvRLJLML9AfJTc%2F%0AI44XV2MvFkyyEBuTLsA%3D%0A&channelIdStr=2496%2C2556%2C2632%2C2663%2C2589%2C2850%2C3300%2C&nodeLevel=1&op=next&searchAfter=1756083600000%2C7.7965612%2C3180198
+
+[调试] 响应结构:
+  data keys: dict_keys(['result'])
+  result keys: dict_keys(['total', 'duration', 'birth', 'pageIndex', 'pageSize', 'pageItems', 'queryItems', 'queryId', 'sortPrev', 'sortNext', 'info'])
+[分页] 从sortNext获取到searchAfter: '1755569640000,8.043952,3176561'
+  sortNext数组: [1755569640000, 8.043952, 3176561]
+
+================================================================================
+第 17 页返回了 15 条记录
+================================================================================
+
+本页所有标题列表:
+  1. 淄博市城市资产运营集团有限公司主体长期信用评级报告
+  2. 五矿二十三冶建设集团有限公司2024年度第二期资产支持票资产运营报告第2期
+  3. 上海广朔实业有限公司2019年第一期光证资产支持票据信托2025年上半年资产运营报告
+  4. 益阳市交通投资运营集团有限公司主体长期信用评级报告
+  5. 广州广汽租赁有限公司2023年度第一期绿色资产支持票据信托资产运营报告(第28期)
+  6. 广州广汽融资租赁有限公司2023年度第二期绿色资产支持票据信托资产运营报告(第24期)
+  7. 广州越秀融资租赁有限公司2024年度第一期小微资产支持票据信托资产运营报告第5期
+  8. 齐鲁文旅集团有限公司2019年度第一期资产支持票据信托资产运营报告(半年度)
+  9. 北京市海淀区国有资本运营有限公司信用评级报告
+  10. 2024年度北京市海淀区国有资本运营有限公司信用评级报告
+  11. 广州越秀融资租赁有限公司2023年度第一期小微资产支持票据信托资产运营报告第8期
+  12. 一汽租赁有限公司2023年度第三期绿色资产支持票据信托资产运营报告(第24期)
+  13. 一汽租赁有限公司2023年度第五期资产支持票据信托资产运营报告(第21期)
+  14. 一汽租赁有限公司2024年度第二期绿色资产支持票据信托资产运营报告(第11期)
+  15. 一汽租赁有限公司2024年度第一期资产支持票据信托资产运营报告(第13期)
+
+开始逐条处理第 17 页的记录...
+
+
+--- 条目 1/15 ---
+标题: 淄博市城市资产运营集团有限公司主体长期信用评级报告
+发布时间: 2025-08-21 19:00:01
+时间戳阈值: 2025-12-28 21:11:55
+❌ 时间检查未通过: 发布时间 (2025-08-21 19:00:01) <= 阈值 (2025-12-28 21:11:55)
+停止处理后续记录（因为按时间倒序排列）
+[分页参数] pageIndex=18, op=next, searchAfter='1755569640000,8.043952,3176561'
+Waiting 4.02 seconds before next request...
+
+================================================================================
+准备请求第 18 页
+pageIndex参数: 18
+================================================================================
+Attempting to post to https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query without proxy...
+HTTP Status Code: 200
+完整请求URL: https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query?sort=date&text=%E8%BF%90%E8%90%A5%E6%8A%A5%E5%91%8A&date=all&field=title&start=&end=&pageIndex=18&pageSize=15&public=false&infoLevel=QfWEaz8JJD6dsL4WJWxR%2BWKHXwbI4KuYd0QvJVi4rqKk6OPjrjfSJ3ibK%2BWrhS9n2Kobs5d%2Fu9YF%0A94oMlF90juU7HTWviBNSolsl%2FZ2zgbtNLdUgYlrtzAQ6gOKL%2F6bkVxW6ELwPD4%2FgFVDk%2FWlzTop%2B%0AAXa9Lo4P7j7k3JOz3eE%3D%0A&sign=Q%2Fd8solfMh3GOoMI5WmGUaZA1ukiCpO5sMwap9ByMZnt4tsJZeSkX6Wq1v3lRrKsnQLcWdAPun00%0ALsYa5AtcTZpCs2CvuKf8xTKL5JKkAphGIIEbpsADAhjeg2dCZIBVMUOFd2LaiLvRLJLML9AfJTc%2F%0AI44XV2MvFkyyEBuTLsA%3D%0A&channelIdStr=2496%2C2556%2C2632%2C2663%2C2589%2C2850%2C3300%2C&nodeLevel=1&op=next&searchAfter=1755569640000%2C8.043952%2C3176561
+
+[调试] 响应结构:
+  data keys: dict_keys(['result'])
+  result keys: dict_keys(['total', 'duration', 'birth', 'pageIndex', 'pageSize', 'pageItems', 'queryItems', 'queryId', 'sortPrev', 'sortNext', 'info'])
+[分页] 从sortNext获取到searchAfter: '1754471556000,9.134549,3168526'
+  sortNext数组: [1754471556000, 9.134549, 3168526]
+
+================================================================================
+第 18 页返回了 15 条记录
+================================================================================
+
+本页所有标题列表:
+  1. 深圳市资本运营集团有限公司2025年度信用评级报告
+  2. 深圳市前海一方恒融商业保理有限公司2024年度第二期华发优生活四号资产支持票据资产运营报告
+  3. 深圳前海联易融商业保理有限公司2024年度第二期天语供应链资产支持票据信托资产运营报告-第1期
+  4. 浙江智慧普华融资租赁有限公司2023年度第二期资产支持票据资产运营报告第8期
+  5. 国信证券股份有限公司关于绍兴市上虞区国有资本投资运营有限公司董事变更的临时债权代理事务报告
+  6. 广西宏桂资本运营集团有限公司相关债券2025年跟踪评级报告
+  7. 兴业证券股份有限公司关于台州市黄岩国有资本投资运营集团有限公司取消监事会及监事的债权代理事务报告
+  8. 淄博高新城市投资运营集团有限公司2025年度第一期中期票据信用评级报告
+  9. 淄博市城市资产运营集团有限公司主体长期信用评级报告
+  10. 青岛海发国有资本投资运营集团有限公司2024年主体信用评级报告
+  11. 浙江省国有资本运营有限公司信用评级报告
+  12. 四川华西集团有限公司2024年度第一期资产支持商业票据信托资产运营报告
+  13. 2025年度北京国有资本运营管理有限公司信用评级报告
+  14. 北京国有资本运营管理有限公司2025年度第十期中期票据信用评级报告
+  15. 2025年度北京国有资本运营管理有限公司信用评级报告
+
+开始逐条处理第 18 页的记录...
+
+
+--- 条目 1/15 ---
+标题: 深圳市资本运营集团有限公司2025年度信用评级报告
+发布时间: 2025-08-18 18:52:16
+时间戳阈值: 2025-12-28 21:11:55
+❌ 时间检查未通过: 发布时间 (2025-08-18 18:52:16) <= 阈值 (2025-12-28 21:11:55)
+停止处理后续记录（因为按时间倒序排列）
+[分页参数] pageIndex=19, op=next, searchAfter='1754471556000,9.134549,3168526'
+Waiting 4.14 seconds before next request...
+
+================================================================================
+准备请求第 19 页
+pageIndex参数: 19
+================================================================================
+Attempting to post to https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query without proxy...
+HTTP Status Code: 200
+完整请求URL: https://www.chinamoney.com.cn/ses/rest/cm-u-notice-ses-cn/query?sort=date&text=%E8%BF%90%E8%90%A5%E6%8A%A5%E5%91%8A&date=all&field=title&start=&end=&pageIndex=19&pageSize=15&public=false&infoLevel=QfWEaz8JJD6dsL4WJWxR%2BWKHXwbI4KuYd0QvJVi4rqKk6OPjrjfSJ3ibK%2BWrhS9n2Kobs5d%2Fu9YF%0A94oMlF90juU7HTWviBNSolsl%2FZ2zgbtNLdUgYlrtzAQ6gOKL%2F6bkVxW6ELwPD4%2FgFVDk%2FWlzTop%2B%0AAXa9Lo4P7j7k3JOz3eE%3D%0A&sign=Q%2Fd8solfMh3GOoMI5WmGUaZA1ukiCpO5sMwap9ByMZnt4tsJZeSkX6Wq1v3lRrKsnQLcWdAPun00%0ALsYa5AtcTZpCs2CvuKf8xTKL5JKkAphGIIEbpsADAhjeg2dCZIBVMUOFd2LaiLvRLJLML9AfJTc%2F%0AI44XV2MvFkyyEBuTLsA%3D%0A&channelIdStr=2496%2C2556%2C2632%2C2663%2C2589%2C2850%2C3300%2C&nodeLevel=1&op=next&searchAfter=1754471556000%2C9.134549%2C3168526
+
+[调试] 响应结构:
+  data keys: dict_keys(['result'])
+  result keys: dict_keys(['total', 'duration', 'birth', 'pageIndex', 'pageSize', 'pageItems', 'queryItems', 'queryId', 'sortPrev', 'sortNext', 'info'])
+[分页] 从sortNext获取到searchAfter: '1753407007000,9.018845,3161051'
+  sortNext数组: [1753407007000, 9.018845, 3161051]
+
+================================================================================
+第 19 页返回了 15 条记录
+================================================================================
+
+本页所有标题列表:
+  1. 北京国有资本运营管理有限公司2025年度第九期中期票据信用评级报告
+  2. 2025年度北京大兴发展国有资本投资运营有限公司信用评级报告
+  3. 2025年度江西省国有资本运营控股集团有限公司信用评级报告
+  4. 河北省国有资产控股运营有限公司2025年度信用评级报告
+  5. 福州国有资本投资运营集团有限公司主体长期信用评级报告
+  6. 赤峰国有资本运营（集团）有限公司2025年主体信用评级报告
+  7. 2025年度丽水市国有资本运营有限公司信用评级报告
+  8. 宁夏国有资本运营集团有限责任公司2025年跟踪评级报告
+  9. 濮阳市国有资本运营集团有限公司2025年主体跟踪评级报告
+  10. 重庆渝富资本运营集团有限公司2025年度跟踪评级报告
+  11. 重庆市江北区国有资本投资运营管理集团有限公司2025年主体信用评级报告
+  12. 益阳市城市建设投资运营集团有限责任公司2025年度跟踪评级报告
+  13. 乳山市国有资本运营有限公司主体与相关债项2025年度跟踪评级报告
+  14. 台州市国有资本运营集团有限公司2025年跟踪评级报告
+  15. 安徽省国有资本运营控股集团有限公司主体与相关债项2025年度跟踪评级报告
+
+开始逐条处理第 19 页的记录...
+
+
+--- 条目 1/15 ---
+标题: 北京国有资本运营管理有限公司2025年度第九期中期票据信用评级报告
+发布时间: 2025-08-06 02:12:36
+时间戳阈值: 2025-12-28 21:11:55
+❌ 时间检查未通过: 发布时间 (2025-08-06 02:12:36) <= 阈值 (2025-12-28 21:11:55)
+停止处理后续记录（因为按时间倒序排列）
+Writing latest date time 2026-01-21 16:51:26 to /Products_log/更新时间TXT记录/ABN更新时间sms_yybg.txt

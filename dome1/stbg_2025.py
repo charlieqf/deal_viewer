@@ -632,40 +632,99 @@ def store_data_to_ftp_with_retry(ftp, data, ftp_path, retries=5):
 
 
 def get_pdf_paths_from_html(doc_url, proxies):
+    """
+    Scrapes the detail page for PDF links.
+    Implements a 'Direct First, Proxy Fallback' strategy and uses regex if BeautifulSoup fails.
+    """
     print(f"Fetching detail page: {doc_url}")
-    try:
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36",
-        }
-        response = requests.get(doc_url, headers=headers, proxies=proxies, timeout=30)
-        if response.status_code != 200:
-            print(f"Failed to fetch detail page. Status: {response.status_code}")
-            return []
-        
-        soup = BeautifulSoup(response.content, "html.parser")
-        # Find the file box
-        file_box = soup.find("div", class_="allDetailFileBox")
-        if not file_box:
-            print("Could not find div.allDetailFileBox in detail page.")
-            return []
-            
-        pdf_paths = []
-        # Find all links ending in .pdf
-        for link in file_box.find_all("a"):
-            href = link.get("href")
-            text = link.get_text(strip=True)
-            if href and href.lower().endswith(".pdf"):
-                # Resolve relative URL
-                absolute_url = urljoin(doc_url, href)
-                pdf_paths.append((absolute_url, text))
-                print(f"Found PDF via scrape: {text}")
-                
-        return pdf_paths
+    
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+        "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+        "Cache-Control": "no-cache",
+        "Pragma": "no-cache",
+        "Connection": "keep-alive"
+    }
 
+    # 1. Try Direct Request First (as demonstrated accessible in browser)
+    try:
+        print("Attempting direct fetch without proxy...")
+        response = requests.get(doc_url, headers=headers, timeout=20)
+        if response.status_code == 200:
+            print("Direct fetch successful.")
+            content = response.content
+            return extract_pdfs_from_content(content, doc_url)
+        else:
+            print(f"Direct fetch failed with status: {response.status_code}")
+    except (requests.exceptions.SSLError, requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
+        print(f"Direct fetch encountered error: {e}")
+
+    # 2. Try with Proxy if Direct fetch fails or gets blocked
+    print("Attempting fetch with proxy...")
+    try:
+        response = requests.get(doc_url, headers=headers, proxies=proxies, timeout=30)
+        if response.status_code == 200:
+            print("Proxy fetch successful.")
+            content = response.content
+            return extract_pdfs_from_content(content, doc_url)
+        else:
+            print(f"Proxy fetch failed with status: {response.status_code}")
+            return []
     except Exception as e:
-        print(f"Error scraping detail page: {e}")
-        traceback.print_exc()
+        print(f"Error scraping detail page with proxy: {e}")
         return []
+
+def extract_pdfs_from_content(content, base_url):
+    """Helper to extract PDF links from HTML content using BeautifulSoup and Regex."""
+    pdf_paths = []
+    
+    # Try BeautifulSoup first
+    try:
+        soup = BeautifulSoup(content, "html.parser")
+        file_box = soup.find("div", class_="allDetailFileBox")
+        if file_box:
+            for link in file_box.find_all("a"):
+                href = link.get("href")
+                text = link.get_text(strip=True)
+                if href and href.lower().endswith(".pdf"):
+                    absolute_url = urljoin(base_url, href)
+                    pdf_paths.append((absolute_url, text))
+            if pdf_paths:
+                print(f"Found {len(pdf_paths)} PDFs via BeautifulSoup")
+                return pdf_paths
+    except Exception as e:
+        print(f"BeautifulSoup parsing failed: {e}")
+
+    # Fallback to Regex if BeautifulSoup fails or finds nothing in the expected div
+    print("Attempting regex fallback for PDF extraction...")
+    try:
+        html_text = content.decode('utf-8', errors='ignore')
+        # Regex to find links ending in .pdf
+        # Pattern: <a ... href="path/to/file.pdf" ...>FileName</a>
+        pdf_pattern = r'<a[^>]+href=["\']([^"\']+\.pdf)["\'][^>]*>(.*?)</a>'
+        matches = re.findall(pdf_pattern, html_text, re.IGNORECASE | re.DOTALL)
+        
+        for href, text in matches:
+            # Clean up text (remove HTML tags if any)
+            clean_text = re.sub('<[^<]+?>', '', text).strip()
+            absolute_url = urljoin(base_url, href)
+            pdf_paths.append((absolute_url, clean_text))
+            
+        if pdf_paths:
+            print(f"Found {len(pdf_paths)} PDFs via Regex")
+            # De-duplicate
+            unique_pdfs = []
+            seen_urls = set()
+            for url, title in pdf_paths:
+                if url not in seen_urls:
+                    unique_pdfs.append((url, title))
+                    seen_urls.add(url)
+            return unique_pdfs
+    except Exception as e:
+        print(f"Regex extraction failed: {e}")
+
+    return []
 
 
 def use_selenium(proxies):

@@ -405,7 +405,14 @@ def create_dir_on_ftp(ftp, dir, folder):
     folder_path = os.path.join(dir, folder)
     if folder not in list_ftp_directory_with_retry(ftp, dir):
         print("create new folder: ", folder_path)
-        ftp.mkd(folder_path)
+        try:
+            ftp.mkd(folder_path)
+        except ftplib.error_perm as e:
+            # 处理目录已存在的情况 (550 Directory already exists)
+            if "550" in str(e) and ("already exists" in str(e).lower() or "exists" in str(e).lower()):
+                print(f"Directory {folder_path} already exists (detected via 550 error), continuing...")
+            else:
+                raise  # 其他550错误重新抛出
     else:
         print(folder, "already exists in", dir, "on FTP")
 
