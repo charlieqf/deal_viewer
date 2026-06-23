@@ -18,6 +18,13 @@ import ftplib
 import pyodbc
 import chardet
 import traceback
+from ftp_session_utils import (
+    attach_ftp_config,
+    ftp_operation,
+    reconnect_ftp_connection,
+    try_keepalive_noop,
+)
+from trust_code_utils import build_trust_code
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -68,37 +75,41 @@ def list_ftp_directory_with_retry(ftp, path, retries=5):
     for attempt in range(retries):
         try:
             return list_ftp_directory(ftp, path)
-        except (ftplib.error_temp, ftplib.error_perm, ftplib.error_reply, BrokenPipeError, TimeoutError, ConnectionError, socket.timeout, OSError) as e:
+        except (
+            ftplib.error_temp,
+            ftplib.error_perm,
+            ftplib.error_reply,
+            BrokenPipeError,
+            TimeoutError,
+            ConnectionError,
+            socket.timeout,
+            OSError,
+        ) as e:
             print(
                 f"Error listing directory {path}: {e}. Retrying {retries - attempt - 1} more times."
             )
-            
+
             # 对于连接相关错误，尝试重新连接FTP
-            if isinstance(e, (BrokenPipeError, TimeoutError, ConnectionError, socket.timeout, OSError)):
+            if isinstance(
+                e,
+                (
+                    BrokenPipeError,
+                    TimeoutError,
+                    ConnectionError,
+                    socket.timeout,
+                    OSError,
+                ),
+            ):
                 try:
                     print("Connection error detected, attempting to reconnect FTP...")
-                    # 保存连接信息
-                    host = ftp.host
-                    port = ftp.port
-                    user = ftp._user if hasattr(ftp, '_user') else FTP_USER  # 备用
-                    passwd = ftp._passwd if hasattr(ftp, '_passwd') else FTP_PASS  # 备用
-                    
-                    # 尝试关闭旧连接
-                    try:
-                        ftp.close()
-                    except:
-                        pass  # 忽略关闭错误
-                    
-                    # 重新连接
-                    print(f"Reconnecting to {host}:{port}...")
-                    ftp.connect(host, port, timeout=60)
-                    ftp.login(user, passwd)
+                    print(f"Reconnecting to {ftp.host}:{ftp.port}...")
+                    reconnect_ftp_connection(ftp, timeout=60)
                     print("FTP reconnection successful")
                 except Exception as reconnect_error:
                     print(f"Failed to reconnect to FTP: {reconnect_error}")
-            
+
             # 使用指数退避策略
-            wait_time = 5 * (2 ** attempt)  # 5, 10, 20, 40...
+            wait_time = 5 * (2**attempt)  # 5, 10, 20, 40...
             if wait_time > 60:
                 wait_time = 60  # 最长等待60秒
             print(f"Waiting {wait_time} seconds before next attempt...")
@@ -111,40 +122,32 @@ def list_ftp_directory_with_retry(ftp, path, retries=5):
 def list_ftp_directory(ftp, path):
     """List files and directories in the given FTP path."""
     print("Listing directory:", path)
-    
-    try:
-        # 切换到目标目录
-        ftp.cwd(path)
-    except ftplib.error_perm as e:
-        # 处理目录不存在的情况
-        if "550" in str(e):
-            print(f"Directory {path} does not exist")
-            return []
-        else:
-            raise
-    
-    try:
-        # 尝试设置更长的超时时间
-        if hasattr(ftp, 'sock') and ftp.sock:
-            ftp.sock.settimeout(120)  # 2分钟超时
-            
-        # 先尝试使用NLST命令
+
+    with ftp_operation(ftp):
         try:
-            # 使用retrlines而非retrbinary，更安全
-            items = []
-            ftp.retrlines("NLST", items.append)
-        except Exception as e:
-            # 如果NLST失败，尝试LIST命令
-            print(f"NLST failed: {e}, trying LIST command instead")
-            items = []
-            ftp.retrlines("LIST", items.append)
-            # 从完整的LIST输出中提取文件名
-            items = [item.split()[-1] for item in items if item.strip()]
-    finally:
-        # 恢复原始超时设置
-        if hasattr(ftp, 'sock') and ftp.sock:
-            ftp.sock.settimeout(None)
-    
+            ftp.cwd(path)
+        except ftplib.error_perm as e:
+            if "550" in str(e):
+                print(f"Directory {path} does not exist")
+                return []
+            raise
+
+        try:
+            if hasattr(ftp, "sock") and ftp.sock:
+                ftp.sock.settimeout(120)
+
+            try:
+                items = []
+                ftp.retrlines("NLST", items.append)
+            except Exception as e:
+                print(f"NLST failed: {e}, trying LIST command instead")
+                items = []
+                ftp.retrlines("LIST", items.append)
+                items = [item.split()[-1] for item in items if item.strip()]
+        finally:
+            if hasattr(ftp, "sock") and ftp.sock:
+                ftp.sock.settimeout(None)
+
     # 清理列表，移除空项
     result = [item for item in items if item and item.strip()]
     print(f"Found {len(result)} items in {path}")
@@ -152,10 +155,11 @@ def list_ftp_directory(ftp, path):
 
 
 def read_ftp_file(ftp, file_path):
-    with io.BytesIO() as bio:
-        ftp.retrbinary(f"RETR {file_path}", bio.write)
-        bio.seek(0)
-        return bio.read().decode("utf-8")
+    with ftp_operation(ftp):
+        with io.BytesIO() as bio:
+            ftp.retrbinary(f"RETR {file_path}", bio.write)
+            bio.seek(0)
+            return bio.read().decode("utf-8")
 
 
 def store_data_to_ftp_with_retry(ftp, data, file_path, retries=5):
@@ -163,67 +167,74 @@ def store_data_to_ftp_with_retry(ftp, data, file_path, retries=5):
     original_timeout = None
     for attempt in range(retries):
         try:
-            # 设置更长的超时时间
-            if hasattr(ftp, 'sock') and ftp.sock:
-                original_timeout = ftp.sock.gettimeout()
-                ftp.sock.settimeout(120)  # 2分钟超时
-            
-            # 创建字节流并上传
-            print(f"正在保存数据到 {file_path} =====> (尝试 {attempt+1}/{retries})")
-            with io.BytesIO(data.encode("utf-8")) as bio:
-                ftp.storbinary(f"STOR {file_path}", bio)
-            
+            with ftp_operation(ftp):
+                if hasattr(ftp, "sock") and ftp.sock:
+                    original_timeout = ftp.sock.gettimeout()
+                    ftp.sock.settimeout(120)
+
+                print(
+                    f"正在保存数据到 {file_path} =====> (尝试 {attempt + 1}/{retries})"
+                )
+                with io.BytesIO(data.encode("utf-8")) as bio:
+                    ftp.storbinary(f"STOR {file_path}", bio)
+
             print(f"成功保存数据到 {file_path}")
-            
+
             # 恢复原始超时时间
-            if hasattr(ftp, 'sock') and ftp.sock and original_timeout:
+            if hasattr(ftp, "sock") and ftp.sock and original_timeout:
                 ftp.sock.settimeout(original_timeout)
-                
+
             return True
-                
-        except (ftplib.error_temp, ftplib.error_perm, ftplib.error_reply, BrokenPipeError, TimeoutError, ConnectionError, socket.timeout, OSError) as e:
+
+        except (
+            ftplib.error_temp,
+            ftplib.error_perm,
+            ftplib.error_reply,
+            BrokenPipeError,
+            TimeoutError,
+            ConnectionError,
+            socket.timeout,
+            OSError,
+        ) as e:
             # 恢复原始超时时间
-            if hasattr(ftp, 'sock') and ftp.sock and original_timeout:
+            if hasattr(ftp, "sock") and ftp.sock and original_timeout:
                 ftp.sock.settimeout(original_timeout)
-                
+
             # 忽略"200 OK"错误，这实际上意味着操作成功
-            if '200 OK' in str(e):
+            if "200 OK" in str(e):
                 print(f"忽略带有'200 OK'的误导性错误: {e}")
                 return True
-                
-            print(f"保存数据到 {file_path} 时出错: {e}。还将重试 {retries - attempt - 1} 次。")
-            
+
+            print(
+                f"保存数据到 {file_path} 时出错: {e}。还将重试 {retries - attempt - 1} 次。"
+            )
+
             # 处理连接相关错误，尝试重新连接FTP
-            if isinstance(e, (BrokenPipeError, TimeoutError, ConnectionError, socket.timeout, OSError)):
+            if isinstance(
+                e,
+                (
+                    BrokenPipeError,
+                    TimeoutError,
+                    ConnectionError,
+                    socket.timeout,
+                    OSError,
+                ),
+            ):
                 try:
                     print("检测到连接错误，尝试重新连接FTP...")
-                    # 保存连接信息
-                    host = ftp.host
-                    port = ftp.port
-                    user = ftp._user if hasattr(ftp, '_user') else FTP_USER  # 备用
-                    passwd = ftp._passwd if hasattr(ftp, '_passwd') else FTP_PASS  # 备用
-                    
-                    # 尝试关闭旧连接
-                    try:
-                        ftp.close()
-                    except:
-                        pass  # 忽略关闭错误
-                    
-                    # 重新连接
-                    print(f"重新连接到 {host}:{port}...")
-                    ftp.connect(host, port, timeout=120)  # 更长的超时时间
-                    ftp.login(user, passwd)
+                    print(f"重新连接到 {ftp.host}:{ftp.port}...")
+                    reconnect_ftp_connection(ftp, timeout=120)
                     print("FTP重连成功")
                 except Exception as reconnect_error:
                     print(f"重连FTP失败: {reconnect_error}")
-            
+
             # 使用指数退避策略
-            wait_time = 5 * (2 ** attempt)  # 5, 10, 20, 40...
+            wait_time = 5 * (2**attempt)  # 5, 10, 20, 40...
             if wait_time > 60:
                 wait_time = 60  # 最长等待时间60秒
             print(f"等待 {wait_time} 秒后重试...")
             time.sleep(wait_time)
-    
+
     # 所有重试都失败
     raise Exception(f"在 {retries} 次尝试后仍然无法保存数据到 {file_path}")
 
@@ -237,6 +248,7 @@ print("Connect to FTP server ", FTP_HOST, FTP_PORT)
 ftp = ftplib.FTP()
 ftp.connect(FTP_HOST, FTP_PORT, timeout=600)
 ftp.login(FTP_USER, FTP_PASS)
+attach_ftp_config(ftp, host=FTP_HOST, port=FTP_PORT, user=FTP_USER, password=FTP_PASS)
 # ftp.cwd(FTP_HOME_DIR)
 
 
@@ -254,35 +266,32 @@ ftp2.connect(FTP2_HOST, FTP2_PORT, timeout=600)
 ftp2.login(FTP2_USER, FTP2_PASS)
 enable_utf8(ftp2)
 ftp2.encoding = "utf-8"
+attach_ftp_config(
+    ftp2,
+    host=FTP2_HOST,
+    port=FTP2_PORT,
+    user=FTP2_USER,
+    password=FTP2_PASS,
+    encoding="utf-8",
+    enable_utf8=True,
+)
 
 
 def keep_alive(ftp, interval):
     while True:
         try:
-            # 尝试发送NOOP命令保持连接活跃
-            ftp.voidcmd("NOOP")
+            if not try_keepalive_noop(ftp):
+                time.sleep(interval)
+                continue
         except Exception as e:
-            # 捕获所有异常，防止线程崩溃
             print(f"FTP keep-alive error: {e}")
-            # 如果是严重错误，可能需要重新连接FTP
+            print("FTP connection appears to be broken, attempting reconnect...")
             try:
-                # 检查FTP连接是否仍然活跃
-                ftp.voidcmd("PWD")
-            except:
-                print("FTP connection appears to be broken, attempting reconnect...")
-                try:
-                    # 尝试重新连接FTP
-                    if isinstance(ftp, ftplib.FTP):
-                        host = ftp.host
-                        port = ftp.port
-                        user = ftp._user
-                        passwd = ftp._passwd
-                        ftp.connect(host, port, timeout=600)
-                        ftp.login(user, passwd)
-                        print("FTP reconnection successful")
-                except Exception as reconnect_error:
-                    print(f"Failed to reconnect to FTP: {reconnect_error}")
-        # 无论是否发生异常，都等待指定的时间
+                if isinstance(ftp, ftplib.FTP):
+                    reconnect_ftp_connection(ftp, timeout=600)
+                    print("FTP reconnection successful")
+            except Exception as reconnect_error:
+                print(f"Failed to reconnect to FTP: {reconnect_error}")
         time.sleep(interval)
 
 
@@ -344,6 +353,7 @@ proxies = {
 
 import re
 
+
 def get_pdf_paths_from_html(doc_url, proxies):
     print(f"Fetching detail page: {doc_url}")
     try:
@@ -354,11 +364,11 @@ def get_pdf_paths_from_html(doc_url, proxies):
         if response.status_code != 200:
             print(f"Failed to fetch detail page. Status: {response.status_code}")
             return []
-        
+
         soup = BeautifulSoup(response.content, "html.parser")
         # Find the file box
         file_box = soup.find("div", class_="allDetailFileBox")
-        
+
         pdf_paths = []
         if file_box:
             # Find all links ending in .pdf
@@ -370,20 +380,20 @@ def get_pdf_paths_from_html(doc_url, proxies):
                     absolute_url = urljoin(doc_url, href)
                     pdf_paths.append((absolute_url, text))
                     print(f"Found PDF via scrape: {text}")
-        
+
         if not pdf_paths:
             print("BeautifulSoup found no PDFs. Attempting regex fallback...")
             content = response.text
             # Regex for double quotes
             pdf_pattern = r'<a[^>]+href="([^"]+\.pdf)"[^>]*>([^<]+)</a>'
             matches = re.findall(pdf_pattern, content, re.IGNORECASE)
-            
+
             # Regex for single quotes
             pdf_pattern_sq = r"<a[^>]+href='([^']+\.pdf)'[^>]*>([^<]+)</a>"
             matches_sq = re.findall(pdf_pattern_sq, content, re.IGNORECASE)
-            
+
             all_matches = matches + matches_sq
-            
+
             for href, text in all_matches:
                 text = text.strip()
                 absolute_url = urljoin(doc_url, href)
@@ -391,13 +401,14 @@ def get_pdf_paths_from_html(doc_url, proxies):
                 if (absolute_url, text) not in pdf_paths:
                     pdf_paths.append((absolute_url, text))
                     print(f"Found PDF via regex: {text}")
-                
+
         return pdf_paths
 
     except Exception as e:
         print(f"Error scraping detail page: {e}")
         traceback.print_exc()
         return []
+
 
 def use_selenium(proxies):
     # proxy test
@@ -435,8 +446,8 @@ def use_selenium(proxies):
             "endDate": "",
             "reportType": "",
             "reportYear": "",
-            "ratingAgency": ""
-        }
+            "ratingAgency": "",
+        },
     }
 
     # Define headers for the request
@@ -445,7 +456,7 @@ def use_selenium(proxies):
         "Accept": "application/json, text/javascript, */*; q=0.01",
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36",
         "X-Requested-With": "XMLHttpRequest",
-        "Referer": "https://www.chinabond.com.cn/xxpl/ywzc_fxyfxdh/fxyfxdh_zqzl/zqzl_zjzzczj/"
+        "Referer": "https://www.chinabond.com.cn/xxpl/ywzc_fxyfxdh/fxyfxdh_zqzl/zqzl_zjzzczj/",
     }
 
     # Configure the proxy
@@ -505,9 +516,10 @@ def use_selenium(proxies):
                         pdf_path = f"{pdf_path_home}/{pdf_name}"
                         pdf_paths.append((pdf_path, target_pdf_name))
             else:
-                 print(f"No appendixIds for {doc_title}, attempting to scrape detail page...")
-                 pdf_paths = get_pdf_paths_from_html(doc_url, proxies)
-
+                print(
+                    f"No appendixIds for {doc_title}, attempting to scrape detail page..."
+                )
+                pdf_paths = get_pdf_paths_from_html(doc_url, proxies)
 
             # save the data to products
 
@@ -531,8 +543,9 @@ def use_selenium(proxies):
 
     # write latest_date_time to the update log file on the FTP server
     print("Writing latest date time {} to".format(latest_date_time), UPDATE_LOG_PATH)
-    with io.BytesIO(latest_date_time.encode("utf-8")) as bio:
-        ftp.storbinary(f"STOR {UPDATE_LOG_PATH}", bio)
+    with ftp_operation(ftp):
+        with io.BytesIO(latest_date_time.encode("utf-8")) as bio:
+            ftp.storbinary(f"STOR {UPDATE_LOG_PATH}", bio)
 
 
 def get_web_pdf_content(web_pdf_path):
@@ -541,43 +554,58 @@ def get_web_pdf_content(web_pdf_path):
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36",
         "Accept": "application/pdf",
     }
-    
+
     # First try without using SmartProxy
     print("Attempting to download without proxy first...")
     try:
         response = requests.get(encoded_url, headers=headers, timeout=(10, 30))
-        
+
         # Check if request was successful
-        if response.status_code == 200 and response.headers.get("Content-Type") == "application/pdf":
+        if (
+            response.status_code == 200
+            and response.headers.get("Content-Type") == "application/pdf"
+        ):
             print("Download successful without proxy")
             return True, response.content
-        
+
         # Check if this is an IP-related failure
         ip_related_failure = False
         if response.status_code in [403, 429, 451]:
             ip_related_failure = True
         elif response.status_code != 200:
             # Check response text for IP blocking messages
-            ip_block_indicators = ["blocked", "forbidden", "access denied", "IP", "地址被禁止", "访问受限", "访问被拒绝"]
+            ip_block_indicators = [
+                "blocked",
+                "forbidden",
+                "access denied",
+                "IP",
+                "地址被禁止",
+                "访问受限",
+                "访问被拒绝",
+            ]
             response_text = response.text.lower()
             for indicator in ip_block_indicators:
                 if indicator.lower() in response_text:
                     ip_related_failure = True
                     break
-        
+
         if not ip_related_failure:
             # Failed but not due to IP issues
-            print(f"Failed to download without proxy. Status: {response.status_code}. Not IP related.")
+            print(
+                f"Failed to download without proxy. Status: {response.status_code}. Not IP related."
+            )
             return False, response.text
     except Exception as e:
         print(f"Error during non-proxy download attempt: {e}")
         # For connection errors, assume it could be IP related
-        if isinstance(e, (requests.exceptions.ConnectionError, requests.exceptions.Timeout)):
+        if isinstance(
+            e, (requests.exceptions.ConnectionError, requests.exceptions.Timeout)
+        ):
             print("Connection error - might be IP related")
         else:
             # For other types of errors, return the error
             return False, str(e)
-    
+
     # If we got here, either there was an IP-related failure or an exception occurred
     # Try again with SmartProxy
     print("Trying download with SmartProxy...")
@@ -585,7 +613,7 @@ def get_web_pdf_content(web_pdf_path):
         response = requests.get(
             encoded_url, headers=headers, proxies=proxies, timeout=(10, 30)
         )
-        
+
         # Check if the content is actually a PDF
         print("Checking content from proxy request")
         if response.headers.get("Content-Type") == "application/pdf":
@@ -604,11 +632,13 @@ def create_dir_on_ftp(ftp, dir, folder):
     folder_path = os.path.join(dir, folder)
     if folder not in list_ftp_directory_with_retry(ftp, dir):
         print("create new folder: ", folder_path)
-        ftp.mkd(folder_path)
+        with ftp_operation(ftp):
+            ftp.mkd(folder_path)
     else:
         print(folder, "already exists in", dir, "on FTP")
 
     return folder_path
+
 
 def update_pdf_new(products):
     month = str(datetime.now().month)
@@ -632,14 +662,14 @@ def update_pdf_new(products):
 
         # if parse(web_date) < datetime.strptime('2024-06-12', "%Y-%m-%d") and parse(web_date) >= datetime.strptime('2024-06-14', "%Y-%m-%d"):
         #     continue
-        
+
         # if '兴瑞2024年' not in product_name and '招元和萃2024年' not in product_name and '臻粹2024年' not in product_name:
         #     continue
 
         print("处理产品:", product_name)
 
         # 在数据库中新建产品（如尚不存在）
-        trust_code = create_new_product(product_name, web_date)
+        trust_code = create_new_product(product_name)
 
         print("TrustCode:", trust_code)
 
@@ -715,7 +745,7 @@ def update_pdf_new(products):
                 if ".pdf" in target_pdf_name:
                     if "评级报告" in target_pdf_name:
                         ftp_dir = ftp_dv_credit_rating_folder_path
-                        sql_file_path = ftp_dv_credit_rating_folder_path + '/'
+                        sql_file_path = ftp_dv_credit_rating_folder_path + "/"
 
                         # 文件上传
                         file_type = "ProductCreditRatingFiles"
@@ -733,7 +763,7 @@ def update_pdf_new(products):
                         )
                     else:
                         ftp_dir = ftp_dv_release_instruction_folder_path
-                        sql_file_path = ftp_dv_release_instruction_folder_path + '/'
+                        sql_file_path = ftp_dv_release_instruction_folder_path + "/"
 
                         # 文件上传
                         file_type = "ProductReleaseInstructions"
@@ -762,31 +792,34 @@ def update_pdf_new(products):
                 txt = trust_code + ".txt"
                 ftp_trust_code_txt_path = os.path.join(product_folder_path, txt)
                 # create this empty txt file on FTP server at ftp_trust_code_txt_path
-                with io.BytesIO(b"") as bio:
-                    ftp.storbinary(f"STOR {ftp_trust_code_txt_path}", bio)
+                with ftp_operation(ftp):
+                    with io.BytesIO(b"") as bio:
+                        ftp.storbinary(f"STOR {ftp_trust_code_txt_path}", bio)
 
                 # create a 'title.success' file in the cache folder, if not exists
                 if not os.path.exists(success_file):
                     with open(success_file, "w") as f:
                         f.write("success")
 
-
         except Exception:
             print(trust_code, "披露信息插入失败!")
             traceback.print_exc()
 
-        print('产品新建完成')
+        print("产品新建完成")
 
-def upload_file_to_ftp_with_retry(ftp, local_file_path, ftp_folder, ftp_file_path, file_name, retries=5):
+
+def upload_file_to_ftp_with_retry(
+    ftp, local_file_path, ftp_folder, ftp_file_path, file_name, retries=5
+):
     """上传文件到FTP，带有重试和自动重连功能"""
     original_timeout = None
     for attempt in range(retries):
         try:
             # 设置更长的超时时间
-            if hasattr(ftp, 'sock') and ftp.sock:
+            if hasattr(ftp, "sock") and ftp.sock:
                 original_timeout = ftp.sock.gettimeout()
                 ftp.sock.settimeout(120)  # 2分钟超时
-            
+
             # 检查文件在FTP上是否存在
             file_exists = False
             try:
@@ -794,100 +827,114 @@ def upload_file_to_ftp_with_retry(ftp, local_file_path, ftp_folder, ftp_file_pat
                 file_exists = file_name in dir_contents
             except Exception as e:
                 # 如果遇到"200 OK"错误，忽略它并继续
-                if '200 OK' in str(e):
+                if "200 OK" in str(e):
                     print(f"忽略误导性的目录列表错误: {e}")
                 else:
                     raise
-                    
+
             if not file_exists:
-                print(f"Writing {local_file_path} to {ftp_file_path} =====> (Attempt {attempt+1}/{retries})")
+                print(
+                    f"Writing {local_file_path} to {ftp_file_path} =====> (Attempt {attempt + 1}/{retries})"
+                )
                 try:
                     with open(local_file_path, "rb") as f:
-                        ftp.storbinary(f"STOR {ftp_file_path}", f)
+                        with ftp_operation(ftp):
+                            ftp.storbinary(f"STOR {ftp_file_path}", f)
                     print(f"Successfully uploaded {ftp_file_path}")
-                    
+
                     # 恢复原始超时时间
-                    if hasattr(ftp, 'sock') and ftp.sock and original_timeout:
+                    if hasattr(ftp, "sock") and ftp.sock and original_timeout:
                         ftp.sock.settimeout(original_timeout)
-                        
+
                     return True
                 except Exception as upload_error:
                     # 如果错误消息包含"200 OK"，实际上是成功的
-                    if '200 OK' in str(upload_error):
-                        print(f"Upload successful despite error message: {upload_error}")
-                        
+                    if "200 OK" in str(upload_error):
+                        print(
+                            f"Upload successful despite error message: {upload_error}"
+                        )
+
                         # 恢复原始超时时间
-                        if hasattr(ftp, 'sock') and ftp.sock and original_timeout:
+                        if hasattr(ftp, "sock") and ftp.sock and original_timeout:
                             ftp.sock.settimeout(original_timeout)
-                            
+
                         return True
                     # 否则重新抛出异常
                     raise
             else:
                 print(f"File already exists on FTP in folder: {ftp_folder}")
-                
+
                 # 恢复原始超时时间
-                if hasattr(ftp, 'sock') and ftp.sock and original_timeout:
+                if hasattr(ftp, "sock") and ftp.sock and original_timeout:
                     ftp.sock.settimeout(original_timeout)
-                    
+
                 return True
-                
-        except (ftplib.error_temp, ftplib.error_perm, ftplib.error_reply, BrokenPipeError, TimeoutError, ConnectionError, socket.timeout, OSError) as e:
+
+        except (
+            ftplib.error_temp,
+            ftplib.error_perm,
+            ftplib.error_reply,
+            BrokenPipeError,
+            TimeoutError,
+            ConnectionError,
+            socket.timeout,
+            OSError,
+        ) as e:
             # 恢复原始超时时间
-            if hasattr(ftp, 'sock') and ftp.sock and original_timeout:
+            if hasattr(ftp, "sock") and ftp.sock and original_timeout:
                 ftp.sock.settimeout(original_timeout)
-                
+
             # 忽略"200 OK"错误，这实际上意味着操作成功
-            if '200 OK' in str(e):
+            if "200 OK" in str(e):
                 print(f"Ignoring misleading error with '200 OK': {e}")
                 return True
-                
-            print(f"Error uploading file {ftp_file_path}: {e}. Retrying {retries - attempt - 1} more times.")
-            
+
+            print(
+                f"Error uploading file {ftp_file_path}: {e}. Retrying {retries - attempt - 1} more times."
+            )
+
             # 处理连接相关错误，尝试重新连接FTP
-            if isinstance(e, (BrokenPipeError, TimeoutError, ConnectionError, socket.timeout, OSError)):
+            if isinstance(
+                e,
+                (
+                    BrokenPipeError,
+                    TimeoutError,
+                    ConnectionError,
+                    socket.timeout,
+                    OSError,
+                ),
+            ):
                 try:
                     print("Connection error detected, attempting to reconnect FTP...")
-                    # Save connection info
-                    host = ftp.host
-                    port = ftp.port
-                    user = ftp._user if hasattr(ftp, '_user') else FTP_USER  # Fallback
-                    passwd = ftp._passwd if hasattr(ftp, '_passwd') else FTP_PASS  # Fallback
-                    
-                    # Try to close old connection
-                    try:
-                        ftp.close()
-                    except:
-                        pass  # Ignore close errors
-                    
-                    # Reconnect
-                    print(f"Reconnecting to {host}:{port}...")
-                    ftp.connect(host, port, timeout=120)  # Longer timeout for upload
-                    ftp.login(user, passwd)
+                    print(f"Reconnecting to {ftp.host}:{ftp.port}...")
+                    reconnect_ftp_connection(ftp, timeout=120)
                     print("FTP reconnection successful")
                 except Exception as reconnect_error:
                     print(f"Failed to reconnect to FTP: {reconnect_error}")
-            
+
             # Use exponential backoff strategy
-            wait_time = 5 * (2 ** attempt)  # 5, 10, 20, 40...
+            wait_time = 5 * (2**attempt)  # 5, 10, 20, 40...
             if wait_time > 60:
                 wait_time = 60  # Maximum wait of 60 seconds
             print(f"Waiting {wait_time} seconds before next attempt...")
             time.sleep(wait_time)
-    
+
     # All retries failed
     raise Exception(f"Failed to upload file {ftp_file_path} after {retries} attempts")
 
+
 def upload_file_to_ftp(ftp, local_file_path, ftp_folder, ftp_file_path, file_name):
     # Use the retry version
-    return upload_file_to_ftp_with_retry(ftp, local_file_path, ftp_folder, ftp_file_path, file_name)
+    return upload_file_to_ftp_with_retry(
+        ftp, local_file_path, ftp_folder, ftp_file_path, file_name
+    )
+
 
 # 转换中文数值为阿拉伯数值
 def conversion(str):
     if type(str) == int:
         return str
     else:
-
         zhong = {
             "零": 0,
             "一": 1,
@@ -955,8 +1002,8 @@ def conversion(str):
         return num
 
 
-# Trust表插入 new 产品数据
-def create_new_product(product_name, web_date=None):
+# Trust表插入新产品数据
+def create_new_product(product_name):
     global trust_code
     if "消费贷款" in product_name:
         FCode = "ConsumerLoan"
@@ -966,7 +1013,11 @@ def create_new_product(product_name, web_date=None):
         FCode = "CreditLoan"
     elif "住房抵押贷款" in product_name:
         FCode = "RMBS"
-    elif "汽车抵押贷款" in product_name or "汽车贷款" in product_name or "汽车分期贷款" in product_name:
+    elif "汽车抵押贷款" in product_name:
+        FCode = "AUTO"
+    elif "汽车贷款" in product_name:
+        FCode = "AUTO"
+    elif "汽车分期贷款" in product_name:
         FCode = "AUTO"
     elif "微小企业贷款" in product_name:
         FCode = "SmallLoan"
@@ -983,54 +1034,28 @@ def create_new_product(product_name, web_date=None):
         trust_name = "华驭第十六期汽车抵押贷款支持证券"
     else:
         try:
-            # 基础拼音转换（仅对“第”字之前的部分）
-            brand_name = product_name.split("第")[0]
-            s_brand = ""
-            for i in pypinyin.pinyin(brand_name, style=pypinyin.NORMAL):
-                s_brand += i[0].title()
-
-            # 获取期数
-            sp_filename = product_name.split("第")[1]
-            nper_str = sp_filename.split("期")[0]
-            conversion_nper = conversion(nper_str)
-
-            # 获取年份
-            year_str = "2025" # 默认
-            if web_date:
-                try:
-                    year_str = str(parse(str(web_date)).year)
-                except:
-                    pass
-            elif "2024" in product_name:
-                year_str = "2024"
-            elif "2026" in product_name:
-                year_str = "2026"
-
-            # 兼容性判断：原逻辑如果拼音中含2025则按原逻辑拆分
-            full_s = ""
+            s = ""
             for i in pypinyin.pinyin(product_name, style=pypinyin.NORMAL):
-                full_s += i[0].title()
-            
-            if year_str in full_s:
-                # 保持原逻辑以防副作用
-                s = full_s.split("Nian")[0]
-                s_trust_code = s + "-" + str(conversion_nper)
-                trust_code_1 = s_trust_code.split(year_str)[0]
-                trust_code_2 = s_trust_code.split(year_str)[-1]
-                trust_code = trust_code_1 + "_" + FCode + year_str + trust_code_2
-            else:
-                # 新逻辑：名称不含年份时，强制使用识别出的年份
-                trust_code = s_brand + "_" + FCode + year_str + "-" + str(conversion_nper)
+                i = i[0].title()
+                s += "".join(i)
 
-            print("Generated TrustCode:", trust_code)
+            s = s.split("Nian")[0]
+
+            sp_filename = product_name.split("第")[1]
+            nper = sp_filename.split("期")[0]
+            conversion_nper = conversion(nper)
+            s_trust_code = s + "-" + str(conversion_nper)
+
+            trust_code = build_trust_code(s_trust_code, FCode)
+            print(trust_code)
 
             if "更正" in product_name or "更新" in product_name:
                 return
             splitname = product_name.split("年")[0]
-            trust_name_short = (brand_name if "年" not in product_name else splitname) + "-" + str(conversion_nper)
+            trust_name_short = splitname + "-" + str(conversion_nper)
             trust_name = product_name.split("发行文件")[0]
-        except Exception as e:
-            print("TrustCode\TrustName获取失败:", e)
+        except:
+            print("TrustCode\TrustName获取失败")
             return
 
     # if Product_name=='华驭第十四期汽车抵押贷款支持证券发行文件':
@@ -1089,9 +1114,7 @@ def create_new_product(product_name, web_date=None):
         SET IDENTITY_INSERT TrustManagement.Trust ON ;
         insert into TrustManagement.Trust(TrustId,TrustCode,TrustName,TrustNameShort,IsMarketProduct,TrustStatus) values({},'{}',N'{}',N'{}',1,'Duration');
         SET IDENTITY_INSERT TrustManagement.Trust OFF ;
-    """.format(
-        TrustId, trust_code, trust_name, trust_name_short
-    )
+    """.format(TrustId, trust_code, trust_name, trust_name_short)
 
     b2.execute(sql)
 
@@ -1102,9 +1125,7 @@ def create_new_product(product_name, web_date=None):
         insert into FixedIncomeSuite.Analysis.Trust(TrustId,TrustCode,TrustName)
         select TrustId,TrustCode,TrustName from [DV].[view_Products] where TrustId={};
         SET IDENTITY_INSERT FixedIncomeSuite.Analysis.Trust OFF ;
-    """.format(
-        TrustId
-    )
+    """.format(TrustId)
     b2.execute(sql2)
     conn.commit()
     sql2 = "insert into TrustManagement.TrustInfoExtension(TrustId, StartDate, EndDate, ItemId, ItemCode, ItemValue) values ({}, GETDATE(), null, null, 'MarketCategory','CAS'),({}, GETDATE(), null, null, 'RegulatoryOrg','CBIRC'),({}, GETDATE(), null, null, 'MarketPlace', 'InterBank'),({}, GETDATE(), null, null, 'AssetType','{}'),({}, GETDATE(), null, null, 'BasicAssetType','Others'),({}, GETDATE(), null, null, 'CollectionMethod', 'PublicOffering')".format(
@@ -1119,66 +1140,76 @@ def create_new_product(product_name, web_date=None):
     return trust_code
 
 
-def upload_to_ftp_with_retry(ftp, local_file_path, remote_dir, remote_file_path, retries=5):
+def upload_to_ftp_with_retry(
+    ftp, local_file_path, remote_dir, remote_file_path, retries=5
+):
     """Upload file to FTP with automatic retry and reconnection capability"""
     bufsize = 1024
-    
+
     for attempt in range(retries):
         try:
-            # Try to create directory if it doesn't exist
-            try:
-                ftp.mkd(remote_dir)
-            except ftplib.error_perm:
-                # Directory probably already exists
-                print("FTP文件夹已存在")
-            
-            # Change to the target directory
-            ftp.cwd(remote_dir)
-            
-            # Upload the file
-            print(f"Uploading to FTP: {remote_file_path} (Attempt {attempt+1}/{retries})")
-            with open(local_file_path, "rb") as fp:
-                ftp.storbinary("STOR " + remote_file_path, fp, bufsize)
-            
+            with ftp_operation(ftp):
+                try:
+                    ftp.mkd(remote_dir)
+                except ftplib.error_perm:
+                    print("FTP文件夹已存在")
+
+                ftp.cwd(remote_dir)
+
+                print(
+                    f"Uploading to FTP: {remote_file_path} (Attempt {attempt + 1}/{retries})"
+                )
+                with open(local_file_path, "rb") as fp:
+                    ftp.storbinary("STOR " + remote_file_path, fp, bufsize)
+
             print(f"Successfully uploaded to FTP: {remote_file_path}")
             return True
-            
-        except (ftplib.error_temp, ftplib.error_perm, ftplib.error_reply, BrokenPipeError, TimeoutError, ConnectionError, socket.timeout, OSError) as e:
-            print(f"Error uploading file {remote_file_path}: {e}. Retrying {retries - attempt - 1} more times.")
-            
+
+        except (
+            ftplib.error_temp,
+            ftplib.error_perm,
+            ftplib.error_reply,
+            BrokenPipeError,
+            TimeoutError,
+            ConnectionError,
+            socket.timeout,
+            OSError,
+        ) as e:
+            print(
+                f"Error uploading file {remote_file_path}: {e}. Retrying {retries - attempt - 1} more times."
+            )
+
             # For connection-related errors, try to reconnect to FTP
-            if isinstance(e, (BrokenPipeError, TimeoutError, ConnectionError, socket.timeout, OSError)):
+            if isinstance(
+                e,
+                (
+                    BrokenPipeError,
+                    TimeoutError,
+                    ConnectionError,
+                    socket.timeout,
+                    OSError,
+                ),
+            ):
                 try:
                     print("Connection error detected, attempting to reconnect FTP...")
-                    # Save connection info
-                    host = ftp.host
-                    port = ftp.port
-                    user = ftp._user if hasattr(ftp, '_user') else FTP_USER  # Fallback
-                    passwd = ftp._passwd if hasattr(ftp, '_passwd') else FTP_PASS  # Fallback
-                    
-                    # Try to close old connection
-                    try:
-                        ftp.close()
-                    except:
-                        pass  # Ignore close errors
-                    
-                    # Reconnect
-                    print(f"Reconnecting to {host}:{port}...")
-                    ftp.connect(host, port, timeout=120)  # Longer timeout for upload
-                    ftp.login(user, passwd)
+                    print(f"Reconnecting to {ftp.host}:{ftp.port}...")
+                    reconnect_ftp_connection(ftp, timeout=120)
                     print("FTP reconnection successful")
                 except Exception as reconnect_error:
                     print(f"Failed to reconnect to FTP: {reconnect_error}")
-            
+
             # Use exponential backoff strategy
-            wait_time = 5 * (2 ** attempt)  # 5, 10, 20, 40...
+            wait_time = 5 * (2**attempt)  # 5, 10, 20, 40...
             if wait_time > 60:
                 wait_time = 60  # Maximum wait of 60 seconds
             print(f"Waiting {wait_time} seconds before next attempt...")
             time.sleep(wait_time)
-    
+
     # All retries failed
-    raise Exception(f"Failed to upload file {remote_file_path} after {retries} attempts")
+    raise Exception(
+        f"Failed to upload file {remote_file_path} after {retries} attempts"
+    )
+
 
 def upload_to_ftp(ftp, local_file_path, remote_dir, remote_file_path):
     """Wrapper for the retry version of upload_to_ftp"""
@@ -1290,7 +1321,9 @@ def insert_task_info(trust_code, web_date):
     b1.execute(sql)
     result = b1.fetchone()
     if not result:
-        print(f"Warning: No '说明书' found for TrustCode {trust_code}. Skipping task insertion.")
+        print(
+            f"Warning: No '说明书' found for TrustCode {trust_code}. Skipping task insertion."
+        )
         return
     TrustDocumentID, FileName = result
     print("TrustDocumentID:", TrustDocumentID, ", FileName:", FileName)

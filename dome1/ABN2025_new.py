@@ -290,18 +290,24 @@ ftp2.set_pasv(True)
 enable_utf8(ftp2)
 ftp2.encoding = "utf-8"
 
-# Start a thread to keep the connection alive
-keep_alive_thread = threading.Thread(
-    target=ftp1_keep_alive, args=(30, 3)
-)  # NOOP every 5 minutes
-keep_alive_thread.daemon = True
-keep_alive_thread.start()
+ENABLE_FTP_KEEP_ALIVE = os.environ.get("ABN_FTP_KEEPALIVE", "0").lower() in (
+    "1",
+    "true",
+    "yes",
+)
 
-keep_alive_thread2 = threading.Thread(
-    target=ftp2_keep_alive, args=(30, 3)
-)  # NOOP every 5 minutes
-keep_alive_thread2.daemon = True
-keep_alive_thread2.start()
+if ENABLE_FTP_KEEP_ALIVE:
+    # Keep-alive NOOPs share the same FTP control connection. Leave this off
+    # during batch runs unless the FTP server is known to require it.
+    keep_alive_thread = threading.Thread(target=ftp1_keep_alive, args=(30, 3))
+    keep_alive_thread.daemon = True
+    keep_alive_thread.start()
+
+    keep_alive_thread2 = threading.Thread(target=ftp2_keep_alive, args=(30, 3))
+    keep_alive_thread2.daemon = True
+    keep_alive_thread2.start()
+else:
+    print("FTP keep-alive threads disabled; set ABN_FTP_KEEPALIVE=1 to enable.")
 
 
 def get_web_pdf_content_with_retry(web_pdf_path, retries=3):

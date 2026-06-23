@@ -1,0 +1,201 @@
+# DealViewer Script Operations Runbook
+
+This runbook captures current operational practice for DealViewer ABSDaily scripts on the Kamatera VM. Update it whenever a production fix changes how scripts are run.
+
+## Environment
+
+- VM: `root@104.238.213.119`.
+- Workdir: `/root/deal_viewer/ABSDaily/ABS/dome1`.
+- Python: `/root/deal_viewer/ABSDaily/ABS/venv/bin/python`.
+- Logs: `/root/deal_viewer/ABSDaily/ABS/dome1/logs`.
+- Local mirrors: `ABSDaily/ABS/dome1` and `deal_viewer/dome1`.
+- Current ABN DB endpoint in active scripts: `113.125.202.171,52482`, database `PortfolioManagement`.
+- Ignore old `172.16.6.143\mssql` entries when they only appear in comments.
+
+Never document passwords. Use the VM's existing config, environment, and SSH key setup.
+
+## Standard Background Run
+
+Run production jobs from the remote workdir and venv. This wrapper records a PID, log, and final status:
+
+```bash
+cd /root/deal_viewer/ABSDaily/ABS/dome1
+mkdir -p logs
+script=ABN2025_new.py
+ts=$(date -u +%Y%m%dT%H%M%SZ)
+log=logs/${script%.py}_${ts}.log
+status=logs/${script%.py}_${ts}.status
+pidfile=logs/${script%.py}_${ts}.pid
+(
+  PYTHONUNBUFFERED=1 /root/deal_viewer/ABSDaily/ABS/venv/bin/python -u "$script"
+  rc=$?
+  echo "$rc" > "$status"
+  exit "$rc"
+) > "$log" 2>&1 &
+echo $! > "$pidfile"
+printf 'pid=%s\nlog=%s\nstatus=%s\n' "$(cat "$pidfile")" "$log" "$status"
+```
+
+Avoid `set -e` inside this wrapper before the status write, because a non-zero Python exit can skip the `.status` file.
+
+Check a run:
+
+```bash
+ps -ef | grep ABN2025_new.py | grep -v grep
+tail -n 80 logs/ABN2025_new_YYYYMMDDTHHMMSSZ.log
+cat logs/ABN2025_new_YYYYMMDDTHHMMSSZ.status
+```
+
+From Windows PowerShell, use a here-string for complex remote shell:
+
+```powershell
+@'
+cd /root/deal_viewer/ABSDaily/ABS/dome1
+pwd
+'@ | ssh root@104.238.213.119 'bash -s'
+```
+
+## stbg_2025.py
+
+Purpose: trusted report data crawl.
+
+Current script supports:
+
+- `STBG_PAGE_NUM`: page number to crawl. Default is `6`.
+- `STBG_WRITE_UPDATE_LOG=auto`: only page `1` writes the final timestamp.
+- `STBG_BROWSER_WARMUP=0`: skip browser warmup.
+
+Use the page-range wrapper when asked to run from page 6 down to page 1:
+
+```bash
+cd /root/deal_viewer/ABSDaily/ABS/dome1
+./run_stbg_2025_pages.sh --background
+```
+
+The wrapper defaults to `6 5 4 3 2 1`, prevents another `stbg_2025.py` copy from running, and writes log/status/pid files under `logs/`. A status value of `0` means the sequence completed.
+
+Known successful example:
+
+- Log: `logs/stbg_2025_pages_6_to_1_20260619T024239Z.log`.
+- Status: `logs/stbg_2025_pages_6_to_1_20260619T024239Z.status` contained `0`.
+
+## ABN2025_products_new.py
+
+Purpose: crawl ABN product rows and update product metadata.
+
+Run:
+
+```bash
+cd /root/deal_viewer/ABSDaily/ABS/dome1
+PYTHONUNBUFFERED=1 /root/deal_viewer/ABSDaily/ABS/venv/bin/python -u ABN2025_products_new.py
+```
+
+Use the standard background wrapper for long runs.
+
+Recent production failure and fix:
+
+- Failure log: `logs/ABN2025_products_new_20260622T004636Z.log`.
+- Error: SQL Server transaction log for `PortfolioManagement` was full due to `LOG_BACKUP`.
+- User changed recovery model to SIMPLE and shrank the log.
+- Rerun succeeded in `logs/ABN2025_products_new_20260622T012628Z.log` with status `0`.
+- Successful run processed 48 URLs: public 2, private 46, other 0, `err1=0`, `LOG_BACKUP=0`.
+- The product timestamp file was updated to `2026-06-18 02:10:05`.
+
+Maintenance note: if SQL Server reports `LOG_BACKUP`, the durable fix is a log backup while in FULL recovery. If the user accepts SIMPLE recovery, switch to SIMPLE, checkpoint, and shrink the log; document that this interrupts point-in-time restore/log-backup continuity.
+
+## ABN2025_new.py
+
+Purpose: crawl ABN trustee/asset operation report data and upload report documents.
+
+Default run should disable FTP keep-alive:
+
+```bash
+cd /root/deal_viewer/ABSDaily/ABS/dome1
+ABN_FTP_KEEPALIVE=0 PYTHONUNBUFFERED=1 /root/deal_viewer/ABSDaily/ABS/venv/bin/python -u ABN2025_new.py
+```
+
+Current patch:
+
+- `ABN_FTP_KEEPALIVE` defaults to `0`.
+- Set `ABN_FTP_KEEPALIVE=1` only when intentionally testing keep-alive behavior.
+- When disabled, the script prints `FTP keep-alive threads disabled; set ABN_FTP_KEEPALIVE=1 to enable.`
+
+Recent production failure and fix:
+
+- First run log: `logs/ABN2025_new_20260622T015232Z.log`.
+- It inserted/processed six reports, then failed during 211 FTP upload for `BangXin1ABN2025-5`.
+- Error looked like the Chinese-named incremental-docs FTP directory did not exist, followed by `ftplib.error_perm: 550 The system cannot find the path specified.`
+- Root cause was likely FTP keep-alive NOOP interleaving on the same control connection.
+- Remote backup before patch: `deploy_backups/20260622T020029Z/ABN2025_new.py`.
+- Patched remote hash: `be7ac387834fb0e47c68bf9d42ccab3c4bae9e205683b5776267dd6feee53355`.
+- Manual repair completed: imported `ABN2025_new` with keep-alive disabled and ran `upload_211('BangXin1ABN2025-5')`; output included `UPLOAD_211_DONE BangXin1ABN2025-5`.
+- Rerun log: `logs/ABN2025_new_resume_20260622T020142Z.log`.
+- Rerun status: `0`, error count 0.
+- The ABN report timestamp file was updated to `2026-06-20 00:51:00`.
+
+Manual 211 repair pattern, only when DB work completed but 211 upload failed for a known trust code:
+
+```bash
+cd /root/deal_viewer/ABSDaily/ABS/dome1
+ABN_FTP_KEEPALIVE=0 /root/deal_viewer/ABSDaily/ABS/venv/bin/python - <<'PY'
+import ABN2025_new as m
+m.upload_211('TRUST_CODE_HERE')
+print('UPLOAD_211_DONE TRUST_CODE_HERE')
+PY
+```
+
+## fxwj2023_new.py
+
+Purpose: related report/document workflow using trust codes and FTP uploads.
+
+Run through the same venv/background pattern:
+
+```bash
+cd /root/deal_viewer/ABSDaily/ABS/dome1
+PYTHONUNBUFFERED=1 /root/deal_viewer/ABSDaily/ABS/venv/bin/python -u fxwj2023_new.py
+```
+
+Maintenance notes:
+
+- 2026 trust code generation was fixed to use `trust_code_utils.build_trust_code()` instead of hard-coded `2025`.
+- Nine malformed trust codes were cleaned from production DB/FTP during the prior repair.
+- `ftp_session_utils.py` provides explicit reconnect credentials and keep-alive locking; use it for future FTP-heavy fixes instead of sharing an unlocked `ftplib.FTP` object across threads.
+- Always use the remote venv, not `/usr/bin/python3`.
+
+## Common Failures
+
+SQL Server log full due `LOG_BACKUP`:
+
+- Confirm the exact error in the log.
+- Ask whether the user accepts SIMPLE recovery if not already stated.
+- Preferred FULL recovery fix is a log backup.
+- SIMPLE workaround is recovery model SIMPLE, checkpoint, shrink log, then rerun.
+- Record the choice because it changes restore/log-backup behavior.
+
+FTP impossible path or wrong reply:
+
+- Symptoms include a missing Chinese-named incremental-docs directory, unexpected `200 Type set to A/I`, or `550 The system cannot find the path specified` for a path that should exist.
+- Suspect keep-alive/control-channel interleaving when a background thread uses the same FTP object.
+- Disable keep-alive or protect FTP commands with a shared lock/reconnect helper.
+- If the script committed DB work before the FTP failure, repair the missing upload and then rerun/resume.
+
+No `.status` file:
+
+- Check whether the process is still running.
+- If not running, read the log tail and inspect the wrapper.
+- A wrapper using `set -e` can exit before writing status.
+
+PowerShell SSH quoting:
+
+- Avoid dense one-liners with nested quotes, regex, or pipes.
+- Prefer a PowerShell here-string piped into `ssh root@104.238.213.119 'bash -s'`.
+
+## Deployment Notes
+
+When patching scripts:
+
+1. Patch both local mirrors if both copies exist.
+2. Run syntax checks, for example `python -m py_compile ABN2025_new.py`.
+3. Back up the remote file under `deploy_backups/<UTC timestamp>/`.
+4. Copy the patched file to `/root/deal_viewer/ABSDaily/ABS/dome1`.
+5. Verify remote syntax or hash before the production run.

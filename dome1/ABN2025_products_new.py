@@ -19,6 +19,7 @@ import io
 from dateutil.parser import parse
 import socket
 from urllib.parse import quote
+from abn_offer_type_utils import classify_offer_type
 
 
 socket.setdefaulttimeout(600)
@@ -286,9 +287,8 @@ def get_web_pdf_content(web_pdf_path):
 
         # Check if request was successful
         content_type = response.headers.get("Content-Type", "").lower()
-        if (
-            response.status_code == 200
-            and ("application/pdf" in content_type or response.content.startswith(b"%PDF"))
+        if response.status_code == 200 and (
+            "application/pdf" in content_type or response.content.startswith(b"%PDF")
         ):
             print("Download successful without proxy")
             return True, response.content
@@ -344,9 +344,8 @@ def get_web_pdf_content(web_pdf_path):
             print("Checking content from proxy request")
             # Loose check: Content-Type OR Magic Number
             content_type = response.headers.get("Content-Type", "").lower()
-            if (
-                "application/pdf" in content_type
-                or response.content.startswith(b"%PDF")
+            if "application/pdf" in content_type or response.content.startswith(
+                b"%PDF"
             ):
                 print("Successfully downloaded with proxy")
                 return True, response.content
@@ -712,7 +711,7 @@ def get_html(timestamp):
         print("token is " + str(token))
         info_level = token["UT"].replace("\n", "")
         sign = token["sign"].replace("\n", "")
-    
+
     print("info_level:", info_level[:50] + "...")
     print("sign:", sign[:50] + "...")
 
@@ -741,15 +740,23 @@ def get_html(timestamp):
             "sec-ch-ua-mobile": "?0",
             "sec-ch-ua-platform": '"Windows"',
         }
-        home_response = session.get(home_url, headers=home_headers, verify=False, timeout=10)
+        home_response = session.get(
+            home_url, headers=home_headers, verify=False, timeout=10
+        )
         print(f"主页访问状态: {home_response.status_code}")
         print(f"获取到的Cookie: {session.cookies.get_dict()}")
 
         # 如果没有自动获取到Cookie，手动设置
         if not session.cookies.get_dict():
             print("未自动获取到Cookie，手动设置浏览器Cookie...")
-            session.cookies.set("AlteonP10", "AYasNCw/F6zhU0YxOaADcg$$", domain="www.chinamoney.com.cn")
-            session.cookies.set("lss", "953d30744145d363215192a47c98ceb5", domain="www.chinamoney.com.cn")
+            session.cookies.set(
+                "AlteonP10", "AYasNCw/F6zhU0YxOaADcg$$", domain="www.chinamoney.com.cn"
+            )
+            session.cookies.set(
+                "lss",
+                "953d30744145d363215192a47c98ceb5",
+                domain="www.chinamoney.com.cn",
+            )
             session.cookies.set("isLogin", "0", domain="www.chinamoney.com.cn")
             print(f"手动设置后的Cookie: {session.cookies.get_dict()}")
     except Exception as e:
@@ -762,9 +769,9 @@ def get_html(timestamp):
     # 使用日期范围查询，不依赖游标分页
     USE_DATE_RANGE = False  # 改为False使用时间戳+游标分页
     START_DATE = "2025-08-01"  # 起始日期（USE_DATE_RANGE=True时生效）
-    END_DATE = "2025-10-01"    # 结束日期（USE_DATE_RANGE=True时生效）
+    END_DATE = "2025-10-01"  # 结束日期（USE_DATE_RANGE=True时生效）
     # ====================================================
-    
+
     params = {
         "sort": "date",
         "text": "上市流通 ABN",
@@ -782,7 +789,7 @@ def get_html(timestamp):
         "op": "top",  # 第一页用top，后续页用next
         "searchAfter": "",  # 游标分页参数
     }
-    
+
     if USE_DATE_RANGE:
         print(f"使用日期范围查询: {START_DATE} 到 {END_DATE}")
 
@@ -827,7 +834,7 @@ def get_html(timestamp):
     requests.packages.urllib3.disable_warnings()
     shortnameList = []
     urlList = []
-    
+
     # 不再从 abn_urls.txt 加载旧URL，每次都是全新获取
     # abn_urls.txt 仅用于保存本次获取的URL，方便调试
     print("开始获取新的URL列表...")
@@ -841,21 +848,25 @@ def get_html(timestamp):
     # 正式运行：100页 × 15条 = 1500条数据
     MAX_PAGES = 100  # 抓取前100页
     search_after = ""  # 游标分页参数
-    
+
     for pageIndex in range(1, MAX_PAGES + 1):
-        print(f"\n{'='*60}")
+        print(f"\n{'=' * 60}")
         print(f"正在获取第 {pageIndex} 页数据...")
-        print(f"{'='*60}")
-        
+        print(f"{'=' * 60}")
+
         # 更新分页参数
         params["pageIndex"] = str(pageIndex)
         params["op"] = "top" if pageIndex == 1 else "next"
         params["searchAfter"] = search_after
-        
+
         if USE_DATE_RANGE:
-            print(f"[分页参数] pageIndex={pageIndex}, op={params['op']}, date={START_DATE}~{END_DATE}, searchAfter='{search_after[:50] if search_after else ''}'")
+            print(
+                f"[分页参数] pageIndex={pageIndex}, op={params['op']}, date={START_DATE}~{END_DATE}, searchAfter='{search_after[:50] if search_after else ''}'"
+            )
         else:
-            print(f"[分页参数] pageIndex={pageIndex}, op={params['op']}, searchAfter='{search_after[:50] if search_after else ''}'")
+            print(
+                f"[分页参数] pageIndex={pageIndex}, op={params['op']}, searchAfter='{search_after[:50] if search_after else ''}'"
+            )
 
         # First try without using proxy to save costs
         # 特殊的POST请求：参数在URL中（params），但使用POST方法，请求体为空（Content-Length: 0）
@@ -927,32 +938,32 @@ def get_html(timestamp):
             print(f"Failed to parse JSON response. Status: {status_code}")
             print(f"Response text (first 1000 chars): {r.text[:1000]}")
             raise Exception(f"Invalid JSON response from server: {e}")
-        
+
         # 详细打印响应结构
         print(f"Response keys: {requestsdata.keys()}")
         if "data" not in requestsdata:
             print(f"❌ 响应中没有'data'字段！")
             print(f"完整响应: {requestsdata}")
             raise Exception("API响应格式错误：缺少'data'字段")
-        
+
         data = requestsdata["data"]
         print(f"Data keys: {data.keys()}")
-        
+
         if "result" not in data:
             print(f"❌ data中没有'result'字段！")
             print(f"完整data: {data}")
             raise Exception("API响应格式错误：缺少'result'字段")
-        
+
         result = data["result"]
         print(f"Result keys: {result.keys()}")
-        
+
         if "pageItems" not in result:
             print(f"❌ result中没有'pageItems'字段！")
             print(f"完整result: {result}")
             raise Exception("API响应格式错误：缺少'pageItems'字段")
-        
+
         pageItems = result["pageItems"]
-        
+
         # 提取searchAfter用于下一页（游标分页）
         # searchAfter来自响应的sortNext字段
         search_after_found = False
@@ -979,7 +990,7 @@ def get_html(timestamp):
 
         print(f"当前页有 {len(pageItems)} 条数据")
         page_new_count = 0  # 当前页新数据计数
-        
+
         for i in pageItems:
             release_date_ts = int(i["releaseDate"]) / 1000
             release_date = datetime.fromtimestamp(release_date_ts)
@@ -990,7 +1001,7 @@ def get_html(timestamp):
 
             # 日期范围模式：收集所有数据；时间戳模式：只处理比上次更新时间更新的数据
             should_process = USE_DATE_RANGE or (release_date > parse(timestamp))
-            
+
             if should_process:
                 has_new_data = True
                 page_new_count += 1
@@ -999,9 +1010,7 @@ def get_html(timestamp):
                     .replace("<font color='red'>", "")
                     .replace("</font>", "")
                 )
-                
 
-                
                 # FILTER REMOVED: Match is unreliable on Title (Code vs Name). Filtering in newProd instead.
                 # is_match, _ = is_target_match(title)
                 # if not is_match:
@@ -1013,7 +1022,9 @@ def get_html(timestamp):
                 else:
                     # Fallback: Use full title if short name pattern not found
                     # This ensures products like "保利商业保理..." are not skipped
-                    print(f"  ⚠️ Non-standard regex match for title: {title}. Using title as identifier.")
+                    print(
+                        f"  ⚠️ Non-standard regex match for title: {title}. Using title as identifier."
+                    )
                     short_name = title
 
                 if short_name not in shortnameList:
@@ -1026,37 +1037,43 @@ def get_html(timestamp):
                         + release_date.strftime("%Y-%m-%d")
                     )
                     if short_name_match:
-                        print(f"  ✓ 🎯 目标新产品: {short_name} (日期: {release_date.strftime('%Y-%m-%d')})")
+                        print(
+                            f"  ✓ 🎯 目标新产品: {short_name} (日期: {release_date.strftime('%Y-%m-%d')})"
+                        )
                     else:
-                        print(f"  ✓ 🎯 目标新产品(非标名): {short_name[:20]}... (日期: {release_date.strftime('%Y-%m-%d')})")
+                        print(
+                            f"  ✓ 🎯 目标新产品(非标名): {short_name[:20]}... (日期: {release_date.strftime('%Y-%m-%d')})"
+                        )
                 else:
                     print(f"  ⊗ 跳过重复: {short_name}")
             # 不要break，继续处理当前页的其他项目
-        
-        print(f"第 {pageIndex} 页: 共 {len(pageItems)} 条数据，其中新数据 {page_new_count} 条")
+
+        print(
+            f"第 {pageIndex} 页: 共 {len(pageItems)} 条数据，其中新数据 {page_new_count} 条"
+        )
 
         # 如果当前页没有新数据，且已经翻了至少5页，可以停止翻页
         # 这样可以避免因为第1页恰好都是旧数据而过早停止
         if not has_new_data and pageIndex >= 5:
             print(f"No new data found on page {pageIndex}, stopping pagination")
             break
-        
+
         has_new_data = False  # 重置标记，检查下一页
-        
+
         # sleep for a while (增加延迟避免请求过快)
         if pageIndex < MAX_PAGES:  # 不是最后一页才延迟
             delay = random.uniform(2, 4)
             print(f"等待 {delay:.1f} 秒后继续...")
             time.sleep(delay)
 
-    print(f"\n{'='*80}")
+    print(f"\n{'=' * 80}")
     print(f"数据获取完成！")
-    print(f"{'='*80}")
+    print(f"{'=' * 80}")
     print(f"找到的URL总数: {len(urlList)}")
     print(f"上次更新时间: {timestamp}")
     print(f"本次最新时间: {latestUpdateTime}")
     print(f"时间差: {(latestUpdateTime - parse(timestamp)).days} 天")
-    print(f"{'='*80}\n")
+    print(f"{'=' * 80}\n")
     return latestUpdateTime, urlList
 
 
@@ -1121,7 +1138,7 @@ def get_file_list(product_name):
     }
     # 使用Session管理Cookie（不要硬编码Cookie）
     session = requests.Session()
-    
+
     # 先访问主页获取有效Cookie
     try:
         home_url = "https://www.chinamoney.com.cn/chinese/qwjsn/"
@@ -1135,7 +1152,7 @@ def get_file_list(product_name):
         print(f"获取Cookie: {session.cookies.get_dict()}")
     except Exception as e:
         print(f"访问主页获取Cookie失败: {e}")
-    
+
     # API请求头（不包含Cookie，让Session自动管理）
     headers = {
         "Accept": "*/*",
@@ -1192,7 +1209,9 @@ def get_file_list(product_name):
     if ip_related_failure:
         if USE_PROXY and proxies is not None:
             print("Retrying with SmartProxy due to IP restriction...")
-            rs = session.post(url, params=data, headers=headers, proxies=proxies, verify=False)
+            rs = session.post(
+                url, params=data, headers=headers, proxies=proxies, verify=False
+            )
             time.sleep(4.33)
             print("rs.status with proxy =", rs.status_code)
         else:
@@ -1261,7 +1280,9 @@ def get_file_list(product_name):
                 print(
                     "Retrying second request with SmartProxy due to IP restriction..."
                 )
-                rs = session.post(url, params=data, headers=headers, proxies=proxies, verify=False)
+                rs = session.post(
+                    url, params=data, headers=headers, proxies=proxies, verify=False
+                )
                 time.sleep(3.156)
                 print("rs.status with proxy (second request) =", rs.status_code)
             else:
@@ -1291,7 +1312,7 @@ def get_file_list(product_name):
     print(f"pageItems数量: {len(pageItems)}")
     for i in pageItems:
         title = i["title"].replace("<font color='red'>", "").replace("</font>", "")
-        
+
         if len(i["paths"]) == 1:
             # 有PDF附件，从paths中提取日期
             z = re.search("\d{4}/?\d{2}/?\d{2}", i["paths"][0]).group().replace("/", "")
@@ -1302,7 +1323,7 @@ def get_file_list(product_name):
             print(f"  跳过(无PDF): {title}")
         else:
             print(f"  跳过(paths={len(i['paths'])}): {title}")
-    
+
     print(f"有效PDF文档数: {len(pdf_list)}")
     return pdf_list
 
@@ -1316,7 +1337,6 @@ def get_file_list(product_name):
 # upload_folder_to_ftp() 已删除 - 有bug且从未被调用
 
 
-
 def get_file_data_from_ftp_with_retry(ftp, ftp_file_path, retries=5):
     for attempt in range(retries):
         try:
@@ -1324,42 +1344,62 @@ def get_file_data_from_ftp_with_retry(ftp, ftp_file_path, retries=5):
             ftp.retrbinary(f"RETR {ftp_file_path}", bio.write)
             bio.seek(0)
             return bio
-        except (ftplib.all_errors, EOFError, socket.timeout, ConnectionError, BrokenPipeError, OSError) as e:
-            print(f"Error getting file data from FTP (Attempt {attempt+1}/{retries}): {e}")
+        except (
+            ftplib.all_errors,
+            EOFError,
+            socket.timeout,
+            ConnectionError,
+            BrokenPipeError,
+            OSError,
+        ) as e:
+            print(
+                f"Error getting file data from FTP (Attempt {attempt + 1}/{retries}): {e}"
+            )
             if attempt < retries - 1:
-                 print("Reconnecting and retrying download...")
-                 try:
-                     ftp.close()
-                 except: pass
-                 try:
+                print("Reconnecting and retrying download...")
+                try:
+                    ftp.close()
+                except:
+                    pass
+                try:
                     ftp.connect(FTP_HOST, FTP_PORT, timeout=120)
                     ftp.login(FTP_USER, FTP_PASS)
-                 except Exception as re:
-                     print(f"Reconnection failed: {re}")
-                 time.sleep(5)
+                except Exception as re:
+                    print(f"Reconnection failed: {re}")
+                time.sleep(5)
     raise Exception(f"Failed to get file data for {ftp_file_path} after retries")
 
 
 def write_file_data_to_ftp_with_retry(ftp, file_data, ftp_file_path, retries=5):
     for attempt in range(retries):
         try:
-            file_data.seek(0) # IMPORTANT: Reset pointer before upload
+            file_data.seek(0)  # IMPORTANT: Reset pointer before upload
             ftp.storbinary(f"STOR {ftp_file_path}", file_data)
             return
-        except (ftplib.all_errors, EOFError, socket.timeout, ConnectionError, BrokenPipeError, OSError) as e:
-            print(f"Error writing file data to FTP (Attempt {attempt+1}/{retries}): {e}")
+        except (
+            ftplib.all_errors,
+            EOFError,
+            socket.timeout,
+            ConnectionError,
+            BrokenPipeError,
+            OSError,
+        ) as e:
+            print(
+                f"Error writing file data to FTP (Attempt {attempt + 1}/{retries}): {e}"
+            )
             if attempt < retries - 1:
-                 print("Reconnecting and retrying upload...")
-                 try:
-                     ftp.close()
-                 except: pass
-                 try:
+                print("Reconnecting and retrying upload...")
+                try:
+                    ftp.close()
+                except:
+                    pass
+                try:
                     ftp.connect(FTP2_HOST, FTP2_PORT, timeout=120)
                     ftp.login(FTP2_USER, FTP2_PASS)
-                    enable_utf8(ftp) # Ensure UTF8 is enabled for FTP2
-                 except Exception as re:
-                     print(f"Reconnection failed: {re}")
-                 time.sleep(5)
+                    enable_utf8(ftp)  # Ensure UTF8 is enabled for FTP2
+                except Exception as re:
+                    print(f"Reconnection failed: {re}")
+                time.sleep(5)
     raise Exception(f"Failed to write file data for {ftp_file_path} after retries")
 
 
@@ -1376,10 +1416,10 @@ def upload_ftp_folder_to_ftp(ftp1, ftp2, ftp1_folder, ftp2_folder):
                 file_data = get_file_data_from_ftp_with_retry(ftp1, ftp1_item_path)
                 write_file_data_to_ftp_with_retry(ftp2, file_data, ftp2_item_path)
             except Exception as e:
-                 print(f"Failed to transfer file {ftp1_item_path}: {e}")
-                 # Continue to next item? Or raise?
-                 # Probably safer to continue but log error
-                 pass
+                print(f"Failed to transfer file {ftp1_item_path}: {e}")
+                # Continue to next item? Or raise?
+                # Probably safer to continue but log error
+                pass
         else:
             # Check if item is a directory on ftp1
             ftp1.cwd(ftp1_item_path)
@@ -1410,6 +1450,7 @@ def upload_ftp_folder_to_ftp(ftp1, ftp2, ftp1_folder, ftp2_folder):
         #         ftp2.mkd(ftp2_item_path)
         #     except ftplib.error_perm:
         #         # Directory might already exist, ignore error
+
 
 def upload_211(trustcode):
     month = str(datetime.now().month)
@@ -1451,7 +1492,9 @@ def crawl_pdf(product_name, i, type_f):
             time.sleep(random.uniform(1, 5))
 
 
-def upload_file_to_ftp_with_retry(ftp, local_file_path, ftp_folder, ftp_file_path, file_name, retries=5):
+def upload_file_to_ftp_with_retry(
+    ftp, local_file_path, ftp_folder, ftp_file_path, file_name, retries=5
+):
     """Upload file with retry logic for EOFError and connection issues"""
     # Check if exists
     try:
@@ -1465,8 +1508,8 @@ def upload_file_to_ftp_with_retry(ftp, local_file_path, ftp_folder, ftp_file_pat
 
     for attempt in range(retries):
         try:
-            print(f"Writing PDF to {ftp_file_path} (Attempt {attempt+1}/{retries})")
-            
+            print(f"Writing PDF to {ftp_file_path} (Attempt {attempt + 1}/{retries})")
+
             # Ensure connection is alive?
             try:
                 ftp.voidcmd("NOOP")
@@ -1483,22 +1526,29 @@ def upload_file_to_ftp_with_retry(ftp, local_file_path, ftp_folder, ftp_file_pat
                 ftp.storbinary(f"STOR {ftp_file_path}", f)
             print(f"✓ Upload successful: {file_name}")
             return
-        except (ftplib.all_errors, EOFError, socket.timeout, ConnectionError, BrokenPipeError, OSError) as e:
+        except (
+            ftplib.all_errors,
+            EOFError,
+            socket.timeout,
+            ConnectionError,
+            BrokenPipeError,
+            OSError,
+        ) as e:
             print(f"Upload failed: {e}")
             if attempt < retries - 1:
                 print("Reconnecting and retrying...")
                 try:
                     ftp.close()
-                except: pass
+                except:
+                    pass
                 try:
                     ftp.connect(FTP_HOST, FTP_PORT, timeout=120)
                     ftp.login(FTP_USER, FTP_PASS)
                 except Exception as re:
-                     print(f"Reconnection failed: {re}")
+                    print(f"Reconnection failed: {re}")
                 time.sleep(5)
-    
-    print(f"❌ Failed to upload {file_name} after retries")
 
+    print(f"❌ Failed to upload {file_name} after retries")
 
     if file_exists:
         ftp_folder = create_dir_on_ftp(ftp, "/Products/资产支持票据", product_name[2])
@@ -1595,7 +1645,7 @@ def upload_114(product_name, q1, q2):
 
 def newProd(url):
     print("newProd process", url)
-    
+
     # Pre-fetch check (Url is partial, but maybe useful to log)
     # log_project_event(url, "Starting newProd process")
 
@@ -1630,7 +1680,7 @@ def newProd(url):
     df = pd.concat(wd, ignore_index=True)
     fullName = df.iloc[1][1]
     fullName = fullName.split("票据")[0] + "票据"
-    
+
     # TRACKING FULLNAME REMOVED
 
     rawShortName = df.iloc[1][3]
@@ -1642,7 +1692,13 @@ def newProd(url):
                 + "20"
                 + rawShortName[:2]
                 + "-"
-                + str(int(rawShortName[rawShortName.find("ABN") + 3 : rawShortName.find("ABN") + 6]))
+                + str(
+                    int(
+                        rawShortName[
+                            rawShortName.find("ABN") + 3 : rawShortName.find("ABN") + 6
+                        ]
+                    )
+                )
             )
         else:
             # 格式不匹配，使用原始值
@@ -1657,13 +1713,9 @@ def newProd(url):
     # if "一汽" not in fullName:
     #     return
 
-    # 公募：PublicOffering，私募：PrivateEquity
-    # 只要offer_type不包含"定向"或"私募"，就属于PublicOffering
-    if "定向" in offer_type or "私募" in offer_type:
-        CollectionMethod = "PrivateEquity"
-    else:
-        CollectionMethod = "PublicOffering"
-    
+    classification = classify_offer_type(offer_type)
+    CollectionMethod = classification.collection_method
+
     print(f"发行类型: {offer_type} -> {CollectionMethod}")
 
     # # conn = pymssql.connect(host='172.16.6.143\mssql', user='sa', password='PasswordGS2017',
@@ -1699,7 +1751,6 @@ def newProd(url):
     if res:
         print(TrustName, "数据库已存在")
 
-
         with open("核查冲突产品.txt", "a", encoding="utf8") as f:
             f.write(df.iloc[1][3] + " ")
             f.write(TrustName + " ")
@@ -1718,9 +1769,7 @@ def newProd(url):
             SET IDENTITY_INSERT TrustManagement.Trust ON ;
             insert into TrustManagement.Trust(TrustId,TrustCode,TrustName,TrustNameShort,IsMarketProduct,TrustStatus) values({},'{}',N'{}',N'{}',1,'Duration');
             SET IDENTITY_INSERT TrustManagement.Trust OFF ;
-        """.format(
-            TrustId, TrustCode, TrustName, TrustNameShort
-        )
+        """.format(TrustId, TrustCode, TrustName, TrustNameShort)
         print(insertTrust)
 
         try:
@@ -1740,9 +1789,7 @@ def newProd(url):
             SET IDENTITY_INSERT FixedIncomeSuite.Analysis.Trust ON ;
             insert into FixedIncomeSuite.Analysis.Trust(TrustId,TrustCode,TrustName) values({},'{}',N'{}');
             SET IDENTITY_INSERT FixedIncomeSuite.Analysis.Trust OFF ;
-        """.format(
-            TrustId, TrustCode, TrustName
-        )
+        """.format(TrustId, TrustCode, TrustName)
         print(insertFATrust)
 
         try:
@@ -1795,19 +1842,21 @@ def newProd(url):
     print(f"查询TrustId SQL: {sql}")
     cursor.execute(sql)
     result = cursor.fetchone()
-    
+
     if result is None:
         print(f"❌ 错误: 无法在数据库中找到产品 '{TrustName}'")
 
         print(f"可能原因: 1) 产品名称包含特殊字符 2) 插入失败但未报错 3) 事务未提交")
         # 尝试再次查询确认
-        cursor.execute("select top 5 TrustId, TrustName from TrustManagement.Trust order by TrustId desc")
+        cursor.execute(
+            "select top 5 TrustId, TrustName from TrustManagement.Trust order by TrustId desc"
+        )
         recent = cursor.fetchall()
         print(f"最近插入的5个产品:")
         for r in recent:
             print(f"  TrustId={r[0]}, TrustName={r[1]}")
         return None
-    
+
     TrustId = result[0]
     print(f"✓ 找到产品 TrustId={TrustId}, TrustName={TrustName}")
 
@@ -1816,9 +1865,9 @@ def newProd(url):
     product_name = [TrustId, TrustCode, TrustName]
     file_list = get_file_list(TrustName)
     q1, q2 = get_usefulPDF(file_list)
-    
+
     # log_project_event(TrustName, f"Found {len(q1)} release docs, {len(q2)} reports")
-    
+
     print(f"产品发行文档(q1): {q1}")
     print(f"运营报告文档(q2): {q2}")
     upload_114(product_name, q1, q2)
@@ -1841,12 +1890,11 @@ def newProd(url):
         print(f"⚠️ 提示: 未找到产品发行文档(q1为空)，可能是私募产品且无公开文档")
         # log_project_event(TrustName, "No release documents found (skipped gracefully)")
 
-
     # 记录已处理的URL
     with open("url_done.txt", "a", encoding="utf8") as f:
         f.write(url + "\n")
 
-    return offer_type, TrustName
+    return classification.summary_bucket, TrustName
 
 
 def insert_into_db(product_name, q, typy_q):
@@ -1884,11 +1932,9 @@ def insert_into_db(product_name, q, typy_q):
     print(q)
     print(q[1])
     print("asd")
-    
+
     # TRACKING: Check for Offering Circular logic
     if "募集说明书" in q[1]:
-
-        
         # sql_i1 = "insert into PortfolioManagement.dbo.DisclosureOfInformation values(%s,%s,%s,%s,%s)".format(
         # )
         # # 之前记录披露时间，现在改成跟文档表一样的入库时间
@@ -1900,30 +1946,32 @@ def insert_into_db(product_name, q, typy_q):
         # 简单避免插入DisclosureOfInformation报错，可以用try-except或者先查一下，这里暂时保持原样，或者也加个check？
         # 用户主要关心"任务系统重复"，即ProductsStateInformation
         try:
-             cursor.execute(sql_i1)
+            cursor.execute(sql_i1)
 
         except Exception as e:
-             if "2627" in str(e): # Primary key violation usually
-                 pass
-             else:
-                 pass
+            if "2627" in str(e):  # Primary key violation usually
+                pass
+            else:
+                pass
 
         # 查询TrustDocumentID
         sql = f"select TrustDocumentID from DV.TrustAssociatedDocument where filename=N'{q[1]}.pdf'"
         cursor.execute(sql)
         result = cursor.fetchone()
-        
+
         if result is None:
             print(f"❌ 错误: 无法找到文档记录，filename='{q[1]}.pdf'")
             print(f"可能原因: 1) 文档未插入成功 2) 文件名不匹配")
             # 查询最近插入的文档
-            cursor.execute(f"select top 5 TrustDocumentID, FileName from DV.TrustAssociatedDocument where Trustid={Trustid} order by TrustDocumentID desc")
+            cursor.execute(
+                f"select top 5 TrustDocumentID, FileName from DV.TrustAssociatedDocument where Trustid={Trustid} order by TrustDocumentID desc"
+            )
             recent_docs = cursor.fetchall()
             print(f"该产品最近插入的5个文档:")
             for doc in recent_docs:
                 print(f"  TrustDocumentID={doc[0]}, FileName={doc[1]}")
             return  # 跳过ProductsStateInformation插入
-        
+
         tdid = result[0]
         print(f"✓ 找到TrustDocumentID={tdid}")
 
@@ -1931,7 +1979,9 @@ def insert_into_db(product_name, q, typy_q):
         check_task_sql = f"select 1 from TaskCollection.dbo.ProductsStateInformation where Trustid={Trustid} and TrustDocumentID={tdid}"
         cursor.execute(check_task_sql)
         if cursor.fetchone():
-             print(f"Task already exists in ProductsStateInformation for TrustDocumentID={tdid}")
+            print(
+                f"Task already exists in ProductsStateInformation for TrustDocumentID={tdid}"
+            )
 
         else:
             # 插入ProductsStateInformation
@@ -1967,40 +2017,39 @@ def insert_into_db(product_name, q, typy_q):
 # crawl_pdf1() 已删除 - 运营报告相关功能，不属于此脚本
 
 if __name__ == "__main__":
-
     # 从FTP读取上次更新时间
     timestamp = read_ftp_file(ftp, UPDATE_LOG_PATH)
     print("上次更新的日期为 " + timestamp)
-    
+
     firstTimestamp, urls = get_html(timestamp)
-    
+
     # save urls in abn_urls.txt line by line, overwriting the file
-    with open('abn_urls.txt', 'w') as f:
+    with open("abn_urls.txt", "w") as f:
         for url in urls:
-            f.write(url + '\n')
+            f.write(url + "\n")
 
     gmProds, smProds, qtProds = [], [], []
     gmEx = set()
 
     for idx, url in enumerate(urls, 1):
-        print(f"\n{'='*80}")
+        print(f"\n{'=' * 80}")
         print(f"处理进度: {idx}/{len(urls)}")
-        print(f"{'='*80}")
-        
-        if len(url.split(':')) < 3:
+        print(f"{'=' * 80}")
+
+        if len(url.split(":")) < 3:
             print(f"⚠️ 跳过格式错误的URL: {url}")
             continue
 
-        url_path = url.split(':')[1]
+        url_path = url.split(":")[1]
         print(f"处理URL: {url_path}")
-        
+
         try:
             res = newProd(url_path)
             if res:
-                if res[0] == '公开发行':
+                if res[0] == "public":
                     gmProds.append(res[1])
                     print(f"✓ 公开发行产品: {res[1]}")
-                elif res[0] == '定向发行':
+                elif res[0] == "private":
                     smProds.append(res[1])
                     print(f"✓ 定向发行产品: {res[1]}")
                 else:
@@ -2011,14 +2060,15 @@ if __name__ == "__main__":
         except Exception as e:
             print(f"❌ 处理产品时出错: {e}")
             import traceback
+
             traceback.print_exc()
             print(f"继续处理下一个产品...")
 
     # 更新时间到FTP（只有在有新数据时才更新）
     if urls:
-        print(f"\n{'='*80}")
+        print(f"\n{'=' * 80}")
         print(f"更新时间戳到FTP")
-        print(f"{'='*80}")
+        print(f"{'=' * 80}")
         print(f"上次时间: {timestamp}")
         print(f"本次时间: {firstTimestamp}")
         print(f"Writing latest date time {firstTimestamp} to {UPDATE_LOG_PATH}")
@@ -2030,19 +2080,18 @@ if __name__ == "__main__":
     else:
         print("\n⚠️ 没有新数据，不更新时间戳")
 
-
-    print(f"提示: 如果未触达，请检查:");
-    print(f"  1. 脚本的 'START_DATE' 和 'END_DATE' 或 'MAX_PAGES' 范围是否覆盖了这些产品的发布日期")
+    print(f"提示: 如果未触达，请检查:")
+    print(
+        f"  1. 脚本的 'START_DATE' 和 'END_DATE' 或 'MAX_PAGES' 范围是否覆盖了这些产品的发布日期"
+    )
     print(f"  2. API列表返回的标题是否与提供的名称一致")
     print(f"  3. 是否被IP拦截导致数据不全")
-    print(f"{'='*80}\n")
+    print(f"{'=' * 80}\n")
     # ==================== DEBUG SUMMARY END ====================
-    
-    print(f"\n{'='*80}")
+
+    print(f"\n{'=' * 80}")
     print("✅ 脚本执行完成！")
-    print(f"{'='*80}")
+    print(f"{'=' * 80}")
     print(f"处理了 {len(urls)} 个URL")
     print(f"公募产品: {len(gmProds)}, 私募产品: {len(smProds)}, 其他: {len(qtProds)}")
-    print(f"{'='*80}\n")
-    
-
+    print(f"{'=' * 80}\n")
