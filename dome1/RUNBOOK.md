@@ -55,6 +55,15 @@ pwd
 '@ | ssh root@104.238.213.119 'bash -s'
 ```
 
+If the script body or arguments are sensitive to Windows CRLF endings, strip carriage returns on the VM side:
+
+```powershell
+@'
+cd /root/deal_viewer/ABSDaily/ABS/dome1
+pwd
+'@ | ssh -i $env:USERPROFILE\.ssh\kamatera root@104.238.213.119 "tr -d '\r' | bash -s"
+```
+
 ## stbg_2025.py
 
 Purpose: trusted report data crawl.
@@ -78,6 +87,40 @@ Known successful example:
 
 - Log: `logs/stbg_2025_pages_6_to_1_20260619T024239Z.log`.
 - Status: `logs/stbg_2025_pages_6_to_1_20260619T024239Z.status` contained `0`.
+
+2026-07-01 run notes:
+
+- Log: `logs/stbg_2025_pages_6_5_4_3_2_1_20260701T015401Z.log`.
+- Status: `logs/stbg_2025_pages_6_5_4_3_2_1_20260701T015401Z.status` contained `0`.
+- Repair log: `logs/stbg_2025_repair_20260701T022718Z.log`, status `0`.
+- Pages `6 5 4 3 2 1` all exited `0`. Pages 6 through 2 had `Processing products... (total: 0)`. Page 1 had `Processing products... (total: 10)`.
+- Of the 10 new page-1 items, 8 matched product folders and were finally inserted. Six completed in the main run and two were repaired manually: `AnHui_SmallLoan2026-1` and `ChangXingYe_SmallLoan2022-1`.
+- Two new page-1 items were not matched by the current product-folder logic: DingYou 2025 third consumer-loan report and HuiYuan 2025 seventh NPL report. Treat these as matching/product-code follow-up, not script crashes.
+- The page-1 timestamp was written to `2026-06-29 16:57:16`; do not rely on rerunning the normal incremental path to pick up item-level failures after that timestamp is written.
+
+Post-run checks for `stbg_2025.py`:
+
+```bash
+cd /root/deal_viewer/ABSDaily/ABS/dome1
+log=logs/stbg_2025_pages_6_5_4_3_2_1_YYYYMMDDTHHMMSSZ.log
+status=logs/stbg_2025_pages_6_5_4_3_2_1_YYYYMMDDTHHMMSSZ.status
+cat "$status"
+grep -E 'Processing products|===== .*pageNum=|Completed at|FINAL_EXIT=' "$log"
+grep -c 'Matched:' "$log"
+grep -c 'Error occurred while processing' "$log"
+find stbg_file_cache -maxdepth 1 -name '*.error' -printf '%TY-%Tm-%Td %TH:%TM:%TS %p\n' | sort | tail -n 20
+```
+
+For this script, status `0` only means the page sequence exited cleanly. Always check `Processing products`, `Matched:`, `Error occurred while processing`, and recent `stbg_file_cache/*.error` files before reporting business success.
+
+Known `stbg_2025.py` issues:
+
+- Windows PowerShell here-strings can pass a trailing carriage return into page arguments. If explicit page arguments produce `Invalid page number`, use the wrapper defaults or pipe through `tr -d '\r' | bash -s`.
+- SQL Server blocking can make page 1 look stuck while it is waiting on the database. In the 2026-07-01 run, the script waited on `TaskCollection.dbo.ProductsStateInformation` with `LCK_M_S` and `blocking_session_id=131`, caused by an open SSMS transaction from another host. Use SQL Server DMVs to confirm `wait_type`, `blocking_session_id`, and SQL text; do not kill external sessions unless rollback is explicitly acceptable.
+- FTP2 keep-alive can interfere with an active upload on the same FTP object. In the 2026-07-01 run it caused one item to fail with `'NoneType' object has no attribute 'readline'` after a keep-alive reconnect. Repair the specific item instead of rerunning the whole incremental job after the timestamp has advanced.
+- `AnHui2026-1_SmallLoan2025AnHui2026-1` was not a valid TrustCode for the 2026-07-01 item. The correct code was `AnHui_SmallLoan2026-1`.
+- Avoid importing `stbg_2025.py` only to repair one item; module import initializes global FTP/DB/browser side effects. Prefer a small standalone repair script that reads existing VM config, uses cached PDFs, uploads to `TrustAssociatedDoc/<TrustCode>/TrusteeReport/`, and inserts the missing DV, disclosure, and task-state rows. Do not print secrets.
+- When repairing Chinese-named files from Windows, do not hard-code Chinese strings through nested PowerShell/bash quoting. Read the actual UTF-8 filenames from the VM cache, or locate them by ASCII fragments such as year/trust code.
 
 ## ABN2025_products_new.py
 
@@ -175,9 +218,15 @@ SQL Server log full due `LOG_BACKUP`:
 FTP impossible path or wrong reply:
 
 - Symptoms include a missing Chinese-named incremental-docs directory, unexpected `200 Type set to A/I`, or `550 The system cannot find the path specified` for a path that should exist.
-- Suspect keep-alive/control-channel interleaving when a background thread uses the same FTP object.
+- Suspect keep-alive/control-channel interleaving when a background thread uses the same FTP object. `stbg_2025.py` can also hit this as `NoneType`/`readline` errors during upload after FTP2 keep-alive reconnects.
 - Disable keep-alive or protect FTP commands with a shared lock/reconnect helper.
 - If the script committed DB work before the FTP failure, repair the missing upload and then rerun/resume.
+
+SQL blocking or apparent hangs:
+
+- If a Python process is alive with low CPU and no new log lines, check sockets and the current syscall before assuming it is dead.
+- For SQL waits, query DMVs for `wait_type`, `blocking_session_id`, current SQL text, host, program name, and open transactions. `LCK_M_S` against `TaskCollection.dbo.ProductsStateInformation` indicates the crawler is blocked by another transaction.
+- Wait for external blockers to clear when possible. Killing another user's SSMS session can roll back their transaction and should be an explicit operational decision.
 
 No `.status` file:
 
