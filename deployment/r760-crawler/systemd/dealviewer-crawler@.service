@@ -1,0 +1,22 @@
+[Unit]
+Description=DealViewer ABS crawler (%i)
+Requires=docker.service
+After=docker.service network-online.target
+Wants=network-online.target
+ConditionPathExists=/data/dealviewer-crawler/bundle/compose.yaml
+
+[Service]
+Type=oneshot
+WorkingDirectory=/data/dealviewer-crawler/bundle
+ExecStart=/usr/bin/flock -n /data/dealviewer-crawler/state/host-run.lock /usr/bin/docker compose -p dealviewer_crawler -f /data/dealviewer-crawler/bundle/compose.yaml run --rm crawler %i
+TimeoutStartSec=6h
+TimeoutStopSec=60
+KillMode=mixed
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=6
+CPUWeight=50
+NoNewPrivileges=true
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=dealviewer-crawler-%i

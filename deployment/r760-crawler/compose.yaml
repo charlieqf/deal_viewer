@@ -1,0 +1,55 @@
+name: dealviewer_crawler
+
+services:
+  crawler:
+    image: dealviewer-crawler:r760-20260811
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: "no"
+    init: true
+    user: "1200:1201"
+    working_dir: /opt/dealviewer
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp:rw,nosuid,nodev,noexec,size=2g,uid=1200,gid=1201,mode=1770
+    shm_size: 2gb
+    environment:
+      TZ: America/Los_Angeles
+      DEALVIEWER_SECRETS_FILE: /run/dealviewer/secrets.json
+      OPENSSL_CONF: /opt/dealviewer/openssl-sql-legacy.cnf
+      DEALVIEWER_PROXY_URL: ""
+      DEALVIEWER_PROXY_PDF_DOWNLOAD: "0"
+      DEALVIEWER_LEGACY_LOG_FILE: /logs/fxwj-legacy.log
+      DEALVIEWER_BROWSER_WARMUP: "0"
+      STBG_BROWSER_WARMUP: "0"
+      HTTP_PROXY: ""
+      HTTPS_PROXY: ""
+      ALL_PROXY: ""
+      NO_PROXY: "localhost,127.0.0.1"
+    volumes:
+      - ../private/secrets.json:/run/dealviewer/secrets.json:ro
+      - ../state:/state
+      - ../state/fxwj_file_cache:/opt/dealviewer/file_cache
+      - ../state/stbg_file_cache:/opt/dealviewer/stbg_file_cache
+      - ../logs:/logs
+    mem_limit: 8g
+    cpus: 4.0
+    pids_limit: 512
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
+    stop_grace_period: 45s
+    logging:
+      driver: json-file
+      options:
+        max-size: 20m
+        max-file: "5"
+    labels:
+      com.dealviewer.role: abs-crawler
+      com.dealviewer.host: r760

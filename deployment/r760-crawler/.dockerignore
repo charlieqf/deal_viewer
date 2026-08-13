@@ -1,0 +1,8 @@
+private/
+state/
+logs/
+raw-source/
+*.json
+__pycache__/
+*.pyc
+*.pyo

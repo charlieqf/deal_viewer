@@ -7,7 +7,7 @@ The root of `dome1` hosts runnable data workflows such as `ABN2024.py`, `ABN2025
 Use Python 3.10+ with a virtual environment: `python -m venv .venv && source .venv/bin/activate` (or `Scripts\\activate` on Windows). Install runtime dependencies with `pip install pandas pymssql pyodbc pypinyin requests python-dateutil chardet selenium` and add any new modules to a `requirements.txt`. Run individual pipelines with `python ABN2025.py`, `python fxwj2023.py`, etc.; add CLI flags rather than hard-coding if you introduce new behaviour.
 
 ## Production Operations
-For Kamatera VM runs, remote background execution, known script-specific flags, SQL Server log-full handling, and FTP keep-alive troubleshooting, use `RUNBOOK.md`. Keep it in sync with any production fixes, especially for `stbg_2025.py`, `ABN2025_products_new.py`, `ABN2025_new.py`, and `fxwj2023_new.py`.
+R760 is the primary isolated crawler runtime; Kamatera is rollback-only for crawler execution. For remote background execution, writer fencing, known script-specific flags, SQL Server log-full handling, and FTP keep-alive troubleshooting, use `RUNBOOK.md`. Keep it in sync with any production fixes, especially for `stbg_2025.py`, `ABN2025_products_new.py`, `ABN2025_new.py`, and `fxwj2023_new.py`.
 
 ## Coding Style & Naming Conventions
 Follow PEP 8 with 4-space indentation and snake_case for functions and variables. Maintain the existing module naming pattern (`ABNYYYY.py`, `fxwjYYYY.py`) when cloning yearly workflows, and co-locate helper functions near their primary script until a shared utility module is extracted. Keep secrets out of source—read from environment variables (see `config.py`) and fallback defaults only for local testing.

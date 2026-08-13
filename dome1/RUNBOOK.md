@@ -1,6 +1,56 @@
 # DealViewer Script Operations Runbook
 
-This runbook captures current operational practice for DealViewer ABSDaily scripts on the Kamatera VM. Update it whenever a production fix changes how scripts are run.
+This runbook captures current operational practice for DealViewer ABSDaily scripts on the R760 and the legacy Kamatera VM. Update it whenever a production fix changes how scripts are run.
+
+## R760 Crawler Runtime (2026-08-11)
+
+The ABS issuance-file (`fxwj2023_new.py`) and trustee-report (`stbg_2025.py`) jobs run in an isolated Docker Compose project on the R760. Docker is not a functional requirement for the Python code, but it is the production isolation boundary for the pinned Chrome/Driver, ODBC libraries, and the legacy TLS policy required by the old SQL Server. Do not move that TLS policy onto the R760 host.
+
+- SSH: use the operator-local DealViewer access notes; do not publish the concrete management endpoint in the repository.
+- Bundle: `/data/dealviewer-crawler/bundle`.
+- Private source and secrets: `/data/dealviewer-crawler/private` (root/operator controlled; never print or copy secrets into logs).
+- Persistent cache: `/data/dealviewer-crawler/state`.
+- Logs and status JSON: `/data/dealviewer-crawler/logs`.
+- Compose project/network: `dealviewer_crawler`; it exposes no public port and is not attached to the Gateway network.
+- Runtime user is non-root; the root filesystem is read-only; CPU, memory, PID, capability, and log-size limits are set in Compose.
+- HTTP mode is direct-first and currently passes Chinabond business-response and sample-PDF checks without a proxy. `DEALVIEWER_PROXY_URL` is empty by default. Do not reuse the R760 Gateway's Mihomo service for this crawler.
+
+Operators use systemd as the only normal entry point; direct Compose knowledge is not required:
+
+```bash
+# Full read-only dependency check
+systemctl start dealviewer-crawler@preflight.service
+journalctl -u dealviewer-crawler@preflight.service -n 100 --no-pager
+
+# ABS issuance files
+systemctl start --no-block dealviewer-crawler@fxwj.service
+
+# Trustee report page-1 canary or full page sequence 6..1
+systemctl start --no-block dealviewer-crawler@stbg-page1.service
+systemctl start --no-block dealviewer-crawler@stbg.service
+
+# Inspect a run
+systemctl show dealviewer-crawler@fxwj.service \
+  -p ActiveState -p SubState -p Result -p ExecMainStatus
+ls -lt /data/dealviewer-crawler/logs | head
+```
+
+`--no-block` returns control to the SSH session immediately; systemd keeps the
+job running if the SSH connection closes.
+
+These are one-shot services: the container is removed after completion. A zero process exit is necessary but not sufficient; inspect the matching status JSON, business progress/error markers, FTP update timestamp, and any cache error artifacts before declaring success.
+
+No timer is enabled because the legacy host had no authoritative crawler schedule. Add timers only after the business run times and overlap policy are explicitly confirmed. Keep the Kamatera code and timestamp backup as the rollback boundary until the R760 production canaries have been accepted; never let both hosts run a writer concurrently.
+
+### 2026-08-11 R760 cutover acceptance
+
+- `stbg-page1` completed with exit code `0`, zero incremental products and no hidden errors. Its FTP timestamp correctly remained `2026-08-07 10:52:47`.
+- The first `fxwj` attempt exposed a stale FTP control-channel failure while creating the second product's 211 subdirectory. It exited nonzero and did not advance the FTP timestamp. The R760 source transform now rebuilds the FTP control connection after every protocol/network list or upload error and rechecks idempotently before writing.
+- The `fxwj` resume completed with exit code `0`, skipped the already completed first product, directly downloaded seven PDFs, completed 21 remaining FTP target uploads and inserted seven remaining document records. Final SQL validation found both products and seven associated documents per product; the two-product total is 14 documents. The final FTP timestamp is `2026-08-11 16:02:57`.
+- A fresh full read-only preflight on `2026-08-13` passed both Chinabond business/sample-PDF checks in direct mode, both FTP list checks with zero writes, both ODBC `SELECT 1` checks and headless Chrome. No proxy was configured.
+- The crawler left no container or public listener behind, and the existing R760 Gateway remained healthy. The accepted crawler image is `sha256:21fe0eecb4ac21350a70aa93a040cead21fa0f5c973e9b9e9c166d1c6e7e4f7b`; the pre-FTP-retry image is retained under rollback tag `dealviewer-crawler:r760-20260811-pre-ftp-retry`.
+- Kamatera `dealviewer-ops.service` is inactive and disabled as of `2026-08-13`; no crawler process runs there. Its code and VM remain intact for an explicit rollback. Before re-enabling it, prove the R760 crawler is stopped so the two hosts cannot write concurrently.
+- Do not power off or cancel the Kamatera VM based only on this crawler cutover. A 2026-08-13 read-only inventory found unrelated active Nginx, OpenCode, WeCom callback/worker, Redis, L2TP/IPsec, a job-search container and two MySQL containers, with multiple public listeners. Identify an owner and migrate or explicitly retire every remaining workload before host shutdown.
 
 ## Environment
 
@@ -14,9 +64,9 @@ This runbook captures current operational practice for DealViewer ABSDaily scrip
 
 Never document passwords. Use the VM's existing config, environment, and SSH key setup.
 
-## Standard Background Run
+## Legacy Kamatera Background Run
 
-Run production jobs from the remote workdir and venv. This wrapper records a PID, log, and final status:
+Use this only for an explicitly approved rollback to Kamatera. This wrapper records a PID, log, and final status:
 
 ```bash
 cd /root/deal_viewer/ABSDaily/ABS/dome1
