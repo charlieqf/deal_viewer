@@ -1,6 +1,6 @@
 # DealViewer Script Operations Runbook
 
-This runbook captures current operational practice for DealViewer ABSDaily scripts on the R760 and the legacy Kamatera VM. Update it whenever a production fix changes how scripts are run.
+This runbook captures current operational practice for DealViewer ABSDaily scripts on the R760 and the powered-off legacy Kamatera cold-rollback VM. Update it whenever a production fix changes how scripts are run.
 
 ## R760 Crawler Runtime (2026-08-11)
 
@@ -14,6 +14,7 @@ The ABS issuance-file (`fxwj2023_new.py`) and trustee-report (`stbg_2025.py`) jo
 - Compose project/network: `dealviewer_crawler`; it exposes no public port and is not attached to the Gateway network.
 - Runtime user is non-root; the root filesystem is read-only; CPU, memory, PID, capability, and log-size limits are set in Compose.
 - HTTP mode is direct-first and currently passes Chinabond business-response and sample-PDF checks without a proxy. `DEALVIEWER_PROXY_URL` is empty by default. Do not reuse the R760 Gateway's Mihomo service for this crawler.
+- Migration scope is limited to `fxwj2023_new.py` and `stbg_2025.py`. `ABN2025_products_new.py` and `ABN2025_new.py` are not in the accepted R760 bundle and have no documented online runtime while Kamatera is powered off.
 
 Operators use systemd as the only normal entry point; direct Compose knowledge is not required:
 
@@ -40,21 +41,23 @@ job running if the SSH connection closes.
 
 These are one-shot services: the container is removed after completion. A zero process exit is necessary but not sufficient; inspect the matching status JSON, business progress/error markers, FTP update timestamp, and any cache error artifacts before declaring success.
 
-No timer is enabled because the legacy host had no authoritative crawler schedule. Add timers only after the business run times and overlap policy are explicitly confirmed. Keep the Kamatera code and timestamp backup as the rollback boundary until the R760 production canaries have been accepted; never let both hosts run a writer concurrently.
+No timer is enabled because the legacy host had no authoritative crawler schedule. Add timers only after the business run times and overlap policy are explicitly confirmed. R760 is the only online crawler runtime; Kamatera is a powered-off cold rollback and must never be started as a writer while an R760 writer is running.
 
 ### 2026-08-11 R760 cutover acceptance
 
 - `stbg-page1` completed with exit code `0`, zero incremental products and no hidden errors. Its FTP timestamp correctly remained `2026-08-07 10:52:47`.
 - The first `fxwj` attempt exposed a stale FTP control-channel failure while creating the second product's 211 subdirectory. It exited nonzero and did not advance the FTP timestamp. The R760 source transform now rebuilds the FTP control connection after every protocol/network list or upload error and rechecks idempotently before writing.
 - The `fxwj` resume completed with exit code `0`, skipped the already completed first product, directly downloaded seven PDFs, completed 21 remaining FTP target uploads and inserted seven remaining document records. Final SQL validation found both products and seven associated documents per product; the two-product total is 14 documents. The final FTP timestamp is `2026-08-11 16:02:57`.
-- A fresh full read-only preflight on `2026-08-13` passed both Chinabond business/sample-PDF checks in direct mode, both FTP list checks with zero writes, both ODBC `SELECT 1` checks and headless Chrome. No proxy was configured.
+- The final same-day read-only preflight before the Kamatera shutdown on `2026-08-13` passed both Chinabond business/sample-PDF checks in direct mode, both FTP list checks with zero writes, both ODBC `SELECT 1` checks and headless Chrome. No proxy was configured; systemd reported `Result=success` and exit code `0`.
 - The crawler left no container or public listener behind, and the existing R760 Gateway remained healthy. The accepted crawler image is `sha256:21fe0eecb4ac21350a70aa93a040cead21fa0f5c973e9b9e9c166d1c6e7e4f7b`; the pre-FTP-retry image is retained under rollback tag `dealviewer-crawler:r760-20260811-pre-ftp-retry`.
-- Kamatera `dealviewer-ops.service` is inactive and disabled as of `2026-08-13`; no crawler process runs there. Its code and VM remain intact for an explicit rollback. Before re-enabling it, prove the R760 crawler is stopped so the two hosts cannot write concurrently.
-- Do not power off or cancel the Kamatera VM based only on this crawler cutover. A 2026-08-13 read-only inventory found unrelated active Nginx, OpenCode, WeCom callback/worker, Redis, L2TP/IPsec, a job-search container and two MySQL containers, with multiple public listeners. Identify an owner and migrate or explicitly retire every remaining workload before host shutdown.
+- Before shutdown, OpenCode and its state, both legacy MySQL containers and their data, and onlytrade were permanently deleted. WeCom services and Redis were disabled, their cron entry was removed, and job-search was stopped with restart disabled while its container and code were retained. The associated public/service ports were verified closed.
+- Kamatera completed an operating-system poweroff at `2026-08-13T08:15:59Z`, after which SSH was confirmed unreachable. The provider instance and disk were retained and were not cancelled or deleted. Its crawler code remains a cold rollback only: boot it only with explicit approval, prove the R760 writer is absent, and revalidate dependencies before enabling any Kamatera writer.
+- Enabled base services and credentials were retained. A cold boot can restore SSH, Nginx and L2TP/IPsec listeners, and the remote GitLab reverse tunnel may reconnect. Audit listeners, established connections, Nginx routes, VPN sessions, Docker state and scheduled jobs before treating the booted VM as isolated.
 
-## Environment
+## Legacy Kamatera Cold-Rollback Environment
 
-- VM: `root@104.238.213.119`.
+- Power state: shut down since `2026-08-13T08:15:59Z`; provider instance and disk retained.
+- Access: use operator-local access notes after an explicitly approved provider-console start; SSH is unavailable while the VM is off.
 - Workdir: `/root/deal_viewer/ABSDaily/ABS/dome1`.
 - Python: `/root/deal_viewer/ABSDaily/ABS/venv/bin/python`.
 - Logs: `/root/deal_viewer/ABSDaily/ABS/dome1/logs`.
@@ -66,7 +69,7 @@ Never document passwords. Use the VM's existing config, environment, and SSH key
 
 ## Legacy Kamatera Background Run
 
-Use this only for an explicitly approved rollback to Kamatera. This wrapper records a PID, log, and final status:
+The VM is currently powered off. Use this only for an explicitly approved rollback to Kamatera after all of the following: start the retained instance, verify the expected host identity, prove no R760 writer is running, confirm `dealviewer-ops.service` remains disabled, and rerun dependency checks. This wrapper then records a PID, log, and final status:
 
 ```bash
 cd /root/deal_viewer/ABSDaily/ABS/dome1
@@ -99,19 +102,21 @@ cat logs/ABN2025_new_YYYYMMDDTHHMMSSZ.status
 From Windows PowerShell, use a here-string for complex remote shell:
 
 ```powershell
+$kamateraHost = '<from operator-local access notes>'
 @'
 cd /root/deal_viewer/ABSDaily/ABS/dome1
 pwd
-'@ | ssh root@104.238.213.119 'bash -s'
+'@ | ssh $kamateraHost 'bash -s'
 ```
 
 If the script body or arguments are sensitive to Windows CRLF endings, strip carriage returns on the VM side:
 
 ```powershell
+$kamateraHost = '<from operator-local access notes>'
 @'
 cd /root/deal_viewer/ABSDaily/ABS/dome1
 pwd
-'@ | ssh -i $env:USERPROFILE\.ssh\kamatera root@104.238.213.119 "tr -d '\r' | bash -s"
+'@ | ssh -i $env:USERPROFILE\.ssh\kamatera $kamateraHost "tr -d '\r' | bash -s"
 ```
 
 ## stbg_2025.py
@@ -287,7 +292,7 @@ No `.status` file:
 PowerShell SSH quoting:
 
 - Avoid dense one-liners with nested quotes, regex, or pipes.
-- Prefer a PowerShell here-string piped into `ssh root@104.238.213.119 'bash -s'`.
+- Prefer a PowerShell here-string piped into `ssh $kamateraHost 'bash -s'`, with the host read from operator-local access notes.
 
 ## Deployment Notes
 

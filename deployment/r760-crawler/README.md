@@ -60,12 +60,29 @@ times and overlap policy before installing or enabling any timer.
   `sha256:21fe0eecb4ac21350a70aa93a040cead21fa0f5c973e9b9e9c166d1c6e7e4f7b`.
   The immediately preceding image remains tagged
   `dealviewer-crawler:r760-20260811-pre-ftp-retry` for rollback.
-- A fresh read-only preflight passed on 2026-08-13 with direct Chinabond access
-  and no configured proxy. Kamatera is retained but its operator service is
-  inactive and disabled, preventing accidental dual writers.
+- The final same-day read-only preflight before the Kamatera shutdown on
+  2026-08-13 passed direct Chinabond access, both zero-write FTP checks, both
+  ODBC checks, and headless Chrome with no configured proxy. The unit result
+  was `success` with exit code `0`.
 
-Crawler cutover does not authorize shutting down Kamatera. A 2026-08-13
-read-only audit found active non-crawler workloads there, including Nginx,
-WeCom services, MySQL, Redis, L2TP/IPsec, and three long-running Docker
-containers. Inventory, assign an owner to, and migrate or retire those services
-before powering off or cancelling the VM.
+## Legacy Kamatera state
+
+Kamatera completed an operating-system poweroff at `2026-08-13T08:15:59Z`,
+and SSH was confirmed unreachable. The provider instance and disk remain
+retained; they were not cancelled or deleted.
+
+Before shutdown, OpenCode and its state, both legacy MySQL containers and their
+data, and onlytrade were permanently deleted. WeCom and Redis were disabled,
+the WeCom cron entry was removed, and job-search was stopped with restart
+disabled while its container and code were retained. Treat the VM only as a
+cold crawler rollback: boot it with explicit
+approval, first prove the R760 writer is absent, and revalidate dependencies
+before enabling any legacy writer.
+
+Enabled base services and credentials remain on the powered-off VM. A cold boot
+can restore SSH, Nginx and L2TP/IPsec listeners, and the remote GitLab reverse
+tunnel may reconnect; audit listeners and consumers before using the host.
+
+The accepted R760 bundle contains only `fxwj2023_new.py` and `stbg_2025.py`.
+It does not provide an online runtime for `ABN2025_products_new.py` or
+`ABN2025_new.py` while Kamatera remains powered off.

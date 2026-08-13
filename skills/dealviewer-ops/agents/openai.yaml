@@ -1,0 +1,4 @@
+interface:
+  display_name: "DealViewer Ops"
+  short_description: "Operate the R760 DealViewer crawler safely"
+  default_prompt: "Use $dealviewer-ops to inspect or operate the R760 crawler while respecting the powered-off Kamatera rollback boundary."
