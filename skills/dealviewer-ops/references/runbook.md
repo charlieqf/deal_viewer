@@ -5,13 +5,13 @@ Use this reference with the repository's `dome1/RUNBOOK.md`, which remains the d
 ## Current Runtime State
 
 - R760 is the only online crawler runtime.
-- The accepted isolated Compose bundle is `/data/dealviewer-crawler/bundle` and covers only `fxwj2023_new.py` and `stbg_2025.py`.
-- The accepted image is `sha256:21fe0eecb4ac21350a70aa93a040cead21fa0f5c973e9b9e9c166d1c6e7e4f7b`.
+- The isolated Compose bundle is `/data/dealviewer-crawler/bundle` and covers `ABN2025_products_new.py`, `ABN2025_new.py`, `fxwj2023_new.py`, and `stbg_2025.py`.
+- The current image is `sha256:2b8c3fc28aa28a128a70c3d7c09a29b9c490f6e7baba3d8a16250e1180717768`.
 - Direct Chinabond access is the default; no proxy is configured, and the crawler must not reuse Gateway Mihomo.
 - No crawler timer is enabled because no authoritative legacy schedule was found. Confirm business run times and overlap policy before adding one.
-- `ABN2025_products_new.py` and `ABN2025_new.py` are not in the accepted R760 bundle and have no documented online runtime while Kamatera is off.
+- All four crawlers are manual one-shot jobs; no crawler timer or cron entry is enabled.
 
-The final same-day read-only R760 preflight before Kamatera shutdown on 2026-08-13 passed both direct Chinabond business/sample-PDF checks, both zero-write FTP checks, both ODBC `SELECT 1` checks, and headless Chrome. Systemd reported `Result=success` and exit code `0`.
+The final 2026-08-20 read-only R760 preflight passed all 11 dependency checks. Systemd reported `Result=success` and exit code `0`.
 
 ## R760 Operations
 
@@ -19,6 +19,8 @@ Use the operator-local R760 access notes. Normal entry points are:
 
 ```bash
 systemctl start dealviewer-crawler@preflight.service
+systemctl start --no-block dealviewer-crawler@abn-products.service
+systemctl start --no-block dealviewer-crawler@abn-reports.service
 systemctl start --no-block dealviewer-crawler@fxwj.service
 systemctl start --no-block dealviewer-crawler@stbg-page1.service
 systemctl start --no-block dealviewer-crawler@stbg.service
@@ -29,11 +31,13 @@ journalctl -u dealviewer-crawler@fxwj.service --no-pager
 
 The services are one-shot jobs and remove their containers after completion. A zero exit status is not sufficient: inspect the matching status record, business counters, FTP timestamp, log errors, and cache `.error` files.
 
-Accepted production validation:
+Accepted 2026-08-20 production validation:
 
-- `stbg-page1` exited `0`, found no increment, and preserved the FTP timestamp `2026-08-07 10:52:47`.
-- The resumed issuance run exited `0`, completed two products with seven associated documents each, and advanced the FTP timestamp to `2026-08-11 16:02:57`.
-- The crawler left no public listener or residual container, and the R760 Gateway remained healthy.
+- ABN products: 49 URLs, exit `0`, timestamp `2026-08-19 17:00:02`.
+- ABN reports: 13 completed reports and one genuinely missing product, exit `0`, timestamp `2026-08-19 18:44:00`.
+- Issuance files: 12 products, 84 PDFs, 252 uploads, 84 document inserts, exit `0`, timestamp `2026-08-19 16:57:34`.
+- Trustee reports: 389/389 success markers and valid SQL records, zero unmatched titles, timestamp `2026-08-20 08:30:00`.
+- The final zero-increment trustee pages 6→1 canary took 65 seconds and produced six exit-code-0 status records. No crawler container, network, timer, or cron entry remained.
 
 ## Kamatera Cold Rollback
 
@@ -65,6 +69,7 @@ The legacy workdir was `/root/deal_viewer/ABSDaily/ABS/dome1`, using `/root/deal
 ### `stbg_2025.py`
 
 - R760 supports page 1 canary and full pages `6,5,4,3,2,1` through systemd.
+- Empty page results skip FTP product-directory scanning. Initial FTP connects are capped at 120 seconds, while the systemd outer limit is 24 hours for a genuine backfill.
 - A status of `0` can hide item-level failures. Check page counters, `Matched:`, `Error occurred while processing`, timestamp behavior, and cache `.error` files.
 - SQL blocking can make the process appear idle; inspect database waits before terminating it.
 - Repair an individual failed FTP item instead of rerunning a completed incremental range after its timestamp has advanced.
@@ -75,12 +80,12 @@ The legacy workdir was `/root/deal_viewer/ABSDaily/ABS/dome1`, using `/root/deal
 - FTP control-channel failures require reconnect and an idempotent recheck before retrying writes.
 - Always validate final SQL document counts and the FTP timestamp, not only the process exit code.
 
-### Legacy-only ABN scripts
+### ABN scripts
 
-- `ABN2025_products_new.py` and `ABN2025_new.py` have not been migrated into the accepted R760 bundle.
-- Do not start them on R760 based on filename similarity or assume Kamatera is reachable.
-- Migrate and validate them separately, or perform the explicit cold-rollback procedure.
-- Keep FTP keep-alive disabled for `ABN2025_new.py` unless deliberately testing the repaired control-channel behavior.
+- `ABN2025_products_new.py` and `ABN2025_new.py` are migrated into the R760 bundle as the `abn-products` and `abn-reports` one-shot tasks.
+- `ABN2025_new.py` keeps FTP keep-alive disabled. Its reconnect path uses the same production FTP credentials and retries uploads idempotently.
+- Validate the product/report counters, final FTP timestamp, hidden error markers, and status JSON before accepting a run.
+- Use the Kamatera copies only during an explicitly approved cold rollback after proving that no R760 writer is running.
 
 ## Common Failure Rules
 

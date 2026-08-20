@@ -2,6 +2,10 @@
 
 Accepted on 2026-08-13 after the production canaries started on 2026-08-11.
 
+This is a historical cutover record. The current four-crawler scope, image,
+performance baseline, and production counters are authoritative in
+`MIGRATION-ACCEPTANCE-2026-08-20.md`.
+
 ## Runtime boundary
 
 - Primary host: R760.

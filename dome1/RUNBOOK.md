@@ -2,9 +2,9 @@
 
 This runbook captures current operational practice for DealViewer ABSDaily scripts on the R760 and the powered-off legacy Kamatera cold-rollback VM. Update it whenever a production fix changes how scripts are run.
 
-## R760 Crawler Runtime (2026-08-11)
+## R760 Crawler Runtime (2026-08-20)
 
-The ABS issuance-file (`fxwj2023_new.py`) and trustee-report (`stbg_2025.py`) jobs run in an isolated Docker Compose project on the R760. Docker is not a functional requirement for the Python code, but it is the production isolation boundary for the pinned Chrome/Driver, ODBC libraries, and the legacy TLS policy required by the old SQL Server. Do not move that TLS policy onto the R760 host.
+The ABN product (`ABN2025_products_new.py`), ABN report (`ABN2025_new.py`), ABS issuance-file (`fxwj2023_new.py`), and ABS trustee-report (`stbg_2025.py`) jobs run in an isolated Docker Compose project on the R760. Docker is not a functional requirement for the Python code, but it is the production isolation boundary for the pinned Chrome/Driver, ODBC libraries, and the legacy TLS policy required by the old SQL Server. Do not move that TLS policy onto the R760 host.
 
 - SSH: use the operator-local DealViewer access notes; do not publish the concrete management endpoint in the repository.
 - Bundle: `/data/dealviewer-crawler/bundle`.
@@ -14,7 +14,7 @@ The ABS issuance-file (`fxwj2023_new.py`) and trustee-report (`stbg_2025.py`) jo
 - Compose project/network: `dealviewer_crawler`; it exposes no public port and is not attached to the Gateway network.
 - Runtime user is non-root; the root filesystem is read-only; CPU, memory, PID, capability, and log-size limits are set in Compose.
 - HTTP mode is direct-first and currently passes Chinabond business-response and sample-PDF checks without a proxy. `DEALVIEWER_PROXY_URL` is empty by default. Do not reuse the R760 Gateway's Mihomo service for this crawler.
-- Migration scope is limited to `fxwj2023_new.py` and `stbg_2025.py`. `ABN2025_products_new.py` and `ABN2025_new.py` are not in the accepted R760 bundle and have no documented online runtime while Kamatera is powered off.
+- All four production crawlers are in the R760 bundle. They are manual one-shot jobs; no crawler timer or cron entry is enabled.
 
 Operators use systemd as the only normal entry point; direct Compose knowledge is not required:
 
@@ -22,6 +22,10 @@ Operators use systemd as the only normal entry point; direct Compose knowledge i
 # Full read-only dependency check
 systemctl start dealviewer-crawler@preflight.service
 journalctl -u dealviewer-crawler@preflight.service -n 100 --no-pager
+
+# ABN product metadata and ABN reports
+systemctl start --no-block dealviewer-crawler@abn-products.service
+systemctl start --no-block dealviewer-crawler@abn-reports.service
 
 # ABS issuance files
 systemctl start --no-block dealviewer-crawler@fxwj.service
@@ -42,6 +46,16 @@ job running if the SSH connection closes.
 These are one-shot services: the container is removed after completion. A zero process exit is necessary but not sufficient; inspect the matching status JSON, business progress/error markers, FTP update timestamp, and any cache error artifacts before declaring success.
 
 No timer is enabled because the legacy host had no authoritative crawler schedule. Add timers only after the business run times and overlap policy are explicitly confirmed. R760 is the only online crawler runtime; Kamatera is a powered-off cold rollback and must never be started as a writer while an R760 writer is running.
+
+### 2026-08-20 full migration acceptance
+
+- Accepted image: `sha256:2b8c3fc28aa28a128a70c3d7c09a29b9c490f6e7baba3d8a16250e1180717768`; the prior image remains tagged `dealviewer-crawler:r760-20260820-pre-connect-timeout120`.
+- ABN products completed 49 URLs and advanced to `2026-08-19 17:00:02`. ABN reports completed 13 items, with one genuinely missing product, and advanced to `2026-08-19 18:44:00`.
+- ABS issuance files completed 12 products, 84 downloads, 252 FTP uploads, and 84 document inserts; the timestamp is `2026-08-19 16:57:34`.
+- The trustee backfill finished with 389/389 success markers, 389/389 valid SQL business records, zero unmatched titles, and timestamp `2026-08-20 08:30:00`.
+- The final zero-increment trustee pages 6→1 canary completed in 65 seconds with six exit-code-0 status records. Empty result sets skip the FTP product-directory scan; initial FTP connects are capped at 120 seconds; the outer systemd limit is 24 hours.
+- Final preflight passed 11/11 checks. No crawler container/network, timer, or cron entry remained after validation. Kamatera was not started.
+- The full evidence and rollback inventory is in `deployment/r760-crawler/MIGRATION-ACCEPTANCE-2026-08-20.md`.
 
 ### 2026-08-11 R760 cutover acceptance
 
@@ -246,11 +260,14 @@ PY
 
 Purpose: related report/document workflow using trust codes and FTP uploads.
 
-Run through the same venv/background pattern:
+Legacy Kamatera command (rollback only):
 
 ```bash
 cd /root/deal_viewer/ABSDaily/ABS/dome1
-PYTHONUNBUFFERED=1 /root/deal_viewer/ABSDaily/ABS/venv/bin/python -u fxwj2023_new.py
+DEALVIEWER_PROXY_URL=socks5h://127.0.0.1:19090 \
+DEALVIEWER_BROWSER_WARMUP=0 \
+PYTHONUNBUFFERED=1 \
+  /root/deal_viewer/ABSDaily/ABS/venv/bin/python -u fxwj2023_new.py
 ```
 
 Maintenance notes:
@@ -258,7 +275,17 @@ Maintenance notes:
 - 2026 trust code generation was fixed to use `trust_code_utils.build_trust_code()` instead of hard-coded `2025`.
 - Nine malformed trust codes were cleaned from production DB/FTP during the prior repair.
 - `ftp_session_utils.py` provides explicit reconnect credentials and keep-alive locking; use it for future FTP-heavy fixes instead of sharing an unlocked `ftplib.FTP` object across threads.
+- On legacy Kamatera, the Chinabond issuance-file API previously needed a China egress path. On R760, the 2026-08-11 preflight and production canary reached the API and PDFs directly; a proxy is now an optional fallback, not a required dependency.
+- Detail-page scraping now tries the Kamatera direct path first and falls back to the configured proxy. This avoids consuming or stalling the China tunnel for HTML pages that are directly reachable.
 - Always use the remote venv, not `/usr/bin/python3`.
+
+2026-08-03 run notes:
+
+- Final successful log: `logs/fxwj2023_new_directfix_retry_20260803T025934Z.log`; status `0`.
+- The run processed two products, downloaded 14 PDFs, completed 42 target uploads, and advanced the issuance-file timestamp to `2026-08-03 10:28:17`.
+- `FixedIncomeSuite` filled its transaction log with `LOG_BACKUP`. Recovery stayed `FULL`; a compressed log backup was written to `C:\SQLLogBackups\FixedIncomeSuite_log_20260803T024728Z.trn`, reducing log use from `93.07%` to `2.77%`.
+- The failed transaction had already committed Trust ID `35157`. The missing `FixedIncomeSuite.Analysis.Trust`, six `TrustInfoExtension`, and `ReportMaxNper` rows were repaired before rerunning.
+- SQL Server drive `E:` reported `0 MB` free. Do not delete backup files without explicit approval; arrange storage cleanup and a recurring transaction-log backup schedule.
 
 ## Common Failures
 

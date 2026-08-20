@@ -2,7 +2,7 @@ name: dealviewer_crawler
 
 services:
   crawler:
-    image: dealviewer-crawler:r760-20260811
+    image: dealviewer-crawler:r760-20260820-all
     build:
       context: .
       dockerfile: Dockerfile
@@ -27,6 +27,8 @@ services:
       DEALVIEWER_LEGACY_LOG_FILE: /logs/fxwj-legacy.log
       DEALVIEWER_BROWSER_WARMUP: "0"
       STBG_BROWSER_WARMUP: "0"
+      STBG_FTP_KEEPALIVE: "0"
+      ABN_FTP_KEEPALIVE: "0"
       HTTP_PROXY: ""
       HTTPS_PROXY: ""
       ALL_PROXY: ""
@@ -36,6 +38,7 @@ services:
       - ../state:/state
       - ../state/fxwj_file_cache:/opt/dealviewer/file_cache
       - ../state/stbg_file_cache:/opt/dealviewer/stbg_file_cache
+      - ../state/abn_file_cache:/opt/dealviewer/abn_file_cache
       - ../logs:/logs
     mem_limit: 8g
     cpus: 4.0

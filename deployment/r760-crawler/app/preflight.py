@@ -24,6 +24,7 @@ from dealviewer_runtime import (
 
 
 CHINABOND_URL = "https://www.chinabond.com.cn/cbiw/trs/getContentByConditions"
+CHINAMONEY_URL = "https://www.chinamoney.com.cn/chinese/qwjsn/"
 
 
 @dataclass
@@ -105,6 +106,19 @@ def check_chinabond(report_name: str) -> dict[str, Any]:
         return {"items": len(items), "sample_pdf": pdf_checked, "mode": "direct"}
 
 
+def check_chinamoney() -> dict[str, Any]:
+    with _session() as session:
+        response = session.get(CHINAMONEY_URL, timeout=(10, 30))
+        response.raise_for_status()
+        if len(response.content) < 1000:
+            raise RuntimeError("ChinaMoney returned an unexpectedly small response")
+        return {
+            "status": response.status_code,
+            "response_nonempty": True,
+            "mode": "direct",
+        }
+
+
 def _ftp_check_once(prefix: str) -> dict[str, Any]:
     ftp = ftplib.FTP()
     try:
@@ -184,6 +198,14 @@ def check_odbc_fxwj() -> dict[str, Any]:
 
 def check_odbc_stbg() -> dict[str, Any]:
     return _odbc_check("SQL_ODBC_STBG")
+
+
+def check_odbc_abn_products() -> dict[str, Any]:
+    return _odbc_check("SQL_ODBC_ABN_PRODUCTS")
+
+
+def check_odbc_abn_reports() -> dict[str, Any]:
+    return _odbc_check("SQL_ODBC_ABN_REPORTS")
 
 
 def check_pymssql() -> dict[str, Any]:
@@ -273,6 +295,8 @@ def main() -> int:
         "SQL_PORT",
         "SQL_ODBC_FXWJ",
         "SQL_ODBC_STBG",
+        "SQL_ODBC_ABN_PRODUCTS",
+        "SQL_ODBC_ABN_REPORTS",
         "SQL_PASSWORD",
         "SQL_USER",
     }
@@ -281,10 +305,13 @@ def main() -> int:
         _run("secrets_schema", lambda: {"required_keys": len(expected)} if expected <= configured else (_ for _ in ()).throw(RuntimeError("Missing secret keys"))),
         _run("chinabond_issuance", lambda: check_chinabond("发行文件")),
         _run("chinabond_trustee", lambda: check_chinabond("付息兑付与行权公告")),
+        _run("chinamoney_abn", check_chinamoney),
         _run("ftp_primary_read_only", check_ftp_primary),
         _run("ftp_secondary_read_only", check_ftp_secondary),
         _run("sql_odbc_fxwj_read_only", check_odbc_fxwj),
         _run("sql_odbc_stbg_read_only", check_odbc_stbg),
+        _run("sql_odbc_abn_products_read_only", check_odbc_abn_products),
+        _run("sql_odbc_abn_reports_read_only", check_odbc_abn_reports),
         _run("headless_chrome", check_browser),
     ]
     payload = {

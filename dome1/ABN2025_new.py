@@ -19,6 +19,7 @@ import io
 from dateutil.parser import parse
 import socket
 from urllib.parse import quote
+from ftp_session_utils import attach_ftp_config, reconnect_ftp_connection
 
 socket.setdefaulttimeout(600)
 
@@ -76,24 +77,7 @@ def list_ftp_directory_with_retry(ftp, path, retries=6):
             ):
                 try:
                     print("Connection timed out, attempting to reconnect FTP...")
-                    # 保存原始连接信息
-                    host = ftp.host
-                    port = ftp.port
-                    user = (
-                        ftp._user if hasattr(ftp, "_user") else FTP_USER
-                    )  # 备用用户名
-                    passwd = (
-                        ftp._passwd if hasattr(ftp, "_passwd") else FTP_PASS
-                    )  # 备用密码
-
-                    # 重新连接
-                    try:
-                        ftp.close()
-                    except:
-                        pass  # 忽略关闭连接时的错误
-
-                    ftp.connect(host, port, timeout=60)  # 增加超时时间
-                    ftp.login(user, passwd)
+                    reconnect_ftp_connection(ftp, timeout=60)
                     print("FTP reconnection successful")
                 except Exception as reconnect_error:
                     print(f"Failed to reconnect to FTP: {reconnect_error}")
@@ -245,20 +229,7 @@ def upload_file_to_ftp_with_retry(ftp, local_file_path, ftp_folder, ftp_file_pat
             ):
                 try:
                     print("Connection error detected, attempting to reconnect FTP...")
-                    # 保存原始连接信息
-                    host = ftp.host
-                    port = ftp.port
-                    user = ftp._user if hasattr(ftp, "_user") else FTP_USER
-                    passwd = ftp._passwd if hasattr(ftp, "_passwd") else FTP_PASS
-
-                    # 重新连接
-                    try:
-                        ftp.close()
-                    except:
-                        pass  # 忽略关闭连接时的错误
-
-                    ftp.connect(host, port, timeout=120)  # 增加超时时间到120秒
-                    ftp.login(user, passwd)
+                    reconnect_ftp_connection(ftp, timeout=120)
                     ftp.set_pasv(True)
                     print("FTP reconnection successful")
                 except Exception as reconnect_error:
@@ -277,6 +248,14 @@ ftp = ftplib.FTP()
 ftp.connect(FTP_HOST, FTP_PORT, timeout=600)
 ftp.login(FTP_USER, FTP_PASS)
 ftp.set_pasv(True)
+attach_ftp_config(
+    ftp,
+    host=FTP_HOST,
+    port=FTP_PORT,
+    user=FTP_USER,
+    password=FTP_PASS,
+    encoding=ftp.encoding,
+)
 # ftp.set_debuglevel(2)
 # ftp.cwd(FTP_HOME_DIR)
 
@@ -289,6 +268,15 @@ ftp2.set_pasv(True)
 # ftp2.set_debuglevel(2)
 enable_utf8(ftp2)
 ftp2.encoding = "utf-8"
+attach_ftp_config(
+    ftp2,
+    host=FTP2_HOST,
+    port=FTP2_PORT,
+    user=FTP2_USER,
+    password=FTP2_PASS,
+    encoding="utf-8",
+    enable_utf8=True,
+)
 
 ENABLE_FTP_KEEP_ALIVE = os.environ.get("ABN_FTP_KEEPALIVE", "0").lower() in (
     "1",
@@ -2246,6 +2234,16 @@ def get_url_list1(timestamp):
                         prod = title[:last_ticket_pos + 2]
                         sub_title = after_ticket
 
+                # Prefer the complete product text before the report marker.
+                # rfind("票据") is ambiguous when a qualifier such as
+                # "(科创票据)" itself contains the same word.
+                for report_marker in ("信托资产运营报告", "信托财产运营报告"):
+                    report_pos = title.find(report_marker)
+                    if report_pos > 0:
+                        prod = title[:report_pos].rstrip()
+                        sub_title = title[report_pos:]
+                        break
+
                 if "《" in prod:
                     prod = prod.split("《")[-1]
 
@@ -2282,6 +2280,27 @@ def get_url_list1(timestamp):
                         res = cur.fetchone()
                         if res:
                             print(f"  ✓ 使用去括号名称找到产品")
+
+                    # Some ChinaMoney titles repeat "票据" inside a trailing
+                    # qualifier, or omit punctuation that is present in the
+                    # database name.  Accept a prefix fallback only when it is
+                    # unambiguous; never guess between multiple products.
+                    if not res:
+                        product_prefix = prod
+                        for open_bracket in ("(", "（"):
+                            if open_bracket in product_prefix:
+                                product_prefix = product_prefix.split(open_bracket, 1)[0]
+                        sql_prefix = (
+                            "select top 2 trustid,trustcode "
+                            "from TrustManagement.Trust where trustname like ?"
+                        )
+                        cur.execute(sql_prefix, product_prefix + "%")
+                        prefix_matches = cur.fetchall()
+                        if len(prefix_matches) == 1:
+                            res = prefix_matches[0]
+                            print(f"  ✓ 使用唯一产品名前缀找到产品: {product_prefix}")
+                        elif len(prefix_matches) > 1:
+                            print(f"  ⚠ 产品名前缀匹配到多个产品，保持跳过: {product_prefix}")
                     
                     if res:
                         print(f"  ✓ 找到对应产品: TrustID={res[0]}, TrustCode={res[1]}")

@@ -12,14 +12,33 @@ from typing import Any, Iterable
 
 
 EXPECTED_SHA256 = {
+    "ABN2025_products_new.py": "7dd00d4aad1788ded89c61f86cec90d9ad15f3bebde0eea6d1fca27f48922694",
+    "ABN2025_new.py": "ff0cfa2c662a193e557756cd5a2dbf5ad400ba74a7bff1c724d279a016f52b5b",
+    "abn_offer_type_utils.py": "21aec176c70416df16f58ca7e3732b1c34d16bbdb22d0316fbbb4ee4c31719f7",
     "fxwj2023_new.py": "3395629ead75d21f96f92c40372581431b014b096dd3998afbcaf53845b2b2d7",
     "stbg_2025.py": "46e5785589c534cbda8bde09e696692a1ad350b4fb32b83165155c3faa0309b3",
     "ftp_session_utils.py": "5864c371bed7c497da1fabb60993306cfe496ade6513c9d616e36ff23471597c",
     "trust_code_utils.py": "3a3cacde4968e82dbff41a4785c82a7ec5681c70e1b97ff8ebc20bf2416dd2cf",
 }
 
-SCRIPT_NAMES = ("fxwj2023_new.py", "stbg_2025.py")
-HELPER_NAMES = ("ftp_session_utils.py", "trust_code_utils.py")
+SCRIPT_NAMES = (
+    "ABN2025_products_new.py",
+    "ABN2025_new.py",
+    "fxwj2023_new.py",
+    "stbg_2025.py",
+)
+HELPER_NAMES = (
+    "abn_offer_type_utils.py",
+    "ftp_session_utils.py",
+    "trust_code_utils.py",
+)
+
+SQL_SECRET_BY_SCRIPT = {
+    "ABN2025_products_new.py": "SQL_ODBC_ABN_PRODUCTS",
+    "ABN2025_new.py": "SQL_ODBC_ABN_REPORTS",
+    "fxwj2023_new.py": "SQL_ODBC_FXWJ",
+    "stbg_2025.py": "SQL_ODBC_STBG",
+}
 
 MODULE_SECRET_MAP = {
     "FTP_HOST": ("FTP_PRIMARY_HOST", "secret"),
@@ -135,9 +154,18 @@ RESILIENT_FTP_UPLOAD_FUNCTION = '''def upload_file_to_ftp_with_retry(
                 f"Writing {local_file_path} to {ftp_file_path} "
                 f"=====> (Attempt {attempt + 1}/{retries})"
             )
+            original_timeout = ftp.timeout
+            original_socket_timeout = ftp.sock.gettimeout()
+            ftp.timeout = 120
+            ftp.sock.settimeout(120)
             with open(local_file_path, "rb") as handle:
-                with ftp_operation(ftp):
-                    ftp.storbinary(f"STOR {ftp_file_path}", handle)
+                try:
+                    with ftp_operation(ftp):
+                        ftp.storbinary(f"STOR {ftp_file_path}", handle)
+                finally:
+                    ftp.timeout = original_timeout
+                    if ftp.sock is not None:
+                        ftp.sock.settimeout(original_socket_timeout)
             print(f"Successfully uploaded {ftp_file_path}")
             return True
         except ftplib.all_errors as exc:
@@ -213,6 +241,14 @@ def _string_literals(node: ast.AST) -> Iterable[str]:
             yield child.value
 
 
+def _odbc_fields(connection_string: str) -> dict[str, str]:
+    return {
+        part.split("=", 1)[0].strip().upper(): part.split("=", 1)[1].strip()
+        for part in connection_string.split(";")
+        if "=" in part
+    }
+
+
 class SourceEditor:
     def __init__(self, source: str):
         self.source = source
@@ -280,6 +316,16 @@ class BundleBuilder:
         ):
             self.banned_values.add(value)
 
+    def record_odbc_secret(self, key: str, value: Any) -> dict[str, str]:
+        if not isinstance(value, str):
+            raise RuntimeError(f"ODBC secret {key} must be a string")
+        self.record_secret(key, value)
+        fields = _odbc_fields(value)
+        password = fields.get("PWD", "")
+        if len(password) >= 8:
+            self.banned_values.add(password)
+        return fields
+
     def verify_inputs(self) -> None:
         for name, expected_hash in EXPECTED_SHA256.items():
             path = self.raw_dir / name
@@ -294,10 +340,15 @@ class BundleBuilder:
         source = (self.raw_dir / name).read_text(encoding="utf-8-sig")
         tree = ast.parse(source, filename=name)
         editor = SourceEditor(source)
-        editor.insert_start(
-            "from dealviewer_runtime import pymssql_connection_kwargs, secret, secret_int\n",
-            "runtime import",
+        runtime_import = (
+            "from dealviewer_runtime import pymssql_connection_kwargs, secret, secret_int\n"
         )
+        if name == "stbg_2025.py":
+            runtime_import += (
+                "from ftp_session_utils import attach_ftp_config, ftp_operation, "
+                "reconnect_ftp_connection\n"
+            )
+        editor.insert_start(runtime_import, "runtime import")
 
         module_assignments: dict[str, ast.Assign | ast.AnnAssign] = {}
         for node in tree.body:
@@ -312,7 +363,7 @@ class BundleBuilder:
             self.record_secret(secret_name, _literal(node.value, f"{name}:{variable}"))
             editor.replace_node(node.value, f'{loader}("{secret_name}")', f"{name}:{variable}")
 
-        sql_key = "SQL_ODBC_FXWJ" if name == "fxwj2023_new.py" else "SQL_ODBC_STBG"
+        sql_key = SQL_SECRET_BY_SCRIPT[name]
         sql_function = _find_function(tree, "get_sql_connection")
         sql_assignments = [
             node
@@ -322,34 +373,81 @@ class BundleBuilder:
         if len(sql_assignments) != 1:
             raise RuntimeError(f"{name} must have exactly one conn_str assignment")
         sql_assignment = sql_assignments[0]
-        self.record_secret(sql_key, _literal(sql_assignment.value, f"{name}:conn_str"))
+        odbc_fields = self.record_odbc_secret(
+            sql_key, _literal(sql_assignment.value, f"{name}:conn_str")
+        )
         editor.replace_node(sql_assignment.value, f'secret("{sql_key}")', f"{name}:conn_str")
 
-        insert_function = _find_function(tree, "insert")
-        pymssql_calls = [
-            node
-            for node in ast.walk(insert_function)
-            if isinstance(node, ast.Call) and _is_library_connect(node, "pymssql")
-        ]
-        if len(pymssql_calls) != 1:
-            raise RuntimeError(f"{name} must have exactly one pymssql connection in insert")
-        pymssql_call = pymssql_calls[0]
-        keyword_values = {item.arg: _literal(item.value, f"{name}:pymssql:{item.arg}") for item in pymssql_call.keywords}
-        host_value = keyword_values.get("host", keyword_values.get("server"))
-        for secret_name, value in (
-            ("SQL_LEGACY_HOST", host_value),
-            ("SQL_USER", keyword_values.get("user")),
-            ("SQL_PASSWORD", keyword_values.get("password")),
-            ("SQL_DATABASE", keyword_values.get("database")),
-        ):
-            if value is None:
-                raise RuntimeError(f"{name} is missing pymssql value {secret_name}")
-            self.record_secret(secret_name, value)
-        editor.replace_node(
-            pymssql_call,
-            f'pyodbc.connect(secret("{sql_key}"))',
-            f"{name}:pymssql.connect",
-        )
+        if name in {"fxwj2023_new.py", "stbg_2025.py"}:
+            insert_function = _find_function(tree, "insert")
+            pymssql_calls = [
+                node
+                for node in ast.walk(insert_function)
+                if isinstance(node, ast.Call) and _is_library_connect(node, "pymssql")
+            ]
+            if len(pymssql_calls) != 1:
+                raise RuntimeError(f"{name} must have exactly one pymssql connection in insert")
+            pymssql_call = pymssql_calls[0]
+            keyword_values = {
+                item.arg: _literal(item.value, f"{name}:pymssql:{item.arg}")
+                for item in pymssql_call.keywords
+            }
+            host_value = keyword_values.get("host", keyword_values.get("server"))
+            for secret_name, value in (
+                ("SQL_LEGACY_HOST", host_value),
+                ("SQL_USER", keyword_values.get("user")),
+                ("SQL_PASSWORD", keyword_values.get("password")),
+                ("SQL_DATABASE", keyword_values.get("database")),
+            ):
+                if value is None:
+                    raise RuntimeError(f"{name} is missing pymssql value {secret_name}")
+                self.record_secret(secret_name, value)
+            editor.replace_node(
+                pymssql_call,
+                f'pyodbc.connect(secret("{sql_key}"))',
+                f"{name}:pymssql.connect",
+            )
+        elif name == "ABN2025_new.py":
+            insert_function = _find_function(tree, "insert_db")
+            pymssql_calls = [
+                node
+                for node in ast.walk(insert_function)
+                if isinstance(node, ast.Call) and _is_library_connect(node, "pymssql")
+            ]
+            if len(pymssql_calls) != 1:
+                raise RuntimeError("ABN report source must have one pymssql connection")
+            legacy_assignments: dict[str, ast.Assign | ast.AnnAssign] = {}
+            for node in ast.walk(insert_function):
+                variable = _assignment_name(node)
+                if variable in {"server", "user", "password", "database"}:
+                    legacy_assignments[variable] = node
+            if set(legacy_assignments) != {"server", "user", "password", "database"}:
+                raise RuntimeError("ABN report legacy SQL assignments are incomplete")
+            legacy_values = {
+                variable: str(_literal(node.value, f"ABN2025_new.py:{variable}"))
+                for variable, node in legacy_assignments.items()
+            }
+            expected_pairs = {"user": "UID", "password": "PWD", "database": "DATABASE"}
+            for variable, field in expected_pairs.items():
+                if legacy_values[variable] != odbc_fields.get(field, ""):
+                    raise RuntimeError(f"ABN report ODBC and pymssql values differ for {field}")
+            if len(legacy_values["password"]) >= 8:
+                self.banned_values.add(legacy_values["password"])
+            for variable, node in legacy_assignments.items():
+                editor.replace_node(node.value, "None", f"ABN report unused legacy SQL {variable}")
+            editor.replace_node(
+                pymssql_calls[0],
+                f'pyodbc.connect(secret("{sql_key}"))',
+                "ABN report pymssql.connect",
+            )
+        else:
+            pymssql_calls = [
+                node
+                for node in ast.walk(tree)
+                if isinstance(node, ast.Call) and _is_library_connect(node, "pymssql")
+            ]
+            if pymssql_calls:
+                raise RuntimeError("ABN product source unexpectedly uses pymssql.connect")
 
         for node in ast.walk(tree):
             if not isinstance(node, (ast.Assign, ast.AnnAssign)) or _assignment_name(node) != "proxies":
@@ -404,22 +502,11 @@ class BundleBuilder:
             proxy_test = _find_function(tree, "test_configured_proxy")
             editor.replace_node(proxy_test, DIRECT_TEST_FUNCTION.rstrip(), "fxwj:direct connectivity test")
 
-            mail_function = _find_function(tree, "mail")
-            password_assignments = [
-                node
-                for node in ast.walk(mail_function)
-                if isinstance(node, (ast.Assign, ast.AnnAssign)) and _assignment_name(node) == "passwd"
-            ]
-            if len(password_assignments) != 1:
-                raise RuntimeError("fxwj mail function must have exactly one passwd assignment")
-            password_assignment = password_assignments[0]
-            self.record_secret("SMTP_PASSWORD", _literal(password_assignment.value, "fxwj:mail password"))
-            editor.replace_node(password_assignment.value, 'secret("SMTP_PASSWORD")', "fxwj:SMTP password")
         else:
             proxy_start = module_assignments.get("proxy_string")
             proxy_end = module_assignments.get("proxies")
             if proxy_start is None or proxy_end is None or proxy_end.lineno <= proxy_start.lineno:
-                raise RuntimeError("stbg proxy configuration block was not found")
+                raise RuntimeError(f"{name} proxy configuration block was not found")
             for value in _string_literals(proxy_start.value):
                 if len(value) >= 8:
                     self.banned_values.add(value)
@@ -428,9 +515,101 @@ class BundleBuilder:
                 proxy_end,
                 'proxy_url = os.environ.get("DEALVIEWER_PROXY_URL", "").strip() or None\n'
                 'proxies = {"http": proxy_url, "https": proxy_url} if proxy_url else {}',
-                "stbg:optional proxy block",
+                f"{name}:optional proxy block",
             )
 
+        if name == "stbg_2025.py":
+            initial_connect_timeouts = [
+                keyword.value
+                for node in ast.walk(tree)
+                if isinstance(node, ast.Call)
+                and isinstance(node.func, ast.Attribute)
+                and node.func.attr == "connect"
+                for keyword in node.keywords
+                if keyword.arg == "timeout"
+                and isinstance(keyword.value, ast.Constant)
+                and keyword.value.value == 600
+            ]
+            if len(initial_connect_timeouts) != 2:
+                raise RuntimeError("stbg initial FTP connect timeouts were not found")
+            for timeout_node in initial_connect_timeouts:
+                editor.replace_node(
+                    timeout_node,
+                    "120",
+                    "stbg:bound initial FTP connect timeout",
+                )
+            update_pdf_function = _find_function(tree, "update_pdf_new")
+            if not update_pdf_function.body:
+                raise RuntimeError("stbg update_pdf_new body is empty")
+            first_update_statement = update_pdf_function.body[0]
+            first_update_source = ast.get_source_segment(source, first_update_statement)
+            if not first_update_source:
+                raise RuntimeError("stbg update_pdf_new first statement was not found")
+            editor.replace_node(
+                first_update_statement,
+                'if not products:\n'
+                '        print("No trustee-report products to process; "'
+                '"skipping FTP product-directory scan")\n'
+                '        return\n'
+                f'    {first_update_source}',
+                "stbg:skip FTP directory scan for empty product list",
+            )
+            list_retry_function = _find_function(tree, "list_ftp_directory_with_retry")
+            editor.replace_node(
+                list_retry_function,
+                RESILIENT_FTP_LIST_FUNCTION.rstrip(),
+                "stbg:reconnect all FTP list errors",
+            )
+            upload_retry_function = _find_function(tree, "upload_file_to_ftp_with_retry")
+            editor.replace_node(
+                upload_retry_function,
+                RESILIENT_FTP_UPLOAD_FUNCTION.rstrip(),
+                "stbg:reconnect all FTP upload errors",
+            )
+            thread_start = next(
+                (
+                    node
+                    for node in tree.body
+                    if isinstance(node, (ast.Assign, ast.AnnAssign))
+                    and _assignment_name(node) == "keep_alive_thread"
+                ),
+                None,
+            )
+            thread_end = next(
+                (
+                    node
+                    for node in tree.body
+                    if isinstance(node, ast.Expr)
+                    and isinstance(node.value, ast.Call)
+                    and isinstance(node.value.func, ast.Attribute)
+                    and node.value.func.attr == "start"
+                    and isinstance(node.value.func.value, ast.Name)
+                    and node.value.func.value.id == "keep_alive_thread2"
+                ),
+                None,
+            )
+            if thread_start is None or thread_end is None:
+                raise RuntimeError("stbg keep-alive thread block was not found")
+            thread_start_offset, _ = editor.bounds(thread_start)
+            _, thread_end_offset = editor.bounds(thread_end)
+            original_threads = editor.encoded[
+                thread_start_offset:thread_end_offset
+            ].decode("utf-8")
+            indented_threads = "\n".join(
+                "    " + line for line in original_threads.splitlines()
+            )
+            editor.replace_range(
+                thread_start,
+                thread_end,
+                'ENABLE_STBG_FTP_KEEP_ALIVE = os.environ.get('
+                '"STBG_FTP_KEEPALIVE", "0").lower() in ("1", "true", "yes")\n'
+                'if ENABLE_STBG_FTP_KEEP_ALIVE:\n'
+                f'{indented_threads}\n'
+                'else:\n'
+                '    print("STBG FTP keep-alive threads disabled; "'
+                '"set STBG_FTP_KEEPALIVE=1 to enable.")',
+                "stbg:disable shared-connection keep-alive by default",
+            )
             upload_function = _find_function(tree, "upload_file")
             legacy_map = {
                 "host": ("FTP_LEGACY_HOST", "secret"),
@@ -452,7 +631,104 @@ class BundleBuilder:
             if found != set(legacy_map):
                 raise RuntimeError("stbg legacy FTP assignments are incomplete")
 
+        if name in {"fxwj2023_new.py", "ABN2025_new.py"}:
+            smtp_secret = (
+                "SMTP_PASSWORD" if name == "fxwj2023_new.py" else "SMTP_PASSWORD_ABN"
+            )
+            mail_function = _find_function(tree, "mail")
+            password_assignments = [
+                node
+                for node in ast.walk(mail_function)
+                if isinstance(node, (ast.Assign, ast.AnnAssign))
+                and _assignment_name(node) == "passwd"
+            ]
+            if len(password_assignments) != 1:
+                raise RuntimeError(f"{name} mail function must have one passwd assignment")
+            password_assignment = password_assignments[0]
+            self.record_secret(
+                smtp_secret, _literal(password_assignment.value, f"{name}:mail password")
+            )
+            editor.replace_node(
+                password_assignment.value,
+                f'secret("{smtp_secret}")',
+                f"{name}:SMTP password",
+            )
+
+        if name == "ABN2025_new.py":
+            backup_upload = _find_function(tree, "upload_211_bak")
+            backup_assignment_map = {
+                "host": ("FTP_SECONDARY_HOST", "secret"),
+                "port": ("FTP_SECONDARY_PORT", "secret_int"),
+                "username": ("FTP_SECONDARY_USER", "secret"),
+                "password": ("FTP_SECONDARY_PASSWORD", "secret"),
+            }
+            found_assignments: set[str] = set()
+            for node in ast.walk(backup_upload):
+                variable = _assignment_name(node)
+                if variable not in backup_assignment_map:
+                    continue
+                secret_name, loader = backup_assignment_map[variable]
+                editor.replace_node(
+                    node.value,
+                    f'{loader}("{secret_name}")',
+                    f"ABN report backup FTP assignment {variable}",
+                )
+                found_assignments.add(variable)
+            if found_assignments != set(backup_assignment_map):
+                raise RuntimeError("ABN report backup FTP assignments are incomplete")
+            ftp_calls = [
+                node
+                for node in ast.walk(backup_upload)
+                if isinstance(node, ast.Call)
+                and isinstance(node.func, ast.Attribute)
+                and isinstance(node.func.value, ast.Name)
+                and node.func.value.id == "ftplib"
+                and node.func.attr == "FTP"
+            ]
+            if len(ftp_calls) != 1:
+                raise RuntimeError("ABN report backup upload must have one FTP constructor")
+            keyword_map = {
+                "host": 'secret("FTP_SECONDARY_HOST")',
+                "user": 'secret("FTP_SECONDARY_USER")',
+                "passwd": 'secret("FTP_SECONDARY_PASSWORD")',
+            }
+            found_keywords: set[str] = set()
+            for keyword in ftp_calls[0].keywords:
+                if keyword.arg in keyword_map:
+                    editor.replace_node(
+                        keyword.value,
+                        keyword_map[keyword.arg],
+                        f"ABN report backup FTP {keyword.arg}",
+                    )
+                    found_keywords.add(keyword.arg)
+            if found_keywords != set(keyword_map):
+                raise RuntimeError("ABN report backup FTP credentials are incomplete")
+
         output = editor.render()
+        if name == "stbg_2025.py":
+            primary_needle = "ftp = ftplib.FTP()\nftp.connect(FTP_HOST, FTP_PORT, timeout=120)"
+            primary_replacement = (
+                "ftp = ftplib.FTP()\n"
+                "attach_ftp_config(\n"
+                "    ftp, host=FTP_HOST, port=FTP_PORT, user=FTP_USER,\n"
+                "    password=FTP_PASS, encoding=ftp.encoding,\n"
+                ")\n"
+                "ftp.connect(FTP_HOST, FTP_PORT, timeout=120)"
+            )
+            secondary_needle = "ftp2 = ftplib.FTP()\ntry:"
+            secondary_replacement = (
+                "ftp2 = ftplib.FTP()\n"
+                "attach_ftp_config(\n"
+                "    ftp2, host=FTP2_HOST, port=FTP2_PORT, user=FTP2_USER,\n"
+                "    password=FTP2_PASS, encoding=\"utf-8\", enable_utf8=True,\n"
+                ")\n"
+                "try:"
+            )
+            if output.count(primary_needle) != 1 or output.count(secondary_needle) != 1:
+                raise RuntimeError("stbg FTP session initializers were not found")
+            output = output.replace(primary_needle, primary_replacement).replace(
+                secondary_needle, secondary_replacement
+            )
         parsed_output = ast.parse(output, filename=name)
         for literal in _string_literals(parsed_output):
             for value in self.banned_values:
@@ -475,11 +751,7 @@ class BundleBuilder:
 
     def derive_public_sql_route(self) -> None:
         connection_string = str(self.secrets["SQL_ODBC_FXWJ"])
-        fields = {
-            part.split("=", 1)[0].strip().upper(): part.split("=", 1)[1].strip()
-            for part in connection_string.split(";")
-            if "=" in part
-        }
+        fields = _odbc_fields(connection_string)
         raw_server = fields.get("SERVER", "").removeprefix("tcp:")
         if "," in raw_server:
             host, raw_port = raw_server.rsplit(",", 1)
@@ -512,11 +784,17 @@ class BundleBuilder:
 
     def write_secrets(self) -> None:
         self.secrets_path.parent.mkdir(parents=True, exist_ok=True)
+        existing_owner: tuple[int, int] | None = None
+        if self.secrets_path.exists():
+            current = self.secrets_path.stat()
+            existing_owner = (current.st_uid, current.st_gid)
         temporary = self.secrets_path.with_name(self.secrets_path.name + ".tmp")
         with temporary.open("w", encoding="utf-8", newline="\n") as handle:
             json.dump(self.secrets, handle, ensure_ascii=False, indent=2, sort_keys=True)
             handle.write("\n")
         os.chmod(temporary, 0o600)
+        if existing_owner is not None and hasattr(os, "chown"):
+            os.chown(temporary, *existing_owner)
         os.replace(temporary, self.secrets_path)
         os.chmod(self.secrets_path, 0o600)
 

@@ -360,7 +360,36 @@ def get_pdf_paths_from_html(doc_url, proxies):
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36",
         }
-        response = requests.get(doc_url, headers=headers, proxies=proxies, timeout=30)
+        response = None
+        try:
+            print("Attempting direct detail-page fetch...")
+            direct_response = requests.get(doc_url, headers=headers, timeout=30)
+            if (
+                direct_response.status_code == 200
+                and b".pdf" in direct_response.content.lower()
+            ):
+                response = direct_response
+                print("Direct detail-page fetch succeeded.")
+            else:
+                print(
+                    "Direct detail-page response did not contain PDFs; "
+                    "falling back to proxy."
+                )
+        except Exception as e:
+            print(f"Direct detail-page fetch failed; falling back to proxy: {e}")
+
+        if response is None:
+            for attempt in range(1, 4):
+                try:
+                    response = requests.get(
+                        doc_url, headers=headers, proxies=proxies, timeout=30
+                    )
+                    break
+                except Exception as e:
+                    print(f"Error fetching detail page (attempt {attempt}/3): {e}")
+                    if attempt == 3:
+                        raise
+                    time.sleep(2 * attempt)
         if response.status_code != 200:
             print(f"Failed to fetch detail page. Status: {response.status_code}")
             return []

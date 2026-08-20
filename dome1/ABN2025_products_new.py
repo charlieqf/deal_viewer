@@ -1491,6 +1491,33 @@ def crawl_pdf(product_name, i, type_f):
             print(f"✗ PDF下载异常: {pdf_file_name}, 错误: {e}")
             time.sleep(random.uniform(1, 5))
 
+    if file_exists:
+        ftp_folder = create_dir_on_ftp(ftp, "/Products/资产支持票据", product_name[2])
+        ftp_file_path = os.path.join(ftp_folder, pdf_file_name).replace("\\", "/")
+        upload_file_to_ftp_with_retry(
+            ftp, cache_pdf_path, ftp_folder, ftp_file_path, pdf_file_name
+        )
+
+        if type_f == 1:
+            create_dir_on_ftp(ftp, "/增量文档", month)
+            folder = create_dir_on_ftp(ftp, f"/增量文档/{month}", product_name[1])
+            ftp_folder = create_dir_on_ftp(ftp, folder, "ProductReleaseInstructions")
+            ftp_file_path = os.path.join(ftp_folder, pdf_file_name).replace("\\", "/")
+            upload_file_to_ftp_with_retry(
+                ftp, cache_pdf_path, ftp_folder, ftp_file_path, pdf_file_name
+            )
+
+        if type_f == 2:
+            create_dir_on_ftp(ftp, "/增量文档", month)
+            folder = create_dir_on_ftp(ftp, f"/增量文档/{month}", product_name[1])
+            ftp_folder = create_dir_on_ftp(ftp, folder, "TrusteeReport")
+            ftp_file_path = os.path.join(ftp_folder, pdf_file_name).replace("\\", "/")
+            upload_file_to_ftp_with_retry(
+                ftp, cache_pdf_path, ftp_folder, ftp_file_path, pdf_file_name
+            )
+
+    time.sleep(random.uniform(1.5, 2.9))
+
 
 def upload_file_to_ftp_with_retry(
     ftp, local_file_path, ftp_folder, ftp_file_path, file_name, retries=5
@@ -1549,51 +1576,6 @@ def upload_file_to_ftp_with_retry(
                 time.sleep(5)
 
     print(f"❌ Failed to upload {file_name} after retries")
-
-    if file_exists:
-        ftp_folder = create_dir_on_ftp(ftp, "/Products/资产支持票据", product_name[2])
-        ftp_file_path = os.path.join(ftp_folder, pdf_file_name).replace("\\", "/")
-
-        upload_file_to_ftp_with_retry(
-            ftp, cache_pdf_path, ftp_folder, ftp_file_path, pdf_file_name
-        )
-
-        if type_f == 1:
-            create_dir_on_ftp(ftp, "/增量文档", month)
-            folder = create_dir_on_ftp(ftp, f"/增量文档/{month}", product_name[1])
-            ftp_folder = create_dir_on_ftp(ftp, folder, "ProductReleaseInstructions")
-            ftp_file_path = os.path.join(ftp_folder, pdf_file_name).replace("\\", "/")
-            upload_file_to_ftp_with_retry(
-                ftp, cache_pdf_path, ftp_folder, ftp_file_path, pdf_file_name
-            )
-
-        if type_f == 2:
-            create_dir_on_ftp(ftp, "/增量文档", month)
-            folder = create_dir_on_ftp(ftp, f"/增量文档/{month}", product_name[1])
-            ftp_folder = create_dir_on_ftp(ftp, folder, "TrusteeReport")
-            ftp_file_path = os.path.join(ftp_folder, pdf_file_name).replace("\\", "/")
-            upload_file_to_ftp_with_retry(
-                ftp, cache_pdf_path, ftp_folder, ftp_file_path, pdf_file_name
-            )
-
-    # with open(r'\\172.16.7.114\/Products/资产支持票据\{}\{}.pdf'.format(product_name[2], i[1]), 'wb') as f:
-    #     f.write(rs.content)
-    #     print(i[1] + '.PDF done')
-
-    # if type_f == 1:
-    #     with open(
-    #             r'\\172.16.7.114\/增量文档\{}\{}\ProductReleaseInstructions\{}.pdf'.format(
-    #                 str(datetime.now().month), product_name[1],
-    #                 i[1]),
-    #             'wb') as f:
-    #         f.write(rs.content)
-    # if type_f == 2:
-    #     with open(r'\\172.16.7.114\/增量文档\{}\{}\TrusteeReport\{}.pdf'.format(str(datetime.now().month),
-    #                                                                                 product_name[1], i[1]),
-    #               'wb') as f:
-    #         f.write(rs.content)
-
-    time.sleep(random.uniform(1.5, 2.9))
 
 
 # crawl_pdf_bak() 已删除 - 备份函数，使用旧的网络共享路径

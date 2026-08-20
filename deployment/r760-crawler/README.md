@@ -1,8 +1,10 @@
 # DealViewer crawler on R760
 
-This bundle runs the production `fxwj2023_new.py` and `stbg_2025.py` scripts as
-isolated, one-shot containers. It publishes no ports and does not share the
-Codex Gateway Compose project, network, volumes, or private Mihomo service.
+This bundle runs the production ABN product (`ABN2025_products_new.py`), ABN
+report (`ABN2025_new.py`), ABS issuance-file (`fxwj2023_new.py`), and ABS
+trustee-report (`stbg_2025.py`) scripts as isolated, one-shot containers. It
+publishes no ports and does not share the Codex Gateway Compose project,
+network, volumes, or private Mihomo service.
 
 ## Layout on R760
 
@@ -35,6 +37,8 @@ After deployment and validation:
 
 ```bash
 systemctl start dealviewer-crawler@preflight.service
+systemctl start --no-block dealviewer-crawler@abn-products.service
+systemctl start --no-block dealviewer-crawler@abn-reports.service
 systemctl start --no-block dealviewer-crawler@fxwj.service
 systemctl start --no-block dealviewer-crawler@stbg-page1.service
 systemctl status dealviewer-crawler@fxwj.service
@@ -49,21 +53,32 @@ runs pages `6,5,4,3,2,1`. No timer is enabled because the legacy environment
 did not provide an authoritative crawler schedule. Confirm the business run
 times and overlap policy before installing or enabling any timer.
 
-## Accepted production canaries
+## Production acceptance
 
-- Trustee page 1 completed with no increment and preserved its
-  `2026-08-07 10:52:47` FTP timestamp.
-- The issuance workflow completed two products after one idempotent resume,
-  with 14 associated-document rows in final SQL validation and the final FTP
-  timestamp `2026-08-11 16:02:57`.
+- The 2026-08-20 ABN product run processed 49 URLs (public 0, private 49,
+  other 0), exited `0`, and advanced its timestamp to
+  `2026-08-19 17:00:02`.
+- The 2026-08-20 ABN report run completed 13 report items, left one genuinely
+  unmatched product, exited `0`, and advanced its timestamp to
+  `2026-08-19 18:44:00`.
+- The 2026-08-20 issuance-file run completed 12 products, 84 direct PDF
+  downloads, 252 FTP uploads, and 84 associated-document inserts. It exited
+  `0` and advanced its timestamp to `2026-08-19 16:57:34`.
+- The 2026-08-20 trustee-report catch-up covered pages 4 through 1. Final
+  validation found 389/389 titles represented by success markers and 389/389
+  valid SQL business records, with no unmatched title. Its timestamp is
+  `2026-08-20 08:30:00`.
+- A post-run zero-increment trustee sequence completed pages 6 through 1 in
+  65 seconds with six exit-code-0 status records. Empty result sets now skip
+  the legacy FTP product-directory scan, and initial FTP connects are bounded
+  at 120 seconds. The systemd outer limit is 24 hours for genuine backfills.
 - The accepted image is
-  `sha256:21fe0eecb4ac21350a70aa93a040cead21fa0f5c973e9b9e9c166d1c6e7e4f7b`.
-  The immediately preceding image remains tagged
-  `dealviewer-crawler:r760-20260811-pre-ftp-retry` for rollback.
-- The final same-day read-only preflight before the Kamatera shutdown on
-  2026-08-13 passed direct Chinabond access, both zero-write FTP checks, both
-  ODBC checks, and headless Chrome with no configured proxy. The unit result
-  was `success` with exit code `0`.
+  `sha256:2b8c3fc28aa28a128a70c3d7c09a29b9c490f6e7baba3d8a16250e1180717768`.
+  Earlier accepted and pre-resilience images remain tagged on R760 for
+  rollback.
+- The final 2026-08-20 read-only preflight passed all 11 checks: Chinabond
+  issuance/trustee data and sample PDFs, ChinaMoney ABN, both zero-write FTP
+  checks, four ODBC checks, secret schema, and headless Chrome.
 
 ## Legacy Kamatera state
 
@@ -83,6 +98,6 @@ Enabled base services and credentials remain on the powered-off VM. A cold boot
 can restore SSH, Nginx and L2TP/IPsec listeners, and the remote GitLab reverse
 tunnel may reconnect; audit listeners and consumers before using the host.
 
-The accepted R760 bundle contains only `fxwj2023_new.py` and `stbg_2025.py`.
-It does not provide an online runtime for `ABN2025_products_new.py` or
-`ABN2025_new.py` while Kamatera remains powered off.
+All four production crawlers now have manual, one-shot R760 entry points.
+There is no crawler timer or cron entry; Kamatera remains a powered-off cold
+rollback and must not be started as a writer while an R760 job is running.
