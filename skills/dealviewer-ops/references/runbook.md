@@ -6,12 +6,14 @@ Use this reference with the repository's `dome1/RUNBOOK.md`, which remains the d
 
 - R760 is the only online crawler runtime.
 - The isolated Compose bundle is `/data/dealviewer-crawler/bundle` and covers `ABN2025_products_new.py`, `ABN2025_new.py`, `fxwj2023_new.py`, and `stbg_2025.py`.
-- The current image is `sha256:2b8c3fc28aa28a128a70c3d7c09a29b9c490f6e7baba3d8a16250e1180717768`.
+- The current image is `sha256:5635137dbb6415f40d535a5c61f9d74ec336d617e642cc345da6c023048231ee`; the prior accepted image remains tagged `dealviewer-crawler:r760-20260830-pre-fxwj-series-prefix`.
 - Direct Chinabond access is the default; no proxy is configured, and the crawler must not reuse Gateway Mihomo.
 - No crawler timer is enabled because no authoritative legacy schedule was found. Confirm business run times and overlap policy before adding one.
 - All four crawlers are manual one-shot jobs; no crawler timer or cron entry is enabled.
 
-The final 2026-08-20 read-only R760 preflight passed all 11 dependency checks. Systemd reported `Result=success` and exit code `0`.
+The 2026-08-30 read-only R760 preflight passed all 11 dependency checks. Systemd reported `Result=success` and exit code `0`.
+
+The 2026-08-30 routine run repaired no-year issuance TrustCode generation, completed 2 issuance products/15 PDFs/45 uploads, 27 ABN products, 7 ABN reports, and 4 trustee reports, with zero item-level errors. Before trustee writes, verified compressed transaction-log backups preserved FULL recovery and reduced the three dependent database logs to low usage. See `dome1/RUNBOOK.md` for counters, timestamps, rollback tags, and the partial-row repair record.
 
 ## R760 Operations
 

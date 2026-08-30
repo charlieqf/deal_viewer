@@ -24,7 +24,7 @@ from ftp_session_utils import (
     reconnect_ftp_connection,
     try_keepalive_noop,
 )
-from trust_code_utils import build_trust_code
+from trust_code_utils import build_trust_code, extract_issuance_series_name
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -1063,12 +1063,11 @@ def create_new_product(product_name):
         trust_name = "华驭第十六期汽车抵押贷款支持证券"
     else:
         try:
+            series_name = extract_issuance_series_name(product_name)
             s = ""
-            for i in pypinyin.pinyin(product_name, style=pypinyin.NORMAL):
+            for i in pypinyin.pinyin(series_name, style=pypinyin.NORMAL):
                 i = i[0].title()
                 s += "".join(i)
-
-            s = s.split("Nian")[0]
 
             sp_filename = product_name.split("第")[1]
             nper = sp_filename.split("期")[0]
@@ -1080,8 +1079,7 @@ def create_new_product(product_name):
 
             if "更正" in product_name or "更新" in product_name:
                 return
-            splitname = product_name.split("年")[0]
-            trust_name_short = splitname + "-" + str(conversion_nper)
+            trust_name_short = series_name + "-" + str(conversion_nper)
             trust_name = product_name.split("发行文件")[0]
         except:
             print("TrustCode\TrustName获取失败")

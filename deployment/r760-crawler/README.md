@@ -55,6 +55,15 @@ times and overlap policy before installing or enabling any timer.
 
 ## Production acceptance
 
+The current production image is
+`sha256:5635137dbb6415f40d535a5c61f9d74ec336d617e642cc345da6c023048231ee`.
+On 2026-08-30 it completed the routine sequence with 2 issuance products/15
+PDFs/45 uploads, 27 ABN products, 7 ABN reports, and 4 trustee reports. The
+issuance fix shortens no-year series identifiers before the downstream
+`nvarchar(50)` boundary; its post-run zero-increment canary exited `0` with no
+writes. The prior image is retained as
+`dealviewer-crawler:r760-20260830-pre-fxwj-series-prefix`.
+
 - The 2026-08-20 ABN product run processed 49 URLs (public 0, private 49,
   other 0), exited `0`, and advanced its timestamp to
   `2026-08-19 17:00:02`.
@@ -72,7 +81,7 @@ times and overlap policy before installing or enabling any timer.
   65 seconds with six exit-code-0 status records. Empty result sets now skip
   the legacy FTP product-directory scan, and initial FTP connects are bounded
   at 120 seconds. The systemd outer limit is 24 hours for genuine backfills.
-- The accepted image is
+- The 2026-08-20 accepted image was
   `sha256:2b8c3fc28aa28a128a70c3d7c09a29b9c490f6e7baba3d8a16250e1180717768`.
   Earlier accepted and pre-resilience images remain tagged on R760 for
   rollback.

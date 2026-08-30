@@ -2,7 +2,7 @@
 
 This runbook captures current operational practice for DealViewer ABSDaily scripts on the R760 and the powered-off legacy Kamatera cold-rollback VM. Update it whenever a production fix changes how scripts are run.
 
-## R760 Crawler Runtime (2026-08-20)
+## R760 Crawler Runtime (2026-08-30)
 
 The ABN product (`ABN2025_products_new.py`), ABN report (`ABN2025_new.py`), ABS issuance-file (`fxwj2023_new.py`), and ABS trustee-report (`stbg_2025.py`) jobs run in an isolated Docker Compose project on the R760. Docker is not a functional requirement for the Python code, but it is the production isolation boundary for the pinned Chrome/Driver, ODBC libraries, and the legacy TLS policy required by the old SQL Server. Do not move that TLS policy onto the R760 host.
 
@@ -46,6 +46,15 @@ job running if the SSH connection closes.
 These are one-shot services: the container is removed after completion. A zero process exit is necessary but not sufficient; inspect the matching status JSON, business progress/error markers, FTP update timestamp, and any cache error artifacts before declaring success.
 
 No timer is enabled because the legacy host had no authoritative crawler schedule. Add timers only after the business run times and overlap policy are explicitly confirmed. R760 is the only online crawler runtime; Kamatera is a powered-off cold rollback and must never be started as a writer while an R760 writer is running.
+
+### 2026-08-30 routine run and issuance-code repair
+
+- Current image: `sha256:5635137dbb6415f40d535a5c61f9d74ec336d617e642cc345da6c023048231ee`. The prior accepted image remains tagged `dealviewer-crawler:r760-20260830-pre-fxwj-series-prefix`; the pre-deploy bundle backup is `deploy_backups/20260829T234711Z-fxwj-series-prefix`.
+- The first issuance attempt stopped before timestamp advancement when a no-year `华驭第十八期...` title generated a 58-character TrustCode for a downstream `nvarchar(50)` column. TrustId `35225` was backed up and reconciled to `HuaYu_AUTO-18`. The parser now builds its pinyin prefix from the name before `年` or `第`.
+- Issuance rerun: 2 products, 15 direct downloads, 45 three-target uploads, 15 document inserts, timestamp `2026-08-28 13:54:17`, followed by an exit-0 zero-increment canary with no writes.
+- ABN products: 27 URLs (public 1, private 26), 27 Analysis rows and 162 extension rows, timestamp `2026-08-27 17:00:01`. ABN reports: 7/7 matched report records, 7 success/7 done markers, zero errors, timestamp `2026-08-28 05:09:48`.
+- Before trustee writes, compressed checksum transaction-log backups for `FixedIncomeSuite`, `PortfolioManagement`, and `TaskCollection` were written under `C:\SQLLogBackups` and passed `RESTORE VERIFYONLY`. FULL recovery was preserved; log use fell to 0.7%, 4.8%, and 9.1%.
+- Trustee pages 6 through 2 were zero increment. Page 1 completed 4/4 matches, 12/12 FTP target paths, four document/task SQL records, four success markers, zero error markers, and timestamp `2026-08-26 14:31:02`. One corrected report reused an existing disclosure under the established duplicate-disclosure rule.
 
 ### 2026-08-20 full migration acceptance
 

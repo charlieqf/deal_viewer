@@ -2,7 +2,7 @@ name: dealviewer_crawler
 
 services:
   crawler:
-    image: dealviewer-crawler:r760-20260820-all
+    image: dealviewer-crawler:r760-20260830-fxwj-series-prefix
     build:
       context: .
       dockerfile: Dockerfile

@@ -15,10 +15,10 @@ EXPECTED_SHA256 = {
     "ABN2025_products_new.py": "7dd00d4aad1788ded89c61f86cec90d9ad15f3bebde0eea6d1fca27f48922694",
     "ABN2025_new.py": "ff0cfa2c662a193e557756cd5a2dbf5ad400ba74a7bff1c724d279a016f52b5b",
     "abn_offer_type_utils.py": "21aec176c70416df16f58ca7e3732b1c34d16bbdb22d0316fbbb4ee4c31719f7",
-    "fxwj2023_new.py": "3395629ead75d21f96f92c40372581431b014b096dd3998afbcaf53845b2b2d7",
+    "fxwj2023_new.py": "b87fccdeced7c7b18d910684e7f4af36c27534261bcc1764fc901aa17694723f",
     "stbg_2025.py": "46e5785589c534cbda8bde09e696692a1ad350b4fb32b83165155c3faa0309b3",
     "ftp_session_utils.py": "5864c371bed7c497da1fabb60993306cfe496ade6513c9d616e36ff23471597c",
-    "trust_code_utils.py": "3a3cacde4968e82dbff41a4785c82a7ec5681c70e1b97ff8ebc20bf2416dd2cf",
+    "trust_code_utils.py": "20a34db8d9b983a7d1364b9b05b76e8a6ab019e6276ac76d42cc901f6ab9b5df",
 }
 
 SCRIPT_NAMES = (
@@ -492,9 +492,13 @@ class BundleBuilder:
                 'os.environ.get("DEALVIEWER_LEGACY_LOG_FILE", "/logs/fxwj-legacy.log")',
                 "fxwj:writable legacy log",
             )
-            default_proxy = module_assignments.get("default_proxy_string")
+            default_proxy = module_assignments.get(
+                "default_proxy_string"
+            ) or module_assignments.get("proxy_string")
             if default_proxy is None:
-                raise RuntimeError("fxwj source is missing default_proxy_string")
+                raise RuntimeError(
+                    "fxwj source is missing default_proxy_string/proxy_string"
+                )
             for value in _string_literals(default_proxy.value):
                 if len(value) >= 8:
                     self.banned_values.add(value)
