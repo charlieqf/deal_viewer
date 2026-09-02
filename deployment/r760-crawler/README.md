@@ -1,8 +1,9 @@
 # DealViewer crawler on R760
 
 This bundle runs the production ABN product (`ABN2025_products_new.py`), ABN
-report (`ABN2025_new.py`), ABS issuance-file (`fxwj2023_new.py`), and ABS
-trustee-report (`stbg_2025.py`) scripts as isolated, one-shot containers. It
+report (`ABN2025_new.py`), ABS issuance-file (`fxwj2023_new.py`), ABS
+issuance-result (`day_fxjg2023_new.py`), and ABS trustee-report
+(`stbg_2025.py`) scripts as isolated, one-shot containers. It
 publishes no ports and does not share the Codex Gateway Compose project,
 network, volumes, or private Mihomo service.
 
@@ -40,6 +41,7 @@ systemctl start dealviewer-crawler@preflight.service
 systemctl start --no-block dealviewer-crawler@abn-products.service
 systemctl start --no-block dealviewer-crawler@abn-reports.service
 systemctl start --no-block dealviewer-crawler@fxwj.service
+systemctl start --no-block dealviewer-crawler@fxjg.service
 systemctl start --no-block dealviewer-crawler@stbg-page1.service
 systemctl status dealviewer-crawler@fxwj.service
 journalctl -u dealviewer-crawler@fxwj.service
@@ -56,8 +58,17 @@ times and overlap policy before installing or enabling any timer.
 ## Production acceptance
 
 The current production image is
-`sha256:5635137dbb6415f40d535a5c61f9d74ec336d617e642cc345da6c023048231ee`.
-On 2026-08-30 it completed the routine sequence with 2 issuance products/15
+`sha256:6082abb4b38abc8d46a75694bb2f9f425164d0e84a79fc7ccd693a5c2b50571e`.
+On 2026-09-02 the issuance-result migration passed all 13 preflight checks and
+an exit-0, write-disabled zero-increment canary. The production run processed
+20 products and PDFs, completed 60 three-target FTP uploads, inserted 20
+`AnnouncementOfResults` records with no duplicates, and advanced the result
+timestamp to `2026-09-01 14:35:25`. Its 20 success markers and zero error
+markers were verified. The prior image and bundle are retained as
+`dealviewer-crawler:r760-20260902-pre-fxjg-migration` and
+`deploy_backups/20260902T073407Z-fxjg-migration`.
+
+On 2026-08-30 the prior image completed the routine sequence with 2 issuance products/15
 PDFs/45 uploads, 27 ABN products, 7 ABN reports, and 4 trustee reports. The
 issuance fix shortens no-year series identifiers before the downstream
 `nvarchar(50)` boundary; its post-run zero-increment canary exited `0` with no
@@ -107,6 +118,6 @@ Enabled base services and credentials remain on the powered-off VM. A cold boot
 can restore SSH, Nginx and L2TP/IPsec listeners, and the remote GitLab reverse
 tunnel may reconnect; audit listeners and consumers before using the host.
 
-All four production crawlers now have manual, one-shot R760 entry points.
+All five production crawlers now have manual, one-shot R760 entry points.
 There is no crawler timer or cron entry; Kamatera remains a powered-off cold
 rollback and must not be started as a writer while an R760 job is running.

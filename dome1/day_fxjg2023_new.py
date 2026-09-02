@@ -411,10 +411,7 @@ def get_sql_connection():
 
 conn = get_sql_connection()
 
-# Smartproxy credentials and proxy URL
-#username = "splci64blr"
-#password = "6j0z1hrwFM4LbdheZ_"
-#proxy_url = f"http://{username}:{password}@gate.smartproxy.com:10001"
+# Optional proxy credentials are supplied by the isolated runtime.
 
 # 解析 ProxyJet 字符串
 proxy_string = "proxy-jet.io:1010:2506034iYZQ-resi_region-AU_Newsouthwales_Parramatta:rUGciFpmX7CwT12"
@@ -478,16 +475,18 @@ def use_selenium(proxies):
     # response = requests.get(test_url, proxies=proxies)
     # print(response.status_code, response.json())
 
-    print("connecting to the website...")
-    driver.get(
-        "https://www.chinabond.com.cn/xxpl/ywzc_fxyfxdh/fxyfxdh_zqzl/zqzl_zjzzczj/"
-    )
-    WebDriverWait(driver, 20).until(
-        EC.presence_of_element_located((By.TAG_NAME, "body"))
-    )
-    time.sleep(3)  # Wait for the page to load
-
-    print(driver.title)
+    if os.environ.get("FXJG_BROWSER_WARMUP", "0").lower() in ("1", "true", "yes"):
+        print("connecting to the website...")
+        driver.get(
+            "https://www.chinabond.com.cn/xxpl/ywzc_fxyfxdh/fxyfxdh_zqzl/zqzl_zjzzczj/"
+        )
+        WebDriverWait(driver, 20).until(
+            EC.presence_of_element_located((By.TAG_NAME, "body"))
+        )
+        time.sleep(3)  # Wait for the page to load
+        print(driver.title)
+    else:
+        print("FXJG browser warmup disabled; using the Chinabond API directly.")
 
     # # Check if the element exists on the page
     # elements = driver.find_elements(By.XPATH, "//span[contains(text(),'发行结果')]")
@@ -509,6 +508,10 @@ def use_selenium(proxies):
     #     print("Error clicking on the element: ", e)
 
     last_date = read_ftp_file(ftp, UPDATE_LOG_PATH)
+    last_date_override = os.environ.get("FXJG_LAST_DATE_OVERRIDE", "").strip()
+    if last_date_override:
+        last_date = last_date_override
+        print("Using FXJG_LAST_DATE_OVERRIDE for a non-writing canary.")
     print("上次更新的日期为 " + last_date)
 
     url = "https://www.chinabond.com.cn/cbiw/trs/getContentByConditions"
@@ -550,7 +553,10 @@ def use_selenium(proxies):
 
     # Send the POST request
     # Send the POST request
-    response = requests.post(url, json=data, headers=headers, proxies=proxies)
+    response = requests.post(
+        url, json=data, headers=headers, proxies=proxies, timeout=(10, 40)
+    )
+    response.raise_for_status()
     # print(response.status_code, response.reason, response.text, response.headers)
     response_data = response.json()
 
@@ -614,9 +620,12 @@ def use_selenium(proxies):
     # print(products)
     update_pdf_new(products)
 
-    print("Writing latest date time {} to".format(latest_date_time), UPDATE_LOG_PATH)
-    with io.BytesIO(latest_date_time.encode("utf-8")) as bio:
-        ftp.storbinary(f"STOR {UPDATE_LOG_PATH}", bio)
+    if os.environ.get("FXJG_WRITE_UPDATE_LOG", "1").lower() in ("1", "true", "yes"):
+        print("Writing latest date time {} to".format(latest_date_time), UPDATE_LOG_PATH)
+        with io.BytesIO(latest_date_time.encode("utf-8")) as bio:
+            ftp.storbinary(f"STOR {UPDATE_LOG_PATH}", bio)
+    else:
+        print("FXJG timestamp write disabled for canary.")
 
 def get_web_pdf_content_with_retry(web_pdf_path, retries=5):
     """下载PDF内容，有指数退避重试和隔离错误处理"""
@@ -792,6 +801,10 @@ def create_dir_on_ftp(ftp, dir, folder):
 
 
 def update_pdf_new(products):
+    if not products:
+        print("No issuance-result products to process; skipping FTP directory scans.")
+        return
+
     month = str(datetime.now().month)
     month_folder_path = create_dir_on_ftp(ftp, INCREMENT_FOLDER_PATH, month)
 
@@ -811,6 +824,7 @@ def update_pdf_new(products):
         "/Products/租赁资产",
         "/Products_log/银行间债券市场更新数据",
     ]
+    completed_titles = set()
 
     for asset_type_dir in asset_type_dirs:
         print(asset_type_dir)
@@ -870,7 +884,9 @@ def update_pdf_new(products):
 
                         # 上传到增量文档 INCREMENT_FOLDER_PATH
                         increment_foler_path = create_dir_on_ftp(ftp, month_folder_path, product_folder)
-                        increment_pdf_path = create_dir_on_ftp(ftp, increment_foler_path, pdf_file_name)
+                        increment_pdf_path = os.path.join(
+                            increment_foler_path, pdf_file_name
+                        )
 
                         print("Uploading PDF to", increment_pdf_path)
                         upload_file_to_ftp(
@@ -910,6 +926,32 @@ def update_pdf_new(products):
                                 insert_db_record(
                                     trust_code, sql_file_path, pdf_file_name
                                 )
+                                completed_titles.add(product["title"])
+                                success_marker = os.path.join(
+                                    cache_folder, product["title"] + ".success"
+                                )
+                                error_marker = os.path.join(
+                                    cache_folder, product["title"] + ".error"
+                                )
+                                with open(success_marker, "w", encoding="utf-8") as f:
+                                    f.write("success")
+                                if os.path.exists(error_marker):
+                                    os.remove(error_marker)
+
+    expected_titles = {product["title"] for product in products}
+    missing_titles = sorted(expected_titles - completed_titles)
+    if missing_titles:
+        for title in missing_titles:
+            with open(
+                os.path.join(cache_folder, title + ".error"),
+                "w",
+                encoding="utf-8",
+            ) as f:
+                f.write("not fully processed")
+        raise RuntimeError(
+            "Issuance-result products were not fully processed: "
+            + ", ".join(missing_titles)
+        )
 
     print("Done")
 
@@ -1019,7 +1061,7 @@ def update_pdf():
 
                         print(data["update_title"] + "下载完成")
                         with open(
-                            "D:\DataTeam\Products_log\更新时间TXT记录\FileName.txt", "a"
+                            r"D:\DataTeam\Products_log\更新时间TXT记录\FileName.txt", "a"
                         ) as f:
                             f.write(now_time)
                             f.write(data["update_title"])
@@ -1035,7 +1077,7 @@ def update_pdf():
                             f.write("\n")
                             f.close()
 
-                        ftp_path = "DealViewer\TrustAssociatedDoc"
+                        ftp_path = "DealViewer/TrustAssociatedDoc"
                         folder = "TrusteeReport"
                         for file in os.listdir(pathname):
                             if ".txt" in file:
@@ -1047,7 +1089,7 @@ def update_pdf():
 
                                 remotepath = "./" + filename
                                 localpath = os.path.join(pathname, filename)
-                                ftp_file = "DealViewer\TrustAssociatedDoc{}".format(
+                                ftp_file = "DealViewer/TrustAssociatedDoc/{}".format(
                                     trust_code
                                 )
                                 upload_file(
@@ -1146,51 +1188,63 @@ def upload_file(
 def insert_db_record(trust_code, sqlfilepath, filename):
     b1 = conn.cursor()
     try:
-        sql = "select Trustid from DV.view_Products where TrustCode='{}'".format(
-            trust_code
+        b1.execute(
+            "select Trustid from DV.view_Products where TrustCode=?", trust_code
         )
-        b1.execute(sql)
-        trust_id = b1.fetchone()[0]
+        row = b1.fetchone()
+        if not row:
+            raise RuntimeError(f"Unknown TrustCode: {trust_code}")
+        trust_id = row[0]
 
-        sql = f"select count(1) from DV.TrustAssociatedDocument where Trustid={trust_id} and FileName=N'{filename}'"
-        b1.execute(sql)
+        b1.execute(
+            "select count(1) from DV.TrustAssociatedDocument "
+            "where Trustid=? and FileName=?",
+            trust_id,
+            filename,
+        )
 
         if b1.fetchone()[0] == 0:
-            sql = "insert into DV.TrustAssociatedDocument(Trustid,FileCategory,SubCategory,FilePath,FileName,FileType,Created,Creator) values({},'AnnouncementOfResults','NULL','{}',N'{}','pdf',GETDATE(),'py')".format(
-                trust_id, sqlfilepath, filename
+            b1.execute(
+                "insert into DV.TrustAssociatedDocument"
+                "(Trustid,FileCategory,SubCategory,FilePath,FileName,FileType,Created,Creator) "
+                "values(?,'AnnouncementOfResults','NULL',?,?,'pdf',GETDATE(),'py')",
+                trust_id,
+                sqlfilepath,
+                filename,
             )
-
-            b1.execute(sql)
             conn.commit()
             print("记录插入成功")
-    except:
+        else:
+            print("记录已存在")
+    except Exception:
+        conn.rollback()
         print(filename, "记录插入失败!")
+        raise
+    finally:
+        b1.close()
 
 
 if __name__ == "__main__":
     # execute cmd 'pkill -f chrome' to kill all chrome processes
     os.system("pkill -f chrome")
 
-    options = webdriver.ChromeOptions()
-    options.add_argument(
-        'user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"'
-    )
-    options.add_argument(
-        "--no-sandbox"
-    )  # Bypass OS security model, needed for Chrome to run as root
-    options.add_argument("--headless")  # Run headless Chrome to avoid GUI issues
-    options.add_argument(
-        "--disable-dev-shm-usage"
-    )  # Overcome limited resource problems
-    options.add_argument("--disable-gpu")  # Disable GPU acceleration
-    options.add_argument(
-        "--remote-debugging-port=9222"
-    )  # To prevent DevToolsActivePort file doesn't exist error
-    options.add_argument(f"--proxy-server={proxy_url}")
-    options.add_argument("--log-level=3")  # Set log level to capture errors
+    driver = None
+    if os.environ.get("FXJG_BROWSER_WARMUP", "0").lower() in ("1", "true", "yes"):
+        options = webdriver.ChromeOptions()
+        options.add_argument(
+            'user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"'
+        )
+        options.add_argument("--no-sandbox")
+        options.add_argument("--headless")
+        options.add_argument("--disable-dev-shm-usage")
+        options.add_argument("--disable-gpu")
+        options.add_argument("--remote-debugging-port=9222")
+        if proxy_url:
+            options.add_argument(f"--proxy-server={proxy_url}")
+        options.add_argument("--log-level=3")
 
-    service = Service("/usr/bin/chromedriver")
-    driver = webdriver.Chrome(service=service, options=options)
+        service = Service("/usr/bin/chromedriver")
+        driver = webdriver.Chrome(service=service, options=options)
 
     # chrome_options = Options()
     # chrome_options.add_argument('user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36')
@@ -1208,5 +1262,6 @@ if __name__ == "__main__":
     ftp.close()
     ftp2.close()
 
-    driver.close()
-    driver.quit()
+    if driver is not None:
+        driver.close()
+        driver.quit()

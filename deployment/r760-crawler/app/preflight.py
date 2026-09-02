@@ -196,6 +196,10 @@ def check_odbc_fxwj() -> dict[str, Any]:
     return _odbc_check("SQL_ODBC_FXWJ")
 
 
+def check_odbc_fxjg() -> dict[str, Any]:
+    return _odbc_check("SQL_ODBC_FXJG")
+
+
 def check_odbc_stbg() -> dict[str, Any]:
     return _odbc_check("SQL_ODBC_STBG")
 
@@ -294,6 +298,7 @@ def main() -> int:
         "SQL_HOST",
         "SQL_PORT",
         "SQL_ODBC_FXWJ",
+        "SQL_ODBC_FXJG",
         "SQL_ODBC_STBG",
         "SQL_ODBC_ABN_PRODUCTS",
         "SQL_ODBC_ABN_REPORTS",
@@ -304,11 +309,13 @@ def main() -> int:
     checks = [
         _run("secrets_schema", lambda: {"required_keys": len(expected)} if expected <= configured else (_ for _ in ()).throw(RuntimeError("Missing secret keys"))),
         _run("chinabond_issuance", lambda: check_chinabond("发行文件")),
+        _run("chinabond_issuance_results", lambda: check_chinabond("发行结果")),
         _run("chinabond_trustee", lambda: check_chinabond("付息兑付与行权公告")),
         _run("chinamoney_abn", check_chinamoney),
         _run("ftp_primary_read_only", check_ftp_primary),
         _run("ftp_secondary_read_only", check_ftp_secondary),
         _run("sql_odbc_fxwj_read_only", check_odbc_fxwj),
+        _run("sql_odbc_fxjg_read_only", check_odbc_fxjg),
         _run("sql_odbc_stbg_read_only", check_odbc_stbg),
         _run("sql_odbc_abn_products_read_only", check_odbc_abn_products),
         _run("sql_odbc_abn_reports_read_only", check_odbc_abn_reports),

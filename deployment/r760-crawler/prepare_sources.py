@@ -16,6 +16,7 @@ EXPECTED_SHA256 = {
     "ABN2025_new.py": "ff0cfa2c662a193e557756cd5a2dbf5ad400ba74a7bff1c724d279a016f52b5b",
     "abn_offer_type_utils.py": "21aec176c70416df16f58ca7e3732b1c34d16bbdb22d0316fbbb4ee4c31719f7",
     "fxwj2023_new.py": "b87fccdeced7c7b18d910684e7f4af36c27534261bcc1764fc901aa17694723f",
+    "day_fxjg2023_new.py": "3df57fc7a1e5bc17576a0ffbc7062186b2b5f6409510a6cbec088df2530b8ca7",
     "stbg_2025.py": "46e5785589c534cbda8bde09e696692a1ad350b4fb32b83165155c3faa0309b3",
     "ftp_session_utils.py": "5864c371bed7c497da1fabb60993306cfe496ade6513c9d616e36ff23471597c",
     "trust_code_utils.py": "20a34db8d9b983a7d1364b9b05b76e8a6ab019e6276ac76d42cc901f6ab9b5df",
@@ -25,6 +26,7 @@ SCRIPT_NAMES = (
     "ABN2025_products_new.py",
     "ABN2025_new.py",
     "fxwj2023_new.py",
+    "day_fxjg2023_new.py",
     "stbg_2025.py",
 )
 HELPER_NAMES = (
@@ -37,6 +39,7 @@ SQL_SECRET_BY_SCRIPT = {
     "ABN2025_products_new.py": "SQL_ODBC_ABN_PRODUCTS",
     "ABN2025_new.py": "SQL_ODBC_ABN_REPORTS",
     "fxwj2023_new.py": "SQL_ODBC_FXWJ",
+    "day_fxjg2023_new.py": "SQL_ODBC_FXJG",
     "stbg_2025.py": "SQL_ODBC_STBG",
 }
 
@@ -194,6 +197,81 @@ RESILIENT_FTP_UPLOAD_FUNCTION = '''def upload_file_to_ftp_with_retry(
 '''
 
 
+FXJG_RESILIENT_FTP_UPLOAD_FUNCTION = '''def upload_file_to_ftp(
+    ftp, local_file_path, ftp_folder, ftp_file_path, file_name, retries=5
+):
+    """Upload idempotently and reconnect after FTP protocol/network errors."""
+    last_error = None
+    for attempt in range(retries):
+        try:
+            if file_name in list_ftp_directory_with_retry(ftp, ftp_folder):
+                print(f"File already exists on FTP in folder: {ftp_folder}")
+                return True
+            print(
+                f"Writing {local_file_path} to {ftp_file_path} "
+                f"=====> (Attempt {attempt + 1}/{retries})"
+            )
+            original_timeout = ftp.timeout
+            original_socket_timeout = ftp.sock.gettimeout()
+            ftp.timeout = 120
+            ftp.sock.settimeout(120)
+            with open(local_file_path, "rb") as handle:
+                try:
+                    with ftp_operation(ftp):
+                        ftp.storbinary(f"STOR {ftp_file_path}", handle)
+                finally:
+                    ftp.timeout = original_timeout
+                    if ftp.sock is not None:
+                        ftp.sock.settimeout(original_socket_timeout)
+            print(f"Successfully uploaded {ftp_file_path}")
+            return True
+        except ftplib.all_errors as exc:
+            last_error = exc
+            remaining = retries - attempt - 1
+            print(
+                f"FTP upload failed for {ftp_file_path}: {type(exc).__name__}; "
+                f"remaining_retries={remaining}"
+            )
+            if remaining <= 0:
+                break
+            try:
+                reconnect_ftp_connection(ftp, timeout=120)
+                print("FTP control connection rebuilt after upload failure")
+            except Exception as reconnect_error:
+                print(
+                    "FTP reconnect after upload failure failed: "
+                    f"{type(reconnect_error).__name__}"
+                )
+            wait_time = min(5 * (2 ** attempt), 60)
+            print(f"Waiting {wait_time} seconds before upload retry")
+            time.sleep(wait_time)
+    raise RuntimeError(
+        f"Failed to upload FTP file {ftp_file_path} after {retries} attempts"
+    ) from last_error
+'''
+
+
+def _fxjg_keepalive_function(name: str) -> str:
+    return f'''def {name}(ftp, interval):
+    """Keep an FTP control connection alive without sharing unlocked commands."""
+    while True:
+        try:
+            with ftp_operation(ftp):
+                ftp.voidcmd("NOOP")
+        except ftplib.all_errors as exc:
+            print(f"FTP keep-alive error: {{type(exc).__name__}}")
+            try:
+                reconnect_ftp_connection(ftp, timeout=120)
+                print("FTP control connection rebuilt after keep-alive failure")
+            except Exception as reconnect_error:
+                print(
+                    "FTP reconnect after keep-alive failure failed: "
+                    f"{{type(reconnect_error).__name__}}"
+                )
+        time.sleep(interval)
+'''
+
+
 def _sha256(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as handle:
@@ -343,7 +421,7 @@ class BundleBuilder:
         runtime_import = (
             "from dealviewer_runtime import pymssql_connection_kwargs, secret, secret_int\n"
         )
-        if name == "stbg_2025.py":
+        if name in {"stbg_2025.py", "day_fxjg2023_new.py"}:
             runtime_import += (
                 "from ftp_session_utils import attach_ftp_config, ftp_operation, "
                 "reconnect_ftp_connection\n"
@@ -505,6 +583,132 @@ class BundleBuilder:
             editor.replace_node(default_proxy.value, '""', "fxwj:direct proxy default")
             proxy_test = _find_function(tree, "test_configured_proxy")
             editor.replace_node(proxy_test, DIRECT_TEST_FUNCTION.rstrip(), "fxwj:direct connectivity test")
+
+        elif name == "day_fxjg2023_new.py":
+            for function_name in ("keep_alive", "keep_alive_backup"):
+                editor.replace_node(
+                    _find_function(tree, function_name),
+                    _fxjg_keepalive_function(function_name).rstrip(),
+                    f"fxjg:resilient {function_name}",
+                )
+            list_retry_function = _find_function(tree, "list_ftp_directory_with_retry")
+            editor.replace_node(
+                list_retry_function,
+                RESILIENT_FTP_LIST_FUNCTION.rstrip(),
+                "fxjg:reconnect all FTP list errors",
+            )
+            upload_function = _find_function(tree, "upload_file_to_ftp")
+            editor.replace_node(
+                upload_function,
+                FXJG_RESILIENT_FTP_UPLOAD_FUNCTION.rstrip(),
+                "fxjg:resilient FTP upload",
+            )
+
+            thread_start = next(
+                (
+                    node
+                    for node in tree.body
+                    if isinstance(node, (ast.Assign, ast.AnnAssign))
+                    and _assignment_name(node) == "keep_alive_thread"
+                ),
+                None,
+            )
+            thread_end = next(
+                (
+                    node
+                    for node in tree.body
+                    if isinstance(node, ast.Expr)
+                    and isinstance(node.value, ast.Call)
+                    and isinstance(node.value.func, ast.Attribute)
+                    and node.value.func.attr == "start"
+                    and isinstance(node.value.func.value, ast.Name)
+                    and node.value.func.value.id == "keep_alive_thread2"
+                ),
+                None,
+            )
+            if thread_start is None or thread_end is None:
+                raise RuntimeError("fxjg keep-alive thread block was not found")
+            thread_start_offset, _ = editor.bounds(thread_start)
+            _, thread_end_offset = editor.bounds(thread_end)
+            original_threads = editor.encoded[
+                thread_start_offset:thread_end_offset
+            ].decode("utf-8")
+            indented_threads = "\n".join(
+                "    " + line for line in original_threads.splitlines()
+            )
+            editor.replace_range(
+                thread_start,
+                thread_end,
+                'ENABLE_FXJG_FTP_KEEP_ALIVE = os.environ.get('
+                '"FXJG_FTP_KEEPALIVE", "0").lower() in ("1", "true", "yes")\n'
+                'if ENABLE_FXJG_FTP_KEEP_ALIVE:\n'
+                f'{indented_threads}\n'
+                'else:\n'
+                '    print("FXJG FTP keep-alive threads disabled; "'
+                '"set FXJG_FTP_KEEPALIVE=1 to enable.")',
+                "fxjg:disable shared-connection keep-alive by default",
+            )
+
+            legacy_upload = _find_function(tree, "upload_file")
+            legacy_map = {
+                "host": ("FTP_SECONDARY_HOST", "secret"),
+                "port": ("FTP_SECONDARY_PORT", "secret_int"),
+                "username": ("FTP_SECONDARY_USER", "secret"),
+                "password": ("FTP_SECONDARY_PASSWORD", "secret"),
+            }
+            found: set[str] = set()
+            for node in ast.walk(legacy_upload):
+                variable = _assignment_name(node)
+                if variable not in legacy_map:
+                    continue
+                secret_name, loader = legacy_map[variable]
+                editor.replace_node(
+                    node.value,
+                    f'{loader}("{secret_name}")',
+                    f"fxjg:legacy FTP {variable}",
+                )
+                found.add(variable)
+            if found != set(legacy_map):
+                raise RuntimeError("fxjg legacy FTP assignments are incomplete")
+            ftp_constructors = [
+                node
+                for node in ast.walk(legacy_upload)
+                if isinstance(node, ast.Call)
+                and isinstance(node.func, ast.Name)
+                and node.func.id == "FTP"
+            ]
+            if len(ftp_constructors) != 1:
+                raise RuntimeError("fxjg legacy upload must have one FTP constructor")
+            editor.replace_node(
+                ftp_constructors[0], "ftplib.FTP()", "fxjg:legacy FTP constructor"
+            )
+            ftp_connects = [
+                node
+                for node in ast.walk(legacy_upload)
+                if isinstance(node, ast.Call)
+                and isinstance(node.func, ast.Attribute)
+                and node.func.attr == "connect"
+                and len(node.args) >= 2
+            ]
+            if len(ftp_connects) != 1:
+                raise RuntimeError("fxjg legacy upload must have one FTP connect call")
+            editor.replace_node(
+                ftp_connects[0].args[1], "port", "fxjg:legacy FTP port"
+            )
+            proxy_start = module_assignments.get("proxy_string")
+            proxy_end = module_assignments.get("proxies")
+            if proxy_start is None or proxy_end is None or proxy_end.lineno <= proxy_start.lineno:
+                raise RuntimeError("fxjg proxy configuration block was not found")
+            for value in _string_literals(proxy_start.value):
+                if len(value) >= 8:
+                    self.banned_values.add(value)
+            editor.replace_range(
+                proxy_start,
+                proxy_end,
+                'proxy_url = os.environ.get("DEALVIEWER_PROXY_URL", "").strip() or None\n'
+                'proxies = {"http": proxy_url, "https": proxy_url} if proxy_url else {}',
+                "fxjg:optional proxy block",
+            )
 
         else:
             proxy_start = module_assignments.get("proxy_string")
@@ -709,6 +913,30 @@ class BundleBuilder:
                 raise RuntimeError("ABN report backup FTP credentials are incomplete")
 
         output = editor.render()
+        if name == "day_fxjg2023_new.py":
+            primary_needle = "ftp = ftplib.FTP()\nftp.connect(FTP_HOST, FTP_PORT, timeout=600)"
+            primary_replacement = (
+                "ftp = ftplib.FTP()\n"
+                "attach_ftp_config(\n"
+                "    ftp, host=FTP_HOST, port=FTP_PORT, user=FTP_USER,\n"
+                "    password=FTP_PASS, encoding=ftp.encoding,\n"
+                ")\n"
+                "ftp.connect(FTP_HOST, FTP_PORT, timeout=120)"
+            )
+            secondary_needle = "ftp2 = ftplib.FTP()\nftp2.connect(FTP2_HOST, FTP2_PORT, timeout=600)"
+            secondary_replacement = (
+                "ftp2 = ftplib.FTP()\n"
+                "attach_ftp_config(\n"
+                "    ftp2, host=FTP2_HOST, port=FTP2_PORT, user=FTP2_USER,\n"
+                "    password=FTP2_PASS, encoding=\"utf-8\", enable_utf8=True,\n"
+                ")\n"
+                "ftp2.connect(FTP2_HOST, FTP2_PORT, timeout=120)"
+            )
+            if output.count(primary_needle) != 1 or output.count(secondary_needle) != 1:
+                raise RuntimeError("fxjg FTP session initializers were not found")
+            output = output.replace(primary_needle, primary_replacement).replace(
+                secondary_needle, secondary_replacement
+            )
         if name == "stbg_2025.py":
             primary_needle = "ftp = ftplib.FTP()\nftp.connect(FTP_HOST, FTP_PORT, timeout=120)"
             primary_replacement = (

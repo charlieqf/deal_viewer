@@ -18,6 +18,8 @@ ALLOWED_TASKS = {
     "abn-products",
     "abn-reports",
     "fxwj",
+    "fxjg",
+    "fxjg-canary",
     "stbg",
     "stbg-page1",
 }
@@ -120,6 +122,7 @@ def _syntax_check() -> int:
         "ABN2025_new.py",
         "abn_offer_type_utils.py",
         "fxwj2023_new.py",
+        "day_fxjg2023_new.py",
         "stbg_2025.py",
         "dealviewer_runtime.py",
         "preflight.py",
@@ -161,7 +164,7 @@ def main(argv: list[str] | None = None) -> int:
     if task not in ALLOWED_TASKS or len(args) != 1:
         print(
             "usage: run_crawler.py "
-            "preflight|syntax|abn-products|abn-reports|fxwj|stbg|stbg-page1",
+            "preflight|syntax|abn-products|abn-reports|fxwj|fxjg|fxjg-canary|stbg|stbg-page1",
             file=sys.stderr,
         )
         return 2
@@ -189,6 +192,19 @@ def main(argv: list[str] | None = None) -> int:
             )
         if task == "fxwj":
             return _run_child("fxwj", "fxwj2023_new.py")
+        if task in {"fxjg", "fxjg-canary"}:
+            environment = {
+                "FXJG_BROWSER_WARMUP": "0",
+                "FXJG_FTP_KEEPALIVE": "0",
+            }
+            if task == "fxjg-canary":
+                environment.update(
+                    {
+                        "FXJG_LAST_DATE_OVERRIDE": "2999-12-31 23:59:59",
+                        "FXJG_WRITE_UPDATE_LOG": "0",
+                    }
+                )
+            return _run_child(task, "day_fxjg2023_new.py", environment)
         return _run_stbg(page_one_only=task == "stbg-page1")
     finally:
         fcntl.flock(lock_handle.fileno(), fcntl.LOCK_UN)

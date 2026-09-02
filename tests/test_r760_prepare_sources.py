@@ -77,6 +77,38 @@ def test_stbg_transform_disables_shared_ftp_keepalive_by_default(tmp_path) -> No
     assert "timeout=600" not in transformed
 
 
+def test_fxjg_transform_is_secret_free_and_safe_for_zero_increment(tmp_path) -> None:
+    module = load_prepare_module()
+    builder = module.BundleBuilder(
+        ROOT / "dome1",
+        tmp_path / "app",
+        tmp_path / "secrets.json",
+    )
+
+    transformed = builder.transform_script("day_fxjg2023_new.py")
+
+    ast.parse(transformed)
+    assert 'secret("SQL_ODBC_FXJG")' in transformed
+    assert 'os.environ.get("DEALVIEWER_PROXY_URL", "")' in transformed
+    assert 'os.environ.get("FXJG_FTP_KEEPALIVE", "0")' in transformed
+    assert "FXJG FTP keep-alive threads disabled" in transformed
+    assert "FTP directory list failed for {path}" in transformed
+    assert "FTP upload failed for {ftp_file_path}" in transformed
+    assert transformed.count("attach_ftp_config(") == 2
+    assert "reconnect_ftp_connection(ftp, timeout=120)" in transformed
+    assert "No issuance-result products to process" in transformed
+    assert "FXJG_LAST_DATE_OVERRIDE" in transformed
+    assert "FXJG timestamp write disabled for canary" in transformed
+    assert "increment_pdf_path = os.path.join(" in transformed
+    assert 'product["title"] + ".success"' in transformed
+    assert 'product["title"] + ".error"' in transformed
+    assert "Issuance-result products were not fully processed" in transformed
+    assert "timeout=600" not in transformed
+    assert "SQL_ODBC_FXJG" in builder.secrets
+    for value in builder.banned_values:
+        assert not value or value not in transformed
+
+
 def test_all_manual_crawler_tasks_are_exposed() -> None:
     source = (
         ROOT / "deployment" / "r760-crawler" / "app" / "run_crawler.py"
@@ -90,7 +122,14 @@ def test_all_manual_crawler_tasks_are_exposed() -> None:
     )
     tasks = ast.literal_eval(assignment.value)
 
-    assert {"abn-products", "abn-reports", "fxwj", "stbg"} <= tasks
+    assert {
+        "abn-products",
+        "abn-reports",
+        "fxwj",
+        "fxjg",
+        "fxjg-canary",
+        "stbg",
+    } <= tasks
 
 
 def test_runtime_wrapper_redacts_chinamoney_authentication_material() -> None:

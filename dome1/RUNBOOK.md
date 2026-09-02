@@ -2,9 +2,9 @@
 
 This runbook captures current operational practice for DealViewer ABSDaily scripts on the R760 and the powered-off legacy Kamatera cold-rollback VM. Update it whenever a production fix changes how scripts are run.
 
-## R760 Crawler Runtime (2026-08-30)
+## R760 Crawler Runtime (2026-09-02)
 
-The ABN product (`ABN2025_products_new.py`), ABN report (`ABN2025_new.py`), ABS issuance-file (`fxwj2023_new.py`), and ABS trustee-report (`stbg_2025.py`) jobs run in an isolated Docker Compose project on the R760. Docker is not a functional requirement for the Python code, but it is the production isolation boundary for the pinned Chrome/Driver, ODBC libraries, and the legacy TLS policy required by the old SQL Server. Do not move that TLS policy onto the R760 host.
+The ABN product (`ABN2025_products_new.py`), ABN report (`ABN2025_new.py`), ABS issuance-file (`fxwj2023_new.py`), ABS issuance-result (`day_fxjg2023_new.py`), and ABS trustee-report (`stbg_2025.py`) jobs run in an isolated Docker Compose project on the R760. Docker is not a functional requirement for the Python code, but it is the production isolation boundary for the pinned Chrome/Driver, ODBC libraries, and the legacy TLS policy required by the old SQL Server. Do not move that TLS policy onto the R760 host.
 
 - SSH: use the operator-local DealViewer access notes; do not publish the concrete management endpoint in the repository.
 - Bundle: `/data/dealviewer-crawler/bundle`.
@@ -14,7 +14,7 @@ The ABN product (`ABN2025_products_new.py`), ABN report (`ABN2025_new.py`), ABS 
 - Compose project/network: `dealviewer_crawler`; it exposes no public port and is not attached to the Gateway network.
 - Runtime user is non-root; the root filesystem is read-only; CPU, memory, PID, capability, and log-size limits are set in Compose.
 - HTTP mode is direct-first and currently passes Chinabond business-response and sample-PDF checks without a proxy. `DEALVIEWER_PROXY_URL` is empty by default. Do not reuse the R760 Gateway's Mihomo service for this crawler.
-- All four production crawlers are in the R760 bundle. They are manual one-shot jobs; no crawler timer or cron entry is enabled.
+- All five production crawlers are in the R760 bundle. They are manual one-shot jobs; no crawler timer or cron entry is enabled.
 
 Operators use systemd as the only normal entry point; direct Compose knowledge is not required:
 
@@ -29,6 +29,10 @@ systemctl start --no-block dealviewer-crawler@abn-reports.service
 
 # ABS issuance files
 systemctl start --no-block dealviewer-crawler@fxwj.service
+
+# ABS issuance results; fxjg-canary forces a write-disabled zero increment
+systemctl start --no-block dealviewer-crawler@fxjg.service
+systemctl start --no-block dealviewer-crawler@fxjg-canary.service
 
 # Trustee report page-1 canary or full page sequence 6..1
 systemctl start --no-block dealviewer-crawler@stbg-page1.service
@@ -46,6 +50,15 @@ job running if the SSH connection closes.
 These are one-shot services: the container is removed after completion. A zero process exit is necessary but not sufficient; inspect the matching status JSON, business progress/error markers, FTP update timestamp, and any cache error artifacts before declaring success.
 
 No timer is enabled because the legacy host had no authoritative crawler schedule. Add timers only after the business run times and overlap policy are explicitly confirmed. R760 is the only online crawler runtime; Kamatera is a powered-off cold rollback and must never be started as a writer while an R760 writer is running.
+
+### 2026-09-02 issuance-result migration and production run
+
+- Current image: `sha256:6082abb4b38abc8d46a75694bb2f9f425164d0e84a79fc7ccd693a5c2b50571e`. The prior image remains tagged `dealviewer-crawler:r760-20260902-pre-fxjg-migration`; the pre-deploy bundle, raw source, and secrets backup is `deploy_backups/20260902T073407Z-fxjg-migration`.
+- The expanded read-only preflight passed 13/13 checks. The `fxjg-canary` run exited `0`, returned zero products, skipped FTP directory scans, and had timestamp writes disabled.
+- Before production writes, `PortfolioManagement` remained in FULL recovery and a compressed checksum log backup was written to `C:\SQLLogBackups\PortfolioManagement_log_20260902T073745Z.trn`; `RESTORE VERIFYONLY WITH CHECKSUM` passed.
+- Production log `fxjg-20260902T073909Z.log` completed with exit code `0`: 20 matches, 20 direct PDF downloads, and 60 uploads across the product, monthly increment, and secondary document paths. Read-only post-run checks found all target files.
+- SQL validation found exactly 20 new `AnnouncementOfResults` rows with the expected trust, filename, path, and PDF type; no rows were missing, malformed, or duplicated. The cache contains 20 PDFs, 20 success markers, and zero error markers from the run.
+- The issuance-result timestamp advanced from `2026-07-28 14:23:19` to `2026-09-01 14:35:25` only after all expected products completed.
 
 ### 2026-08-30 routine run and issuance-code repair
 
