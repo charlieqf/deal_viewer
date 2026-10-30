@@ -1,0 +1,78 @@
+{
+  "verified_at": "2026-10-30T06:09:16.497860+00:00",
+  "version": "issuer-batch-review-v9",
+  "status": "deployed_and_verified",
+  "source_sha256": "bc81680e8e0b82a09e913817c2ddfe030402cd49ec5944bb14878b97e81024b9",
+  "changes": [
+    "Keep successful metrics and continue later batches when a sibling request fails; attribute failures by record_id and metric_code.",
+    "After one corrected retry, split invalid tool JSON into smaller batches. Also split an output-limit response received during that corrected retry.",
+    "For a confirmed single-metric tool truncation with transformed_retry_allowed, make at most one plain-JSON recovery generation using the same input and a 16,000-token cap. Preserve the original receipt and apply the existing identity, JSON, size and financial-evidence checks."
+  ],
+  "validation": {
+    "local_tests_passed": 28,
+    "production_image_tests_passed": 28,
+    "historical_parser_outcomes_compared": 876,
+    "parser_outcome_differences": 0,
+    "negative_controls_rejected": 4896,
+    "complete_groups": 98,
+    "expected_records": 245,
+    "reviewed_records": 245,
+    "unique_metric_slots": 1960,
+    "request_failed_before": 23,
+    "request_failed_after": 0,
+    "checks_passed": 816,
+    "evidence_exceptions": 933,
+    "no_reported_value": 211,
+    "missing": [],
+    "stale_records": [],
+    "new_records": [],
+    "changed_observations": [],
+    "review_complete": true,
+    "business_writes": false,
+    "published_view_rows": 0,
+    "service_result": "success",
+    "exit_code": 0,
+    "runner_lock_free": true
+  },
+  "live_recovery": {
+    "parent_request_id": "req-e31ba400-1932-4458-87a3-a79ed8bfb803",
+    "request_id": "req-e6f258db-2323-435d-8c12-5e0c7e6338f6",
+    "version": "issuer-batch-review-v9",
+    "status": 200,
+    "seconds": 13.82,
+    "max_tokens": 16000,
+    "completion_tokens": 1864,
+    "reasoning_tokens": 1603,
+    "parsed_items": 1,
+    "exact_candidate_payload_fingerprint_verified": true,
+    "final_status": "exception: visual_check_required from both models",
+    "note": "The exact candidate code was exercised online. Its validated receipt was reused by the final full-scope reconciliation; the final v9 batch required no additional model requests."
+  },
+  "runtime": {
+    "production_source": "/data/dealviewer-issuer-production/acquisition-src/ai_review_batch.py",
+    "launcher": "/data/dealviewer-issuer-production/acquisition-src/deployment/run-ai-review-batch.py",
+    "release": "/data/dealviewer-issuer-production/releases/ai-review-v9-bc81680e8e0b",
+    "run": "/data/dealviewer-issuer-production/ai-review/full-20261030-v9",
+    "unit": "dealviewer-issuer-ai-review-full-20261030-v9.service",
+    "image": "dealviewer-issuer-acquisition:20261027-v5",
+    "image_id": "sha256:64fe45f8d52962fcccf08099fea7b539e63121a2d30abf53cc167e914ef357a8",
+    "future_calls": "The standard launcher freezes ai_review_batch.py from acquisition-src into each new run and mounts that file read-only over the image module. The production source, release artifact and final run have identical SHA-256. A fresh production-image import from the production source confirmed issuer-batch-review-v9.",
+    "existing_runtime_dependencies": "The existing acquisition image supplies requests, PyMuPDF, pyodbc and pilot_runtime; the retained launcher supplies the existing snapshot/OCR workflow. No image rebuild or schema migration was required.",
+    "new_schedules": false
+  },
+  "preservation": {
+    "v8_backup": "/data/dealviewer-issuer-production/deploy_backups/20261030T055327Z-ai-review-v8",
+    "v9_backup": "/data/dealviewer-issuer-production/deploy_backups/20261030T060511Z-ai-review-v9",
+    "old_v7_results_unchanged": 98,
+    "results_reused_from_v7_by_v8": 95,
+    "old_v8_results_unchanged": 98,
+    "results_reused_from_v8_by_v9": 97,
+    "final_groups_requeued": ["1077-1111-1109"],
+    "verification": "Source backups, frozen input copies and retained result files were checked with SHA-256. Old run directories remain intact; failed receipts and each new attempt remain available for audit."
+  },
+  "limits": [
+    "review_complete means the frozen review scope has been processed without request failures; evidence exceptions still require business review and are not approved financial values.",
+    "The upstream DeepSeek tool-output/usage discrepancy is not established as fixed. The bounded caller recovery handles this failure mode without increasing the primary budget or accepting incomplete JSON.",
+    "The initial diagnostic report is retained in GATEWAY-OUTPUT-AUDIT-2026-10-30.json; its deployment=false and v7 counts describe the earlier investigation, not the current release."
+  ]
+}

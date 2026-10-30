@@ -1,0 +1,124 @@
+{
+  "date": "2026-10-30",
+  "subsequent_release_report": "AI-REVIEW-OUTPUT-RELEASE-2026-10-30.json",
+  "scope": "DealViewer 财务复核的大输出、工具参数与失败隔离；生产只读核查，本地候选修正和离线回放",
+  "production_modified": false,
+  "new_model_requests": 0,
+  "window": {
+    "timezone": "Asia/Shanghai",
+    "timestamp_basis": "Gateway request started_at",
+    "first_error": "2026-10-30T08:22:31.009+08:00",
+    "last_error": "2026-10-30T09:07:22.789+08:00",
+    "deepseek_truncated": 13,
+    "glm_invalid_json": 3,
+    "subsequent_successes": 72,
+    "last_success": "2026-10-30T10:13:04.397+08:00"
+  },
+  "request_contract": {
+    "report_periods_per_request": 1,
+    "maximum_metrics": 8,
+    "max_tokens": 64000,
+    "reasoning_effort": "low",
+    "max_completion_tokens_sent": false,
+    "tool": "submit_financial_review",
+    "schema_limits": "固定本次 record_id、metric_code 与准确条目数；最多每指标6个引用；quote<=500字符，reason<=80字符，禁止额外字段",
+    "budget_interpretation": "预算包含思考与最终输出；不把 completion_tokens 减 reasoning_tokens 直接换算成实际收到的 JSON 大小"
+  },
+  "samples": [
+    {
+      "request_id": "req-2a85ed85-4b02-4920-8ffb-0ae265f3c11d",
+      "started_at": "2026-10-30T00:22:31.009Z",
+      "route": "goldencode-d",
+      "upstream_model": "deepseek-v4.1-flash-1017",
+      "upstream_request_id": "2eaf7806-ce27-40f0-b11c-7f51db4df9d1",
+      "record_id": 392,
+      "issuer": "平安银行股份有限公司",
+      "period_end": "2025-09-30",
+      "metrics": 8,
+      "input_pages": 7,
+      "context_characters": 12022,
+      "upstream_attempts": 1,
+      "completion_tokens": 64000,
+      "reasoning_tokens": 5155,
+      "finish_reason": "length",
+      "tool_argument_bytes": 6715,
+      "raw_sse_characters": 814056,
+      "recovery": [
+        {"request_id": "req-d750658c-92c2-47b4-9f20-111ed416863a", "metrics": 4, "status": "ok", "completion_tokens": 6560},
+        {"request_id": "req-dc776121-a0ad-4731-9f15-be63bd44658a", "metrics": 4, "status": "ok", "completion_tokens": 14886, "upstream_attempts": 2}
+      ],
+      "conclusion": "既有拆半恢复已生效，两批完整解析通过；业务证据异常仍独立保留。原始 SSE 体积包含协议开销，不能当作工具参数长度。"
+    },
+    {
+      "request_id": "req-ec8cc40f-6b89-4fe0-8ffa-56c31fd5d6e8",
+      "started_at": "2026-10-30T00:24:29.371Z",
+      "route": "goldencode",
+      "upstream_model": "glm-5.3",
+      "record_id": 431,
+      "issuer": "平安银行股份有限公司",
+      "period_end": "2024-06-30",
+      "metrics": 8,
+      "input_pages": 9,
+      "context_characters": 19588,
+      "attempts": [
+        {"kind": "native_initial", "completion_tokens": 2315, "finish_reason": "tool_calls", "tool_argument_bytes": 7332, "argument_code_units": 6264, "json_syntax_error_offset": 6264, "output_limit_hit": false},
+        {"kind": "validation_failed_to_same", "completion_tokens": 1716, "finish_reason": "tool_calls", "tool_argument_bytes": 5513, "argument_code_units": 4935, "json_syntax_error_offset": 4935, "output_limit_hit": false}
+      ],
+      "recovery_request_id": "req-8accdd0c-ea39-4f17-b54f-a491128a2200",
+      "recovery_status": "ok; 8项完整解析通过",
+      "conclusion": "网关两次生成均为 invalid_json，语法错误位置均在字符串末尾；没有达到64k预算。调用方追加输出指令后的独立请求恢复，不能将原错误归为预算耗尽。"
+    }
+  ],
+  "single_metric_truncations_in_window": [
+    {"request_id": "req-af9989d0-d118-4cde-a03a-860910ae6a2d", "upstream_request_id": "f2ace2ff-15d3-438f-b6f6-c974e89ee611", "record_id": 1079, "metric": "capital_adequacy_ratio", "completion_tokens": 64000, "reasoning_tokens": 1639, "tool_argument_bytes": 697},
+    {"request_id": "req-23b7ddf1-a88b-4a17-b65f-9f06f32ce3a0", "upstream_request_id": "51212cd7-6792-41a7-9121-3c44720032d4", "record_id": 1109, "metric": "capital_adequacy_ratio", "completion_tokens": 64000, "reasoning_tokens": 1689, "tool_argument_bytes": 807},
+    {"request_id": "req-0ca36a49-2dcf-4b87-8f73-08ffaaa91783", "upstream_request_id": "9c407a40-15e1-47ae-b7e1-4d41f92648bf", "record_id": 433, "metric": "total_profit", "completion_tokens": 64000, "reasoning_tokens": 1444, "tool_argument_bytes": 989}
+  ],
+  "caller_candidate": {
+    "version": "issuer-batch-review-v8",
+    "deployed": false,
+    "changes": [
+      "JSON 校验失败在一次纠正重试后，若仍失败则按指标拆半；单指标仍失败即停止该项。",
+      "JSON 纠正重试转为输出截断时，也执行拆半恢复。",
+      "按 record_id + metric_code 保存局部成功与失败；一个批次或叶子指标失败不会清空成功结果或跳过后续批次。"
+    ],
+    "unchanged": ["64k总预算", "单报告期最多8指标", "原始数据与证据校验", "单指标触顶不无限重试", "生产配置与业务数据"],
+    "validation": {
+      "unit_tests_passed": 25,
+      "historical_http_200_compared": 876,
+      "parser_outcome_differences": 0,
+      "accepted": 868,
+      "preexisting_rejected": 8,
+      "replayed_failed_groups": 3,
+      "network_disabled_during_replay": true,
+      "request_failed_before": 23,
+      "request_failed_after_offline_replay": 12,
+      "restored_as_evidence_exceptions": 11,
+      "remaining_offline": "2项单指标触顶、1项既有结构错误、3个未缓存请求涉及9个指标。离线未缓存不代表线上新失败。",
+      "interpretation": "11项恢复的是准确的证据待核对状态，不是财务核准；没有将候选回放结果写入生产。"
+    }
+  },
+  "production_verification": {
+    "run": "full-20261030-v7",
+    "service_state": "inactive/dead; exit 0",
+    "expected_records": 245,
+    "metric_slots": 1960,
+    "checks_passed": 816,
+    "exceptions": 910,
+    "no_reported_value": 211,
+    "request_failed": 23,
+    "review_complete": false,
+    "published_view_rows": 0,
+    "note": "服务正常退出及后续72次HTTP成功不代表整轮财务复核完成。"
+  },
+  "forwardable_investigation": {
+    "recipient_scope": "Gateway / 上游服务排障；本报告未对外发送",
+    "requested_checks": [
+      "按所列上游 request ID，分别累计原始 delta.content、delta.reasoning_content、delta.tool_calls[*].function.arguments；记录未识别字段、空事件与结束标记。",
+      "对比供应商原始 usage 与网关计量，明确是否做过转换；不要从 usage 差值推断工具 JSON 体积。",
+      "若原始 arguments 很长而网关累计很短，检查字段解析与拼接；若原始 arguments 也仅数百字节而计量达到64k，检查上游生成和计量；若重复生成，提供重复片段和次数。",
+      "GLM 分别检查两次响应末尾及结束标记：若上游原文已不合法，查生成或提前结束；若上游合法、网关不合法，查累计与转换。"
+    ],
+    "minimum_material_back": "请求ID、各字段累计字节数、原始usage、结束标记、JSON解析位置及脱敏末尾2KB；如有重复，附最小重复片段和次数。无需密钥、认证头或整份业务文档。"
+  }
+}
