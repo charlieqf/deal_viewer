@@ -1,0 +1,15 @@
+[Unit]
+Description=DealViewer weekly issuer risk acquisition
+After=docker.service network-online.target
+Requires=docker.service
+StartLimitIntervalSec=0
+
+[Service]
+Type=oneshot
+WorkingDirectory=/data/dealviewer-issuer-production/acquisition-src
+ExecStart=/usr/bin/python3 -m acquisition.scheduled --kind risk
+TimeoutStartSec=12h
+Nice=10
+UMask=0027
+Restart=on-failure
+RestartSec=6h

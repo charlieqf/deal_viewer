@@ -1,0 +1,21 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>主体风险信息 · DealViewer</title><link rel="stylesheet" href="risk.css"></head><body>
+<header><a href="./">DealViewer · 主体资料</a><nav><a href="risk.html?mapping=1">产品发起人映射</a><a href="documents.html">原文资料库</a></nav></header>
+<main><h1 id="title">主体风险信息</h1><p class="intro">每周整理监管处罚、主体评级下调和公开市场违约。建议分供投后评价参考，实际分数由评价人按现有流程保存。</p>
+<label id="issuerLabel">发起人 <select id="issuer"></select></label><p id="error" role="alert" hidden></p>
+<section id="riskView"><div id="score" class="score"></div>
+<h2>来源与检查区间</h2><p>中国货币网固定按标题检索；违约材料仅在标题或附件名含“违约、未按期兑付、未能按期、兑付风险、展期”时下载。地方机关、其他市场尚未接入；国际评级目前由人工补录，未开展定期国际检索。</p><div id="sources" class="scroll"></div>
+<h2>风险事件</h2><button id="add">补录已归档材料</button><div id="events"></div><details><summary>已排除、未达阈值及非本法人（代发）</summary><div id="collapsed"></div></details>
+<p class="intro">无事件材料只保留原件及核对结果。建议分仅计近24个自然月已确认适用的事件；日期不明及待确认事项尚未计入。每类最多扣一次。</p></section>
+<section id="mappingView" hidden><p>名称按 NFKC 和首尾空格规范化后匹配；名称匹配不表示发起人角色已核实。手工修正保留原文依据，后续自动匹配不会覆盖。</p><label>查找产品ID或主体 <input id="mappingSearch"></label><div id="mappings" class="scroll"></div></section>
+</main><dialog id="editor"><form id="form"><h2 id="editTitle">核对 / 更正</h2><div class="fields">
+<label id="categoryRow">类别<select id="category"><option value="penalty">监管处罚</option><option value="rating">主体评级</option><option value="default">公开市场违约</option></select></label>
+<label id="documentRow">已归档原文<select id="document"></select></label>
+<label id="mappingIssuerRow" hidden>正确发起人<select id="mappingIssuer"></select></label>
+<label id="statusRow">归类<select id="status"><option value="pending">待确认</option><option value="confirmed">确认适用</option><option value="excluded">排除</option><option value="below_threshold">未达阈值</option><option value="other_debtor">非本法人（代发）</option></select></label>
+<label id="dateRow">事件日期<input id="eventDate" type="date"></label>
+<div id="penaltyFields"><label>决定书号<input id="decision"></label><label>受罚当事人<input id="party"></label><label>当事人类型<select id="partyType"><option value="legal_entity">本法人</option><option value="branch">分支机构</option><option value="person">人员</option><option value="unknown">待核清</option></select></label><label>同决定书同法人罚款合计（元）<input id="fine" inputmode="decimal"></label><label><input type="checkbox" id="complete"> 已核清完整罚款合计，人员、分支和没收另列</label></div>
+<div id="ratingFields"><label>评级机构<input id="agency"></label><label>当前等级<input id="grade"></label><label>前次等级（未给可空）<input id="previous"></label><label>调整方向<select id="direction"><option>未知</option><option>下调</option><option>上调</option><option>维持</option></select></label></div>
+<div id="defaultFields"><label>实际债务人<input id="debtor"></label><label>本主体角色<select id="role"><option value="unknown">待核清</option><option value="debtor">债务人</option><option value="lead_underwriter">主承销商代发</option><option value="disclosure_agent">代发机构</option><option value="guarantor">担保人</option><option value="keepwell">维好义务人</option><option value="spv">SPV相关义务</option></select></label><label><input type="checkbox" id="actualDefault"> 已确认公开债务实际违约</label><label><input type="checkbox" id="ownAbnormal"> 存在本主体义务履行异常线索</label></div>
+<label id="quoteRow">原文引文<textarea id="quote" rows="3"></textarea></label><label id="pageRow">物理页码<input id="page" type="number" min="1" value="1"></label>
+<label>原因 / 原文依据<textarea id="reason" required maxlength="2000" rows="3"></textarea></label><label>核对人<input id="reviewer" required maxlength="80"></label><label>共享复核口令<input id="key" type="password" required autocomplete="off"></label></div><p id="formError" role="alert"></p><button type="submit" id="save">保存核对</button> <button type="button" id="cancel">取消</button></form></dialog>
+<script src="risk.js"></script></body></html>

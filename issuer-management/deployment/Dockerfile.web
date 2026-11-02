@@ -1,0 +1,11 @@
+FROM dealviewer-crawler:r760-20260921-stbg-increment-file
+USER root
+RUN pip install --no-cache-dir waitress==3.0.2 pypdfium2==4.30.0 Pillow==11.3.0
+COPY . /opt/issuer
+ARG REVISION=development
+ARG ACQUISITION_IMAGE=dealviewer-issuer-acquisition:development
+LABEL org.opencontainers.image.revision=$REVISION
+RUN python -c "import json;json.dump({'commit':'$REVISION','acquisition_image':'$ACQUISITION_IMAGE'},open('/opt/issuer/release.json','w'))"
+USER 1200:1201
+ENV OPENSSL_CONF=/opt/dealviewer/openssl-sql-legacy.cnf ISSUER_ARCHIVE_ROOT=/archive ISSUER_WEB_CONFIG=/run/issuer/web.json
+ENTRYPOINT ["python","/opt/issuer/production_web.py"]

@@ -1,0 +1,10 @@
+[Unit]
+Description=Weekly issuer risk checks, Tuesday 04:00 Beijing
+
+[Timer]
+OnCalendar=Tue *-*-* 04:00:00 Asia/Shanghai
+Persistent=true
+Unit=dealviewer-issuer-risk.service
+
+[Install]
+WantedBy=timers.target

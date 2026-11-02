@@ -1,0 +1,15 @@
+FROM dealviewer-crawler:r760-20260921-stbg-increment-file
+USER root
+RUN pip install --no-cache-dir playwright==1.56.0 pymupdf==1.26.5 tzdata==2025.2 \
+ && PLAYWRIGHT_BROWSERS_PATH=/opt/playwright python -m playwright install --with-deps chromium \
+ && chmod -R a+rX /opt/playwright
+COPY . /opt/issuer
+ARG REVISION=development
+ARG ACQUISITION_IMAGE=dealviewer-issuer-acquisition:development
+LABEL org.opencontainers.image.revision=$REVISION
+RUN python -c "import json;json.dump({'commit':'$REVISION','acquisition_image':'$ACQUISITION_IMAGE'},open('/opt/issuer/release.json','w'))"
+ENV PYTHONPATH=/opt/issuer:/opt/dealviewer PLAYWRIGHT_BROWSERS_PATH=/opt/playwright \
+    OPENSSL_CONF=/opt/dealviewer/openssl-sql-legacy.cnf
+WORKDIR /opt/issuer
+USER 1200:1201
+ENTRYPOINT ["python"]

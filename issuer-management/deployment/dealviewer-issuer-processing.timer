@@ -1,0 +1,11 @@
+[Unit]
+Description=Resume pending issuer extraction jobs daily without new website searches
+
+[Timer]
+OnCalendar=*-*-* 10:00:00 Asia/Shanghai
+Persistent=true
+RandomizedDelaySec=15m
+Unit=dealviewer-issuer-processing.service
+
+[Install]
+WantedBy=timers.target

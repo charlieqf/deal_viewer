@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>发行主体财报与评级监测 · DealViewer</title><link rel="stylesheet" href="style.css?v=20261027-20"></head>
+<body><div class="app-shell">
+<header class="topbar"><div class="topbar-inner"><a class="brand" href="#" aria-label="返回发行主体概览"><span class="brand-mark" aria-hidden="true">▥</span><span class="brand-title" id="appTitle">发行主体财报与评级监测</span><h1 class="brand-title" id="name" hidden></h1></a><div class="topbar-meta"><a href="documents.html" style="color:inherit">&#20027;&#20307;&#25991;&#26723;&#24211;</a><span>DealViewer</span><span class="demo-chip">真实披露数据 · 待业务复核</span></div></div></header>
+<main><div id="error" class="notice error" role="alert" hidden></div><div id="loading" class="loading" role="status" hidden>正在读取主体资料…</div>
+<section id="overview" aria-labelledby="listTitle">
+<div class="page-heading"><div><h1 id="listTitle">发行主体概览</h1><p class="page-desc">汇总各主体最新报告期的财务指标，点击数值追溯原文证据。</p></div><div class="as-of"><a href="documents.html">&#27983;&#35272;&#20027;&#20307;&#25991;&#26723;&#24211; &#8599;</a><br> 金额：亿元 · 收入与利润：年初累计</div></div>
+<div class="summary-grid" aria-label="概览统计">
+<article class="summary-card"><div class="summary-label">已入库主体</div><div class="summary-value"><span id="issuerCount">—</span><small>家</small></div><div class="summary-foot" id="issuerComposition">正在读取数据</div></article>
+<article class="summary-card"><div class="summary-label">最新财报报告期</div><div class="summary-value compact" id="latestPeriod">—</div><div class="summary-foot" id="periodCoverage">按各主体实际报告期展示</div></article>
+<article class="summary-card"><div class="summary-label">主体评级</div><div class="summary-value compact">按机构展示</div><div class="summary-foot">按机构分别保留，候选待复核</div></article>
+</div>
+<section class="panel" aria-label="发行主体列表">
+<div class="toolbar"><label class="search-wrap"><span class="sr-only">搜索发行主体</span><input id="search" class="control" type="search" placeholder="搜索发行主体名称或简称" aria-label="搜索发行主体名称或简称"></label>
+<select id="type" class="control" aria-label="机构类型"><option value="">全部机构类型</option><option value="bank">银行</option><option value="amc">资产管理公司</option></select>
+<select id="adoption" class="control" aria-label="采用状态"><option value="">全部采用状态</option><option value="active">待业务复核</option><option value="paused">暂停采用</option></select>
+<button id="refresh" class="secondary-btn" type="button">刷新</button><div id="summary" class="record-count" aria-live="polite"></div></div>
+<div class="table-scroll" tabindex="0" aria-label="主体指标总表，可横向滚动"><table class="main-table" id="overviewTable"><thead><tr>
+<th rowspan="2" class="sticky-name" scope="col">发行主体</th><th rowspan="2" scope="col">机构类型</th><th rowspan="2" scope="col">不良 ABS 数量</th><th colspan="9" scope="colgroup">最新财报关键信息 · 金额单位：亿元</th><th colspan="2" scope="colgroup">主体评级</th><th rowspan="2" scope="col">采用状态</th></tr>
+<tr><th scope="col">报告期</th><th scope="col">总资产</th><th scope="col">资本充足率</th><th scope="col">不良贷款率</th><th scope="col">拨备覆盖率</th><th scope="col">营业收入</th><th scope="col">利润总额</th><th scope="col">合并净利润</th><th scope="col">归母净利润</th><th scope="col">主体评级</th><th scope="col">评级日期 / 展望</th></tr></thead><tbody id="overviewRows"><tr><td colspan="15" class="empty">正在读取主体资料…</td></tr></tbody></table></div>
+<div class="panel-footer"><span>财务数据均待业务复核；暂停采用的主体保留历史查询。</span><span>不良 ABS：银行间信贷项目累计数（含已清算），点击数量查看明细</span></div></section></section>
+<section id="detail" hidden aria-labelledby="name">
+<a class="breadcrumb" href="#">‹ 返回发行主体概览</a>
+<div class="detail-hero compact-hero"><div class="hero-title-row"><div class="hero-logo" id="detailLogo" aria-hidden="true"></div><div><p class="hero-meta"><span id="institution"></span> · <span id="detailStatus"></span></p></div></div><div class="hero-rating"><div class="hero-rating-label">最新主体评级</div><div class="hero-rating-value pending-rating">待接入</div><div class="hero-rating-date">评级机构与历史记录待接入</div></div></div>
+<div id="sourceHold" class="notice" hidden>货币网材料暂缺：保留历史原件和审计记录，暂停补录及业务采用。</div>
+<div class="review-line"><span class="status">待业务复核</span><span>保留原文证据与口径；待识别不代表未披露。金额按亿元展示，收入与利润为年初累计。</span></div>
+<div class="detail-shortcuts"><button class="secondary-btn" data-jump="documentTitle">报告原文 ↓</button><button class="secondary-btn" data-jump="metricsTab">历史财务指标 ↓</button></div>
+<div class="section-caption" id="kpiPeriod"></div><div class="detail-kpis" id="kpis" aria-label="主体最新关键指标"></div>
+<div class="detail-grid"><section class="panel" aria-labelledby="trendTitle"><div class="card-header"><div class="card-title-wrap"><span class="title-bar" aria-hidden="true"></span><h2 id="trendTitle">关键指标趋势</h2></div><select id="metricSelect" class="control chart-control" aria-label="选择趋势指标"></select></div>
+<div class="chart-wrap"><svg id="trendChart" viewBox="0 0 760 286" role="group" aria-label="指标趋势；数据点可打开证据"></svg><p id="chartEmpty" class="empty" hidden></p><div class="chart-caption" id="chartCaption"></div></div></section>
+<aside class="panel disclosure-card"><div class="card-header"><div class="card-title-wrap"><span class="title-bar" aria-hidden="true"></span><h2>最近报告与披露</h2></div></div><div id="recentTimeline" class="timeline"></div></aside></div>
+<section class="panel document-panel" aria-labelledby="documentTitle"><div class="card-header"><div class="card-title-wrap"><span class="title-bar" aria-hidden="true"></span><h2 id="documentTitle">财报文档和评级文档管理</h2></div><div class="document-head-actions" aria-label="文档筛选"><button class="doc-filter-btn" data-doc-filter="all" aria-pressed="true">全部 <span id="allDocCount"></span></button><button class="doc-filter-btn" data-doc-filter="finance" aria-pressed="false">财报材料 <span id="financeDocCount"></span></button><button class="doc-filter-btn" data-doc-filter="rating" aria-pressed="false">评级材料</button></div></div>
+<div class="table-scroll" tabindex="0" aria-label="报告原文列表"><table class="document-table"><thead><tr><th scope="col">文档名称</th><th scope="col">文档类型</th><th scope="col">对应报告期</th><th scope="col">披露日期</th><th scope="col">文件信息</th><th scope="col">操作</th></tr></thead><tbody id="documents"></tbody></table></div></section>
+<section class="panel data-panel"><nav class="tabs" role="tablist" aria-label="历史信息分类"><button id="metricsTab" data-tab="metrics" class="tab-btn" role="tab" aria-controls="metricsPanel" aria-selected="true">财报数据</button><button id="ratingsTab" data-tab="ratings" class="tab-btn" role="tab" aria-controls="ratingsPanel" aria-selected="false" tabindex="-1">评级记录</button><button id="tasksTab" data-tab="tasks" class="tab-btn" role="tab" aria-controls="tasksPanel" aria-selected="false" tabindex="-1">处理记录</button></nav>
+<section id="metricsPanel" role="tabpanel" aria-labelledby="metricsTab"><div class="tab-info"><span><strong>历史财务指标</strong> · 金额单位：亿元</span><div class="history-actions"><label>年度 <select id="year" class="control" aria-label="年度"><option value="">全部年度</option></select></label><button id="csv" class="secondary-btn">下载 CSV</button></div></div>
+<div class="table-scroll" tabindex="0" aria-label="历史财务指标，可横向滚动"><table class="detail-table"><thead><tr><th scope="col">报告期</th><th scope="col">总资产</th><th scope="col">资本充足率</th><th scope="col">不良贷款率</th><th scope="col">拨备覆盖率</th><th scope="col">营业收入</th><th scope="col">利润总额</th><th scope="col">合并净利润</th><th scope="col">归母净利润</th><th scope="col">状态</th></tr></thead><tbody id="metricRows"></tbody></table></div><div class="panel-footer">资本充足率区分监管并表范围；金额优先会计集团口径。点击数值查看来源、单位与复核事项。</div></section>
+<section id="ratingsPanel" role="tabpanel" aria-labelledby="ratingsTab" hidden><div class="empty"><h3>主体评级记录待接入</h3><p>将按评级机构分别保留自 2024 年起的记录，评级日期与财报报告期分别展示。</p></div></section>
+<section id="tasksPanel" role="tabpanel" aria-labelledby="tasksTab" hidden><div id="tasks"></div></section></section></section>
+<footer>发行主体资料 · 原文可追溯 · <span id="readAt"></span></footer></main>
+<dialog id="evidence" aria-labelledby="evidenceTitle"><div class="dialog-head"><h2 id="evidenceTitle">指标证据</h2><button id="close" class="secondary-btn" aria-label="关闭证据">关闭</button></div><div id="evidenceBody"></div></dialog>
+<dialog id="products" aria-labelledby="productsTitle">
+<div class="dialog-head"><h2 id="productsTitle">关联不良 ABS</h2><button id="productsClose" class="secondary-btn" aria-label="关闭关联产品">关闭</button></div>
+<p class="product-scope">银行间债券市场 · 信贷资产证券化 · 不良资产重组。按项目去重，包含已清算产品，不按证券分层计数。</p>
+<div class="product-toolbar"><p id="productSummary" role="status"></p><label>产品状态 <select id="productStatus" class="control"><option value="">全部状态</option><option value="Duration">存续期</option><option value="Liquidated">已清算</option></select></label></div>
+<p id="productError" class="notice error" role="alert" hidden></p>
+<div class="product-table-scroll" tabindex="0" aria-label="关联产品列表，可滚动"><table class="product-table"><thead><tr><th scope="col">产品名称</th><th scope="col">产品 ID</th><th scope="col">发行主体</th><th scope="col">发行日期</th><th scope="col">状态</th></tr></thead><tbody id="productRows"></tbody></table></div>
+</dialog>
+<dialog id="review" aria-labelledby="reviewTitle"><div class="dialog-head"><h2 id="reviewTitle">核对并录入</h2><button id="reviewClose" type="button" class="secondary-btn">关闭</button></div>
+<p id="reviewHelp" class="review-help">① 打开原文核对 → ② 填写数值和依据 → ③ 勾选确认并入库。保存为新版本，历史值和证据保留。</p>
+<form id="reviewForm"><div class="review-grid">
+<label class="wide">对应原文<select id="reviewDocument" class="control" required></select></label>
+<label>PDF 页码<input id="reviewPage" class="control" type="number" min="1" required></label><a id="reviewSource" target="_blank" rel="noopener">打开原始 PDF 对应页 ↗</a>
+<label>原文数值<input id="reviewValue" class="control" inputmode="decimal" required maxlength="40"></label>
+<label>原文单位<select id="reviewUnit" class="control" required></select></label>
+<label>披露范围<select id="reviewScope" class="control" required><option value="unknown">未明确，按本行处理</option><option value="standalone">本行 / 母公司</option><option value="accounting_consolidated">会计集团 / 合并</option><option value="regulatory_consolidated">监管并表（资本指标）</option></select></label>
+<label>会计准则<select id="reviewBasis" class="control"><option value="unknown">原文未明确</option><option value="CAS">中国企业会计准则</option><option value="IFRS">国际财务报告准则</option></select></label>
+<label class="wide">原文摘录（含指标、当期数值及期间）<textarea id="reviewQuote" rows="5" required maxlength="20000"></textarea></label>
+<label class="wide">核对说明<textarea id="reviewReason" rows="2" required maxlength="2000" placeholder="说明核对结果；原文存在差异时注明处理依据。"></textarea></label>
+<label>核对人<input id="reviewerName" class="control" required maxlength="80" autocomplete="name"></label>
+<label>共享复核口令<input id="reviewKey" class="control" type="password" required autocomplete="off"></label>
+</div><label id="reviewDefinitionRow" class="review-confirm" hidden><input type="checkbox" id="reviewDefinition"> 我已确认原文指标定义与所选财务指标一致；定义不同的指标不录入。</label>
+<label class="review-confirm"><input type="checkbox" id="reviewConfirmed" required> 我已核对原文、报告期、单位及当期列，确认上述数值。</label>
+<p id="reviewError" class="notice error" role="alert" hidden></p><p id="reviewResult" class="notice" role="status" hidden></p>
+<button id="reviewSave" class="secondary-btn" type="submit">确认并入库</button></form></dialog>
+</div><script src="app.js?v=20261027-20"></script></body></html>

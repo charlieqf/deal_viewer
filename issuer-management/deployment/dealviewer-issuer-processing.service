@@ -1,0 +1,13 @@
+[Unit]
+Description=Resume queued DealViewer disclosure processing
+After=docker.service network-online.target
+Requires=docker.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/data/dealviewer-issuer-production/acquisition-src
+ExecStart=-/usr/bin/python3 -m acquisition.scheduled --skip-collect
+ExecStart=/usr/bin/python3 -m acquisition.scheduled --skip-collect --kind risk
+TimeoutStartSec=8h
+Nice=10
+UMask=0027

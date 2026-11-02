@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+  <connectionStrings>
+    <clear />
+    <add name="IssuerReadOnly" providerName="System.Data.SqlClient" connectionString="SERVER_CONFIGURED_READ_ONLY_CONNECTION" />
+  </connectionStrings>
+  <appSettings>
+    <add key="IssuerArchiveRoot" value="SERVER_CONFIGURED_ARCHIVE_DIRECTORY" />
+  </appSettings>
+  <system.web>
+    <compilation debug="false" targetFramework="4.0">
+      <assemblies><add assembly="System.Web.Extensions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35" /></assemblies>
+    </compilation>
+    <httpRuntime />
+    <customErrors mode="On" />
+  </system.web>
+  <system.webServer>
+    <defaultDocument><files><clear /><add value="index.html" /></files></defaultDocument>
+    <directoryBrowse enabled="false" />
+    <httpProtocol><customHeaders><add name="X-Frame-Options" value="SAMEORIGIN" /><add name="X-Content-Type-Options" value="nosniff" /></customHeaders></httpProtocol>
+  </system.webServer>
+</configuration>

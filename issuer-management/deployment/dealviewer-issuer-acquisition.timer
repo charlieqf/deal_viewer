@@ -1,0 +1,11 @@
+[Unit]
+Description=Monthly ChinaMoney issuer financial and rating check
+
+[Timer]
+OnCalendar=*-*-01 02:00:00 Asia/Shanghai
+Persistent=true
+RandomizedDelaySec=15m
+Unit=dealviewer-issuer-acquisition.service
+
+[Install]
+WantedBy=timers.target

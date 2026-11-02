@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>主体文档库 · DealViewer</title><link rel="stylesheet" href="documents.css?v=20261029-21"><script src="documents.js?v=20261029-21" defer></script></head>
+<body>
+<header><div class="header-inner"><a class="brand" href="./">▥ <span>DealViewer</span></a><a href="./">发行主体概览 ↗</a></div></header>
+<main>
+<div class="heading"><div><p class="eyebrow">发行主体资料</p><h1>主体文档库</h1><p class="subtitle">浏览和下载已归档的财务报告、评级报告及相关披露原文。</p></div><div class="archive-note">原始 PDF<span>按主体与报告期整理</span></div></div>
+<section class="panel" aria-label="文档目录">
+<form id="filters" class="filters" role="search">
+<label class="search">搜索<input id="search" name="q" type="search" maxlength="200" placeholder="输入文档名称或主体名称"></label>
+<label>发行主体<select id="issuer" name="issuer"><option value="">全部主体</option></select></label>
+<label>文档类型<select id="type" name="type"><option value="">全部类型</option><option value="financial">财报及相关披露</option><option value="rating">主体评级报告</option></select></label>
+<label>年份<select id="year" name="year"><option value="">全部年份</option></select></label>
+<button class="primary" type="submit">查询</button><button id="reset" type="button">重置</button>
+</form>
+<div class="results-bar"><p id="summary" role="status" aria-live="polite">正在读取文档…</p><span>财报按报告期年份 · 评级按披露年份</span></div>
+<p id="error" role="alert" hidden></p>
+<div class="table-wrap" tabindex="0" aria-label="文档列表，可滚动"><table><thead><tr><th>文档名称 / 发行主体</th><th>类型</th><th>报告期</th><th>披露日期</th><th>文件信息</th><th>操作</th></tr></thead><tbody id="rows"></tbody></table></div>
+<div class="pagination"><button id="prev" type="button" disabled>上一页</button><span id="pageInfo">—</span><button id="next" type="button" disabled>下一页</button></div>
+</section>
+<p class="footnote">文档归档不代表其中的识别数据已获业务认可。暂停采用的主体保留历史文件供查询。</p>
+</main></body></html>
