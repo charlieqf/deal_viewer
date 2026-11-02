@@ -114,8 +114,12 @@ class ChinaMoney:
         self.page.locator('#containTitle1').uncheck()
         if self.since and getattr(self,'until',None):
             self.page.locator('#pssf-ch-2-6').check()
-            self.page.locator('#psawf-start-date').fill(self.since)
-            self.page.locator('#psawf-end-date').fill(self.until)
+            # The site's jQuery date inputs are readonly. Use their datepicker
+            # API so its internal selection and the submitted values agree.
+            for selector,value in [('#psawf-start-date',self.since),('#psawf-end-date',self.until)]:
+                field=self.page.locator(selector)
+                field.evaluate('(el,value) => window.jQuery(el).datepicker("setDate",value)',value)
+                if field.input_value()!=value:raise ValueError('search_date_not_applied')
         with site_slot('search'), self.page.expect_response(lambda r: result_response(r, 1)) as response:
             self.page.get_by_text('查询', exact=True).click()
         current = response.value

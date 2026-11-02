@@ -125,8 +125,12 @@ def sync_mappings(cn, inventory):
     for product in products: grouped.setdefault(product['ProductId'],[]).append(product)
     products=[v[0] if len(v)==1 else {'ProductId':k,'ProductSubject':None} for k,v in grouped.items()]
     existing=rows(cn,'SELECT * FROM DV.ProductIssuerMapping WITH(UPDLOCK,HOLDLOCK)')
+    prior={r['ProductId']:r for r in existing}
     for item in match_products(products,inventory,existing):
         if item['MappingSource']=='manual': continue
+        before=prior.get(item['ProductId'])
+        if before and all(before[key]==item[key] for key in ('IssuerId','OriginalProductSubject','Basis')):
+            continue
         cn.execute('''UPDATE DV.ProductIssuerMapping SET IssuerId=?,OriginalProductSubject=?,Basis=?,UpdatedAt=SYSUTCDATETIME()
           WHERE ProductId=? AND MappingSource='auto';
           IF NOT EXISTS(SELECT 1 FROM DV.ProductIssuerMapping WHERE ProductId=?)

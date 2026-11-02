@@ -55,6 +55,8 @@ def main():
     cn.execute("INSERT DV.tbl_view_Products(TrustId,ProductSubject,MarketPlaceName,MarketCategoryName) VALUES(?,?,N'银行间债券市场',N'信贷资产证券化')",pid,'大众汽车金融(中国)有限公司'+run)
     inventory=[dict(id=a,name='大众汽车金融（中国）有限公司'+run),dict(id=b,name='另一发起人'+run)]
     sync_mappings(cn,inventory);m=rows(cn,'SELECT * FROM DV.ProductIssuerMapping WHERE ProductId=?',pid)[0];assert m['IssuerId']==a
+    sync_mappings(cn,inventory)
+    assert bytes(cn.execute('SELECT RowVersion FROM DV.ProductIssuerMapping WHERE ProductId=?',pid).fetchval())==bytes(m['RowVersion'])
     review(cn,dict(operation='product_mapping',id=pid,issuer_id=b,version=bytes(m['RowVersion']).hex(),reviewer='SQL验收',reason='按项目原文修正发起人',request_id=uuid.uuid4().hex));sync_mappings(cn,inventory)
     assert cn.execute('SELECT IssuerId FROM DV.ProductIssuerMapping WHERE ProductId=?',pid).fetchval()==b;result['A11']='pass'
     RiskRulesTests('test_two_weeks_retry_and_month_store_untouched').test_two_weeks_retry_and_month_store_untouched();result['A12']='pass'
