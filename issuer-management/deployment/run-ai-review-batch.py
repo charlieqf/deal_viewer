@@ -9,17 +9,22 @@ import subprocess
 
 BASE=Path('/data/dealviewer-issuer-production')
 IMAGE=json.loads((BASE/'acquisition-src/release.json').read_text())['acquisition_image']
+# Reviewer code is frozen from the release this launcher belongs to (acquisition-src when run from there).
+SOURCE=Path(__file__).resolve().parents[1]
 OCR='sha256:82d620877850d860fee885a74d50e26e3d3cad3b4d59a1b59615d22d9e0fc7ac'
 
 
 def main():
-    parser=argparse.ArgumentParser();parser.add_argument('--run',required=True);args=parser.parse_args()
+    parser=argparse.ArgumentParser();parser.add_argument('--run',required=True)
+    parser.add_argument('--reviewed',action='append',default=[],help='Completed run; only values it did not judge are reviewed')
+    args=parser.parse_args()
     import re
-    if not re.fullmatch('[a-z0-9-]{1,80}',args.run):raise ValueError('Invalid run')
+    if not all(re.fullmatch('[a-z0-9-]{1,80}',run) for run in [args.run]+args.reviewed):raise ValueError('Invalid run')
+    reviewed=[BASE/'ai-review'/run for run in args.reviewed]
     root=BASE/'ai-review'/args.run;root.mkdir(parents=True,exist_ok=True);os.chown(root,1200,1201)
     lock=(BASE/'ai-review/runner.lock').open('a+b');fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
     for name in ['ai_review.py','ai_review_batch.py','pilot_ocr_v2.py','verify_ai_review_batch.py']:
-        source=BASE/'acquisition-src'/name;dest=root/name
+        source=SOURCE/name;dest=root/name
         if not dest.exists():shutil.copyfile(source,dest)
         elif dest.read_bytes()!=source.read_bytes():raise RuntimeError('Frozen code differs; new run required')
     common=['docker','run','--rm','--user','1200:1201','--cap-drop','ALL','--security-opt','no-new-privileges','-v',str(root)+':'+str(root)]
@@ -28,7 +33,9 @@ def main():
                    '-v',str(BASE/'acquisition')+':'+str(BASE/'acquisition')+':ro','-v',str(BASE/'archive')+':'+str(BASE/'archive')+':ro',
                    '-v',str(root/'ai_review.py')+':/opt/issuer/ai_review.py:ro','-v',str(root/'ai_review_batch.py')+':/opt/issuer/ai_review_batch.py:ro',
                    '-v',str(root/'verify_ai_review_batch.py')+':/opt/issuer/verify_ai_review_batch.py:ro']
-    if not (root/'snapshot.json').exists():subprocess.run(runtime+[IMAGE,'-m','ai_review_batch','export','--root',str(root)],check=True,timeout=1200)
+    if not (root/'snapshot.json').exists():
+        prior=[a for run in reviewed for a in ('-v',str(run)+':'+str(run)+':ro')]+[IMAGE,'-m','ai_review_batch','export','--root',str(root)]
+        subprocess.run(runtime+prior+[a for run in reviewed for a in ('--reviewed',str(run))],check=True,timeout=1200)
     # Reuse only hash/page-verified OCR, never relabel native text as OCR.
     caches={}
     search=[BASE/'ai-review/pilot-20261029/artifacts/ocr',root/'artifacts/ocr-new',BASE/'acquisition/jobs',BASE/'runs']

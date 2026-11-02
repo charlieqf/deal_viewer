@@ -132,4 +132,36 @@ class BatchReviewTests(unittest.TestCase):
         with self.assertRaises(ValueError):parse(body,records)
 
 
+class IncrementalScopeTests(unittest.TestCase):
+    def run_dir(self,folder,complete=True):
+        import json
+        from pathlib import Path
+        root=Path(folder)/'full-v9';(root/'results').mkdir(parents=True)
+        (root/'verification.json').write_text(json.dumps({'review_complete':complete}))
+        (root/'results/5.json').write_text(json.dumps({'results':[
+            {'metric':'total_assets','observation_id':11,'status':'checks_passed'},
+            {'metric':'net_profit','observation_id':12,'status':'exception'},
+            {'metric':'npl_ratio','observation_id':13,'status':'request_failed'},
+            {'metric':'car','observation_id':None,'status':'no_reported_value'}]}))
+        return root
+
+    def test_only_judged_observations_are_covered_and_only_from_complete_runs(self):
+        import tempfile
+        from ai_review_batch import covered_observations
+        with tempfile.TemporaryDirectory() as folder:
+            self.assertEqual(covered_observations([self.run_dir(folder)]),{('total_assets',11),('net_profit',12)})
+        with tempfile.TemporaryDirectory() as folder:
+            with self.assertRaises(ValueError):covered_observations([self.run_dir(folder,complete=False)])
+
+    def test_unreviewed_keeps_new_reported_values_including_newer_drafts_with_new_observations(self):
+        from ai_review_batch import unreviewed
+        records=[{'FinancialRecordId':i} for i in (5,8,9)]
+        metric=lambda record,code,obs,status='reported':{'FinancialRecordId':record,'MetricCode':code,'ObservationId':obs,'ValueStatus':status}
+        metrics=[metric(5,'total_assets',11),metric(8,'total_assets',11),metric(8,'net_profit',14),
+                 metric(9,'car',None,'unresolved'),metric(9,'total_assets',15),metric(7,'total_assets',16)]
+        kept,owed=unreviewed(records,metrics,{('total_assets',11)})
+        self.assertEqual([r['FinancialRecordId'] for r in kept],[8,9])
+        self.assertEqual([(m['FinancialRecordId'],m['MetricCode']) for m in owed],[(8,'net_profit'),(9,'total_assets')])
+
+
 if __name__=='__main__':unittest.main()

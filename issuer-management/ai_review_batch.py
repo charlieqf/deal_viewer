@@ -104,7 +104,29 @@ def db(root):
 def stamp(): return datetime.now(timezone.utc).isoformat()
 
 
-def export(root):
+def covered_observations(runs):
+    """(metric, observation) pairs a completed run already judged; observations are immutable."""
+    covered = set()
+    for run in runs:
+        if not json.loads((run/'verification.json').read_text()).get('review_complete'):
+            raise ValueError('Reviewed run is incomplete: '+run.name)
+        for path in (run/'results').glob('*.json'):
+            # Exceptions are not re-asked under the same rules; request failures are.
+            covered.update((r['metric'], r['observation_id']) for r in json.loads(path.read_text())['results']
+                           if r['status'] in ('checks_passed', 'exception'))
+    return covered
+
+
+def unreviewed(records, metrics, covered):
+    """Records and reported metrics that no covered review has seen."""
+    ids = {r['FinancialRecordId'] for r in records}
+    owed = [m for m in metrics if m['FinancialRecordId'] in ids and m['ValueStatus']=='reported'
+            and (m['MetricCode'], m['ObservationId']) not in covered]
+    keep = {m['FinancialRecordId'] for m in owed}
+    return [r for r in records if r['FinancialRecordId'] in keep], owed
+
+
+def export(root, reviewed=()):
     from pilot_runtime import guarded_connection
     import pymupdf
     cn = guarded_connection()
@@ -124,6 +146,10 @@ def export(root):
           JOIN DV.IssuerDocument d ON d.DocumentId=e.DocumentId AND d.IssuerId=e.IssuerId
           JOIN DV.IssuerFile f ON f.FileId=d.FileId WHERE d.DocumentStatus='active' AND f.ArchiveStatus='archived'""")
     finally: cn.close()
+    covered = covered_observations(reviewed)
+    if reviewed:
+        records, all_metrics = unreviewed(records, all_metrics, covered)
+        ids = {r['FinancialRecordId'] for r in records}
     metrics = defaultdict(list); record_docs = defaultdict(lambda: defaultdict(set)); docs = {}
     for m in all_metrics:
         if m['FinancialRecordId'] in ids: metrics[m['FinancialRecordId']].append(m)
@@ -150,7 +176,9 @@ def export(root):
             group = rows[offset:offset+3]
             name = '-'.join(str(r['FinancialRecordId']) for r in group)
             groups.append({'id':name,'record_ids':[r['FinancialRecordId'] for r in group]})
-    save(root/'snapshot.json', {'version':VERSION,'at':stamp(),'records':records,'groups':groups})
+    snapshot = {'version':VERSION,'at':stamp(),'records':records,'groups':groups}
+    if reviewed: snapshot.update(reviewed_runs=[r.name for r in reviewed], covered=sorted(covered))
+    save(root/'snapshot.json', snapshot)
     print(json.dumps({'records':len(records),'metrics':sum(len(r['metrics']) for r in records),'groups':len(groups),'documents':len(docs)}),flush=True)
 
 
@@ -427,7 +455,9 @@ class Runner:
 
 
 if __name__=='__main__':
-    p=argparse.ArgumentParser();p.add_argument('stage',choices=['export','review']);p.add_argument('--root',type=Path,required=True);p.add_argument('--workers',type=int,default=4);a=p.parse_args()
+    p=argparse.ArgumentParser();p.add_argument('stage',choices=['export','review']);p.add_argument('--root',type=Path,required=True);p.add_argument('--workers',type=int,default=4)
+    p.add_argument('--reviewed',type=Path,action='append',default=[],help='Completed run whose judged observations are skipped')
+    a=p.parse_args()
     a.root.mkdir(parents=True,exist_ok=True)
-    if a.stage=='export':export(a.root)
+    if a.stage=='export':export(a.root,a.reviewed)
     else:Runner(a.root,min(max(a.workers,1),4)).run()

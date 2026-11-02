@@ -6,7 +6,7 @@ from decimal import Decimal
 import json
 from pathlib import Path
 from ai_review import MODELS,query,save
-from ai_review_batch import assess,context
+from ai_review_batch import assess,context,unreviewed
 from pilot_runtime import guarded_connection
 
 
@@ -44,10 +44,14 @@ def main(root):
           SELECT FinancialRecordId FROM ranked WHERE n=1""")
         current={r['FinancialRecordId'] for r in live};stale=sorted(set(records)-current);added=sorted(current-set(records))
         published=cn.execute('SELECT COUNT(*) FROM DV.vw_IssuerFinancialPublished').fetchval()
-        metrics=query(cn,'SELECT FinancialRecordId,MetricCode,ObservationId FROM DV.IssuerFinancialMetric')
+        metrics=query(cn,'SELECT FinancialRecordId,MetricCode,ObservationId,ValueStatus FROM DV.IssuerFinancialMetric')
         live_obs={(m['FinancialRecordId'],m['MetricCode']):m['ObservationId'] for m in metrics}
         changed=[k for r in records.values() for m in r['metrics'] if live_obs.get(k:=(r['FinancialRecordId'],m['MetricCode']))!=m['ObservationId']]
     finally:cn.close()
+    if 'covered' in snapshot:
+        # An incremental run owes only reported values that no completed run covered.
+        _,owed=unreviewed(live,metrics,{tuple(c) for c in snapshot['covered']})
+        added=sorted({m['FinancialRecordId'] for m in owed if (m['FinancialRecordId'],m['MetricCode']) not in expected})
     report={'expected_records':len(records),'expected_metrics':len(expected),'reviewed_records':len({r['record_id'] for r in results}),
             'counts':dict(counts),'missing':missing,'stale_records':stale,'new_records':added,'changed_observations':changed,
             'negative_controls_rejected':controls,'published_view_rows':published,'business_writes':False,
