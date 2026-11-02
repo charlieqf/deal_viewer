@@ -135,11 +135,15 @@ def main():
         print(json.dumps({'processed':min(len(jobs),args.limit_jobs),'remaining':max(0,len(jobs)-args.limit_jobs),'failed':failed}))
         if failed:raise SystemExit(1)
     finally:
+        import_failed=False
         if args.kind=='risk':
             try:run('acquisition.risk_import','--root',ROOT,'--inventory',inventory,sql=True)
-            except Exception: print(json.dumps({'risk_import':'failed'}))
+            except Exception:
+                import_failed=True
+                print(json.dumps({'risk_import':'failed'}))
         journal.db.close();lock.close()
         if processing_lock:processing_lock.close()
+        if import_failed:raise RuntimeError('risk_import_failed')
 
 
 if __name__=='__main__':main()

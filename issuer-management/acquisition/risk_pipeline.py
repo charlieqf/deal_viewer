@@ -105,6 +105,9 @@ def ingest():
             source=inputs['document']['source_url'];raw=None
             try:
                 raw=json.loads((ARTIFACTS/'responses'/(str(attempt[0])+'.json')).read_text(encoding='utf-8'))
+                if raw.get('status_code')==429:
+                    atomic_json(ARTIFACTS/'processing-result.json',{'status':'waiting_quota','error':'quota_deferred:模型服务返回429，额度或频率受限，留待续跑'})
+                    raise RuntimeError('risk_model_quota_deferred')
                 if raw['input_hash']!=item['input_hash'] or raw['body']['choices'][0]['finish_reason']!='stop':raise ValueError('response_incomplete')
                 body=parse_response(raw['body']['choices'][0]['message']['content'])
                 if not isinstance(body.get('events'),list):raise ValueError('invalid_events')

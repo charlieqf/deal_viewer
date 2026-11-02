@@ -47,6 +47,8 @@ def ingest(root, cn):
         checks+=grouped_checks(store,inventory)
         for record_id,data in checks:
             source=data['source'];status=data['status'];reason=data.get('error')
+            deferred=[r[0] for r in store.db.execute("SELECT DISTINCT error FROM documents WHERE issuer_id=? AND kind=? AND status='processing_failed' AND error LIKE 'quota_deferred:%'",(data['issuer_id'],data.get('kind','penalty')))]
+            if deferred:reason=';'.join(([reason] if reason else [])+deferred)
             pending=store.db.execute("SELECT COUNT(*) FROM documents WHERE issuer_id=? AND kind=? AND status IN ('downloaded','prepared','processing_failed','preparation_failed')",(data['issuer_id'],data.get('kind','penalty'))).fetchone()[0]
             key=hashlib.sha256((str(Path(root).resolve())+':'+record_id).encode()).digest()
             if not cn.execute('SELECT RiskCheckLogId FROM DV.RiskCheckLog WHERE CheckKey=?',key).fetchval():
@@ -54,7 +56,7 @@ def ingest(root, cn):
                   VALUES(?,?,?,?,?,?,?,?,?,?)''',data['issuer_id'],source,key,data['checked_at'][:23],data.get('since'),data.get('until'),status,reason,
                   data.get('archive') or 'acquisition.sqlite/events/'+record_id,pending)
             else:
-                cn.execute('UPDATE DV.RiskCheckLog SET PendingDocuments=? WHERE CheckKey=?',pending,key)
+                cn.execute('UPDATE DV.RiskCheckLog SET PendingDocuments=?,FailureReason=? WHERE CheckKey=?',pending,reason,key)
         # Only advance per-source dates when every planned query in this batch succeeded.
         history_path=Path(root)/'successful-intervals.json'
         history=json.loads(history_path.read_text()) if history_path.exists() else {}

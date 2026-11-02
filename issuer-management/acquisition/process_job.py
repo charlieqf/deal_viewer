@@ -11,7 +11,15 @@ from pilot_runtime import ROOT, CONFIG, ARTIFACTS, atomic_json, guarded_connecti
 def main():
     source=Path(__file__).resolve().parents[1]
     def run(script,*args):
-        subprocess.run([sys.executable,str(source/script),*args],check=True,timeout=1800)
+        result=subprocess.run([sys.executable,str(source/script),*args],stdout=subprocess.PIPE,
+                              stderr=subprocess.STDOUT,text=True,timeout=1800)
+        print(result.stdout,flush=True)
+        if result.returncode:
+            if 'Application daily request limit reached' in result.stdout:
+                atomic_json(ARTIFACTS/'processing-result.json',{'status':'waiting_quota','error':'quota_deferred:模型当日额度已用尽，下一配额日续跑'})
+            elif 'Issuer request limit reached' in result.stdout:
+                atomic_json(ARTIFACTS/'processing-result.json',{'status':'waiting_quota','error':'quota_deferred:该材料已达有限重试上限，需核对后继续'})
+            result.check_returncode()
     if CONFIG['document_kind'] in ('default','penalty'):
         from .risk_pipeline import prepare,ingest
         prepare();run('pilot_runtime.py','register-local')

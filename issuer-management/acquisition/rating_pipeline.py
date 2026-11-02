@@ -46,8 +46,11 @@ def ingest():
             status = cn.execute('SELECT MonitoringStatus FROM DV.Issuer WITH(UPDLOCK,HOLDLOCK) WHERE IssuerId=?',doc['issuer_id']).fetchval()
             if status != 'active': raise ValueError('issuer_paused')
             attempt = cn.execute('SELECT TOP 1 AttemptId,Status FROM DV.IssuerProcessingAttempt WHERE TaskId=? ORDER BY AttemptNo DESC',item['task_id']).fetchone()
-            if attempt[1] not in ('response_saved','succeeded'): raise ValueError('rating_response_not_ready')
             raw = json.loads((ARTIFACTS/'responses'/(str(attempt[0])+'.json')).read_text(encoding='utf-8'))
+            if raw.get('status_code')==429:
+                atomic_json(ARTIFACTS/'processing-result.json',{'status':'waiting_quota','error':'quota_deferred:模型服务返回429，额度或频率受限，留待续跑'})
+                raise RuntimeError('rating_model_quota_deferred')
+            if attempt[1] not in ('response_saved','succeeded'): raise ValueError('rating_response_not_ready')
             if raw['input_hash'] != item['input_hash'] or raw['body']['choices'][0]['finish_reason'] != 'stop':
                 raise ValueError('rating_response_input_mismatch')
             body = parse_content(raw['body']['choices'][0]['message']['content'])
