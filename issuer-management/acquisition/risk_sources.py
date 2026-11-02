@@ -15,7 +15,7 @@ from risk_rules import normalize_name, business_day, window_start
 from .state import Store, now
 
 SOURCES={
- 'nfra':'https://www.nfra.gov.cn/cn/view/pages/ItemList.html?itemId=931&itemPId=923&itemUrl=zhengwuxinxi%2Fxingzhengchufa.html',
+ 'nfra':'https://www.nfra.gov.cn/cn/view/pages/ItemList.html?itemPId=923&itemId=4113&itemUrl=ItemListRightList.html&itemName=总局机关&itemsubPId=931&itemsubPName=行政处罚',
  'pbc':'https://www.pbc.gov.cn/zhengwugongkai/4081330/4081344/4081407/4081705/index.html',
  'safe':'https://www.safe.gov.cn/www/illegal?siteid=safe'}
 
@@ -78,12 +78,8 @@ def collect_authority(context, source, root, batch_id, max_pages=40):
     records=[];visited=set();dates=[];snapshots=[]
     try:
         response=page.goto(SOURCES[source],wait_until='domcontentloaded',timeout=45000)
-        if source=='nfra':page.wait_for_function("document.body.innerText.includes('行政处罚')",timeout=30000)
+        if source=='nfra':page.locator('.title a[href*="docId="][href*="itemId=4113"]:visible').first.wait_for(timeout=30000)
         if response and response.status>=400:raise RuntimeError('http_'+str(response.status))
-        if source=='nfra':
-            # The wrapper contains local and head-office sections. Only the head-office tab is selected.
-            tab=page.get_by_text('总局机关',exact=True)
-            if tab.count():tab.first.click();page.wait_for_load_state('networkidle')
         for index in range(max_pages):
             html=page.content();text=page.locator('body').inner_text()
             digest=save_original(root,html.encode('utf-8'));snapshots.append(digest)
@@ -94,7 +90,8 @@ def collect_authority(context, source, root, batch_id, max_pages=40):
                 links=page.locator('.cfxx_jg table a').evaluate_all('es=>es.map(e=>({text:e.innerText,url:e.href}))')
                 if total==0:break
             else:
-                links=page.locator('a').evaluate_all('es=>es.map(e=>({text:e.innerText.trim(),url:e.href}))')
+                selector='.title a[href*="docId="][href*="itemId=4113"]' if source=='nfra' else 'a'
+                links=page.locator(selector).evaluate_all('es=>es.filter(e=>e.offsetParent!==null).map(e=>({text:e.innerText.trim(),url:e.href}))')
                 links=[x for x in links if ('处罚' in x['text'] if source=='nfra' else '罚决' in x['text']) and ('docId=' in x['url'] if source=='nfra' else bool(re.search(r'/\d{15,}/index.html',x['url'])))
                        and ('总局' in x['text'] or source!='nfra')]
                 if not links:raise RuntimeError('authority_list_empty_or_schema_changed')
@@ -129,6 +126,9 @@ def collect_authority(context, source, root, batch_id, max_pages=40):
             if source=='safe' and int(page.locator('#page').inner_text())>=int(page.locator('#total').inner_text()):break
             if index==max_pages-1:raise RuntimeError('authority_page_limit_incomplete')
             time.sleep(1.5);next_link.first.click();page.wait_for_load_state('networkidle')
+            if source=='nfra':
+                page.wait_for_function('p => { const a=Array.from(document.querySelectorAll(p.selector)).find(e=>e.offsetParent!==null); return a && a.href!==p.previous; }',
+                                       arg={'selector':selector,'previous':links[0]['url']})
         else:raise RuntimeError('authority_page_limit_incomplete')
         end=business_day();start=max(window_start(end),end-timedelta(days=365)) if source=='safe' else min(dates) if dates else None
         return {'source':source,'status':'success','since':str(start) if start else None,'until':end.isoformat(),
