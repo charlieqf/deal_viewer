@@ -22,17 +22,17 @@ def encode(value):return json.dumps(value,ensure_ascii=False,sort_keys=True,defa
 
 
 def candidates(root):
-    verification=json.loads((root/'verification.json').read_text())
+    verification=json.loads((root/'verification.json').read_text(encoding='utf-8'))
     if not verification.get('review_complete') or verification.get('business_writes'):
         raise ValueError('AI review run is incomplete or already wrote business data')
-    snapshot=json.loads((root/'snapshot.json').read_text());records={r['FinancialRecordId']:r for r in snapshot['records']}
+    snapshot=json.loads((root/'snapshot.json').read_text(encoding='utf-8'));records={r['FinancialRecordId']:r for r in snapshot['records']}
     hashes={}
     def document_hash(id_):
-        if id_ not in hashes:hashes[id_]=json.loads((root/'documents'/f'{id_}.json').read_text())['Sha256'].lower()
+        if id_ not in hashes:hashes[id_]=json.loads((root/'documents'/f'{id_}.json').read_text(encoding='utf-8'))['Sha256'].lower()
         return hashes[id_]
     items=[]
     for path in sorted((root/'results').glob('*.json')):
-        for result in json.loads(path.read_text())['results']:
+        for result in json.loads(path.read_text(encoding='utf-8'))['results']:
             if result['status']!='checks_passed':continue
             record=records[result['record_id']]
             stored=next(m for m in record['metrics'] if m['MetricCode']==result['metric'])

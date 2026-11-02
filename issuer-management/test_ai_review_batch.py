@@ -108,9 +108,34 @@ class BatchReviewTests(unittest.TestCase):
         errors=assess(item,self.stored,self.pages,'bank')
         for e in ['value_mismatch','period_end_mismatch','unit_kind_mismatch']:self.assertIn(e,errors)
 
-    def test_ocr_only_requires_visual(self):
+    def test_ocr_number_suffices_without_native_text_but_absence_still_requires_visual(self):
         self.pages[(1,2)]['ocr']=self.pages[(1,2)]['native'];self.pages[(1,2)]['native']=''
-        self.assertIn('visual_check_required',assess(self.item,self.stored,self.pages,'bank'))
+        self.assertEqual(assess(self.item,self.stored,self.pages,'bank'),[])
+        self.pages[(1,2)]['ocr']=self.pages[(1,2)]['ocr'].replace('1.81','1.31')
+        errors=assess(self.item,self.stored,self.pages,'bank')
+        self.assertIn('visual_check_required',errors);self.assertIn('ocr_disagreement',errors)
+
+    def test_unstated_basis_defaults_to_cas_only_for_domestic_reports(self):
+        stored=dict(self.stored,UnitCode='CNY',MetricCode='total_assets',AccountingBasisCode='CAS',CurrencyCode='CNY',NumericValue='181')
+        item=copy.deepcopy(self.item);item.update(metric_code='total_assets',raw_value='181',raw_unit='元',accounting_basis='unknown',currency='CNY')
+        item['evidence']['value']=dict(document_id=1,page=2,quote='资产总计 181');self.pages[(1,2)]['native']+=' 资产总计 181'
+        self.assertEqual(assess(item,stored,self.pages,'bank',domestic=True),[])
+        self.assertIn('basis_mismatch',assess(item,stored,self.pages,'bank',domestic=False))
+        # An unstated stored basis is CAS too; a stated IFRS on either side still differs.
+        self.assertEqual(assess(item,dict(stored,AccountingBasisCode='unknown'),self.pages,'bank',domestic=True),[])
+        self.assertIn('basis_mismatch',assess(item,dict(stored,AccountingBasisCode='IFRS'),self.pages,'bank',domestic=True))
+        item.update(accounting_basis='IFRS');item['evidence']['basis']=dict(document_id=1,page=2,quote='银行')
+        self.assertIn('basis_mismatch',assess(item,dict(stored,AccountingBasisCode='unknown'),self.pages,'bank',domestic=True))
+
+    def test_negative_controls_reject_altered_values_including_basis(self):
+        from unittest.mock import patch
+        from ai_review_batch import negative_controls
+        stored=dict(self.stored,AccountingBasisCode='not_applicable')
+        answers={'goldencode':self.item,'goldencode-d':self.item}
+        self.assertEqual(negative_controls(answers,stored,self.pages,'bank'),6)
+        self.assertEqual(negative_controls(answers,dict(stored,UnitCode='CNY',CurrencyCode='CNY'),self.pages,'bank'),8)
+        with patch('ai_review_batch.assess',return_value=[]),self.assertRaises(AssertionError):
+            negative_controls(answers,stored,self.pages,'bank')
 
     def test_duplicate_or_missing_model_item_rejected(self):
         import json
@@ -130,6 +155,30 @@ class BatchReviewTests(unittest.TestCase):
         self.assertEqual(parse(body,records)[(1,'total_assets')]['evidence']['value']['page'],2)
         body['choices'][0]['message']['tool_calls'][0]['function']['name']='change_database'
         with self.assertRaises(ValueError):parse(body,records)
+
+
+class QuoteAndScriptTests(unittest.TestCase):
+    def test_width_forms_and_whitespace_are_not_differences(self):
+        from ai_review_batch import quote_found
+        self.assertTrue(quote_found('（除特别注明外，金额单位均为人民币百万元）','(除特别注明外,金额单位均为\n人民币百万元)本集团'))
+        self.assertTrue(quote_found('单位:人民币千元','单位：人民币千元'))
+        self.assertFalse(quote_found('','任何文本'))
+
+    def test_table_cells_must_be_in_page_order_close_together_and_not_tiny(self):
+        from ai_review_batch import quote_found
+        page='项目 年初至报告期末 比上年同期增减(%) 营业收入 160,818 -3.01 净利润 59,973 -2.84'
+        self.assertTrue(quote_found('年初至报告期末营业收入160,818净利润59,973',page))
+        self.assertFalse(quote_found('净利润59,973营业收入160,818',page))
+        self.assertFalse(quote_found('营业收入160,818净利润59,973','营业收入160,818'+'其他'*80+'净利润59,973'))
+        # Pieces shorter than four characters could be found anywhere and prove nothing.
+        self.assertFalse(quote_found('营业收入160,818净利',page))
+        self.assertFalse(quote_found('营业收入999,999',page))
+
+    def test_traditional_reports_are_not_domestic(self):
+        from ai_review_batch import simplified_text
+        self.assertTrue(simplified_text('本行按照中国企业会计准则编制财务报告，资产总额与净利润均为本集团合并口径。'*3))
+        self.assertFalse(simplified_text('本行根據國際財務報告準則編製財務報告，資產總額與淨利潤均為本集團合併口徑。'*3))
+        self.assertFalse(simplified_text('短'))
 
 
 class IncrementalScopeTests(unittest.TestCase):
