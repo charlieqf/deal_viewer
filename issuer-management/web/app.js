@@ -5,7 +5,7 @@ const names=['总资产','资本充足率','不良贷款率','拨备覆盖率','
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const day=s=>(s||'').slice(0,10);
 const typeName=s=>s==='amc'?'资产管理公司':s==='bank'?'银行':'其他机构';
-const statusName=s=>({needs_review:'待复核',succeeded:'处理完成',running:'处理中',queued:'排队中',waiting_quota:'等待额度',failed:'处理异常',cancelled:'已取消'}[s]||'材料已登记');
+const statusName=s=>({needs_review:'识别完成',succeeded:'处理完成',running:'处理中',queued:'排队中',waiting_quota:'等待额度',failed:'处理异常',cancelled:'已取消'}[s]||'材料已登记');
 let overview=null,detail=null,requestGeneration=0,evidenceGeneration=0,documentFilter='all';
 let productGeneration=0,productData=null;
 function renderProducts(){
@@ -40,6 +40,12 @@ function missingLabel(m){
   return ({material_label_not_found:'待补充/核查材料',scope_pending:'口径待核对',numeric_evidence_pending:'数字待核对',basis_pending:'准则待核对',evidence_pending:'证据待核对'})[n.missing_evidence?.code]||'待识别';
 }
 function hasValue(m){return !!m?.ObservationId&&m.ValueStatus==='reported'&&m.NumericValue!=null;}
+// Only items a person still has to check are marked; AI- or manually verified values carry no mark.
+function needsReview(m,issuer){
+  if(!m||m.ReviewStatus!=='pending')return false;
+  if(issuer?.InstitutionType==='amc'&&codes.slice(1,4).includes(m.MetricCode))return false;
+  return hasValue(m)||['unresolved','conflict'].includes(m.ValueStatus);
+}
 function display(m){
   if(!hasValue(m))return missingLabel(m);
   return m.UnitCode==='yuan'?decimalAmount(m.NumericValue):String(m.NumericValue).replace(/(\.\d*?)0+$/,'$1').replace(/\.$/,'')+'%';
@@ -69,9 +75,14 @@ function missingMarkup(m,issuerId,allowReview=false){
 }
 function metricMarkup(m,issuerId,allowReview=false){
   if(!hasValue(m))return missingMarkup(m,issuerId,allowReview);
-  return `<button class="metric" data-observation="${esc(m.ObservationId)}"${issuerId?` data-issuer="${esc(issuerId)}"`:''} aria-label="${esc(names[codes.indexOf(m.MetricCode)])} ${esc(display(m))}，查看证据">${display(m)}</button>${scopeLabel(m)?`<small class="scope-pending">${scopeLabel(m)}</small>`:''}${m.ReviewStatus==='verified'?'<small class="value-verified">数值已核对</small>':''}`;
+  return `<button class="metric" data-observation="${esc(m.ObservationId)}"${issuerId?` data-issuer="${esc(issuerId)}"`:''} aria-label="${esc(names[codes.indexOf(m.MetricCode)])} ${esc(display(m))}，查看证据">${display(m)}</button>${scopeLabel(m)?`<small class="scope-pending">${scopeLabel(m)}</small>`:''}${needsReview(m,reviewIssuer(issuerId))?'<small class="review-needed">待复核</small>':''}`;
 }
-function adoptionLabel(issuer){return `<span class="status${issuer.MonitoringStatus==='paused'?' paused':''}">${issuer.MonitoringStatus==='paused'?'暂停采用':'待复核'}</span>`;}
+function adoptionLabel(issuer,counts){
+  if(issuer.MonitoringStatus==='paused')return '<span class="status paused">暂停采用</span>';
+  if(!counts)return '';
+  const parts=[['指标',counts.metrics],['评级',counts.ratings]].filter(([,n])=>n).map(([k,n])=>`${k} ${n}`);
+  return parts.length?`<span class="status">待复核</span><small class="review-count">${parts.join(' · ')}</small>`:'<span class="status done">已核对</span>';
+}
 async function api(action,id){
   let r=await fetch('api.ashx?action='+action+(id?'&id='+encodeURIComponent(id):''),{cache:'no-store'});
   if(!r.ok)throw new Error('数据读取失败（'+r.status+'），请刷新重试。');return r.json();
@@ -93,12 +104,17 @@ function renderOverview(){
   $('summary').textContent=`显示 ${rows.length} / ${overview.issuers.length} 家主体`;
   $('overviewRows').innerHTML=rows.map(x=>{
     const r=overview.records.find(r=>r.IssuerId===x.IssuerId);
-    return `<tr data-issuer-row="${esc(x.IssuerId)}"><td class="sticky-name"><a class="issuer-link" href="#issuer=${encodeURIComponent(x.IssuerId)}">${esc(x.LegalName)}</a><small class="issuer-alias">${esc(x.DisplayName)} · ${x.DocumentCount} 份材料</small>${x.MonitoringStatus==='paused'?adoptionLabel(x):''}</td><td><span class="type-tag">${typeName(x.InstitutionType)}</span></td><td><button class="metric product-count" data-products="${esc(x.IssuerId)}" aria-label="${esc(x.LegalName)}不良 ABS 累计 ${x.NplProductCount} 个项目，查看产品列表">${x.NplProductCount}</button><small class="product-count-note">累计项目</small></td><td>${r?day(r.PeriodEnd):'待识别'}<small class="issuer-alias">${r?period(r.PeriodEnd):''}</small></td>${codes.map(code=>`<td>${metricMarkup(overview.metrics.find(m=>m.IssuerId===x.IssuerId&&m.MetricCode===code),x.IssuerId)}</td>`).join('')}<td>${ratingSummary(x.IssuerId)}</td><td>${ratingSummary(x.IssuerId,true)}</td><td>${adoptionLabel(x)}</td></tr>`;
+    return `<tr data-issuer-row="${esc(x.IssuerId)}"><td class="sticky-name"><a class="issuer-link" href="#issuer=${encodeURIComponent(x.IssuerId)}">${esc(x.LegalName)}</a><small class="issuer-alias">${esc(x.DisplayName)} · ${x.DocumentCount} 份材料</small>${x.MonitoringStatus==='paused'?adoptionLabel(x):''}</td><td><span class="type-tag">${typeName(x.InstitutionType)}</span></td><td><button class="metric product-count" data-products="${esc(x.IssuerId)}" aria-label="${esc(x.LegalName)}不良 ABS 累计 ${x.NplProductCount} 个项目，查看产品列表">${x.NplProductCount}</button><small class="product-count-note">累计项目</small></td><td>${r?day(r.PeriodEnd):'待识别'}<small class="issuer-alias">${r?period(r.PeriodEnd):''}</small></td>${codes.map(code=>`<td>${metricMarkup(overview.metrics.find(m=>m.IssuerId===x.IssuerId&&m.MetricCode===code),x.IssuerId)}</td>`).join('')}<td>${ratingSummary(x.IssuerId)}</td><td>${ratingSummary(x.IssuerId,true)}</td><td>${adoptionLabel(x,overviewCounts(x,r))}</td></tr>`;
   }).join('')||'<tr><td colspan="15" class="empty">没有找到符合条件的发行主体</td></tr>';
+}
+function overviewCounts(issuer,record){
+  const ratings=(overview.ratings||[]).filter(r=>r.IssuerId===issuer.IssuerId&&r.ReviewStatus==='pending').length;
+  if(!record&&!ratings)return null;
+  return {metrics:overview.metrics.filter(m=>m.IssuerId===issuer.IssuerId&&needsReview(m,issuer)).length,ratings};
 }
 function chosenRows(){return detail.records.filter(r=>!$('year').value||day(r.PeriodEnd).startsWith($('year').value));}
 function renderMetrics(){
-  $('metricRows').innerHTML=chosenRows().map(r=>`<tr><td><strong>${period(r.PeriodEnd)}</strong><small>截至 ${day(r.PeriodEnd)}</small></td>${codes.map(c=>`<td>${metricMarkup(detailMetric(r,c),undefined,true)}</td>`).join('')}<td>${adoptionLabel(detail.issuer)}</td></tr>`).join('')||'<tr><td colspan="10" class="empty">当前年度暂无财务指标</td></tr>';
+  $('metricRows').innerHTML=chosenRows().map(r=>`<tr><td><strong>${period(r.PeriodEnd)}</strong><small>截至 ${day(r.PeriodEnd)}</small></td>${codes.map(c=>`<td>${metricMarkup(detailMetric(r,c),undefined,true)}</td>`).join('')}<td>${adoptionLabel(detail.issuer,{metrics:codes.filter(c=>needsReview(detailMetric(r,c),detail.issuer)).length})}</td></tr>`).join('')||'<tr><td colspan="10" class="empty">当前年度暂无财务指标</td></tr>';
 }
 function comparable(a,b){
   if(!hasValue(a)||!hasValue(b))return false;
@@ -138,7 +154,7 @@ function renderChart(){
   const width=Math.min(760,Math.max(360,$('trendChart').parentElement.clientWidth-24)),right=width-30;
   $('trendChart').setAttribute('viewBox',`0 0 ${width} 286`);
   const x=i=>62+(data.length===1?(right-62)/2:i/(data.length-1)*(right-62)),y=v=>230-(v-min)/(max-min)*196;
-  let svg=`<title>${esc(names[index])}趋势（${unit}），待业务复核</title><desc>实线表示同口径同准则，虚线仅作披露值趋势参考；空值不按零处理。</desc>`;
+  let svg=`<title>${esc(names[index])}趋势（${unit}）</title><desc>实线表示同口径同准则，虚线仅作披露值趋势参考；空值不按零处理。</desc>`;
   for(let i=0;i<5;i++){const value=min+(max-min)*i/4,py=y(value);svg+=`<line x1="62" x2="${right}" y1="${py}" y2="${py}" stroke="#e8eff8"/><text x="53" y="${py+4}" text-anchor="end" fill="#7d8ba0" font-size="11">${value.toLocaleString('zh-CN',{maximumFractionDigits:1})}</text>`;}
   data.forEach((p,i)=>{
     if(i===0||i===data.length-1||data.length<=4||(width>600&&i%2===0&&i<data.length-2))svg+=`<text x="${x(i)}" y="256" text-anchor="middle" fill="#7d8ba0" font-size="11">${day(p.r.PeriodEnd).slice(0,7).replace('-','.')}</text>`;
@@ -184,7 +200,7 @@ function renderDetail(){
   if(years.includes(params.get('year')))$('year').value=params.get('year');
   $('metricSelect').innerHTML=codes.map((c,i)=>`<option value="${c}">${names[i]}（${i===0||i>=4?'亿元':'%'}）</option>`).join('');
   if(codes.includes(params.get('metric')))$('metricSelect').value=params.get('metric');
-  $('tasks').innerHTML=detail.tasks.map(t=>`<div class="task"><div><strong>${statusName(t.Status)}</strong><p>${t.OutcomeCode==='extraction_incomplete'?'部分识别任务尚未完成':t.Status==='needs_review'?'识别结果已入库，等待业务复核':'处理进度已保存'}</p></div><small>${esc((t.FinishedAt||t.CreatedAt||'').replace('T',' '))} UTC</small></div>`).join('')||'<div class="empty">暂无处理记录</div>';
+  $('tasks').innerHTML=detail.tasks.map(t=>`<div class="task"><div><strong>${statusName(t.Status)}</strong><p>${t.OutcomeCode==='extraction_incomplete'?'部分识别任务尚未完成':t.Status==='needs_review'?'识别结果已入库，逐项复核状态见指标表':'处理进度已保存'}</p></div><small>${esc((t.FinishedAt||t.CreatedAt||'').replace('T',' '))} UTC</small></div>`).join('')||'<div class="empty">暂无处理记录</div>';
   renderKpis();renderMetrics();renderChart();renderDocuments();renderTimeline();renderRatings();switchTab(params.get('tab')||'metrics',false);
 }
 function setHashParam(k,v){const p=new URLSearchParams(location.hash.slice(1));if(v)p.set(k,v);else p.delete(k);history.replaceState(null,'',location.pathname+location.search+'#'+p);}
@@ -357,7 +373,7 @@ function exportCsv(){
   const rows=[['主体','报告期','指标','显示值','原始入库值（文本，避免科学计数）','单位','口径','准则','复核状态','缺项原因','主体采用状态']];
   for(const r of chosenRows())for(const code of codes){
     const m=detailMetric(r,code)||{};
-    rows.push([detail.issuer.LegalName,day(r.PeriodEnd),names[codes.indexOf(code)],display(m),m.NumericValue==null?'':'\t'+String(m.NumericValue),({yuan:'元',percent:'%'})[m.UnitCode]||'',({accounting_consolidated:'会计集团',regulatory_consolidated:'监管并表',standalone:'本行 / 母公司',unknown:'未确认'})[m.EntityScopeCode]||'',m.AccountingBasisCode||'',({pending:'待复核',verified:'已核对',corrected:'已更正'})[m.ReviewStatus]||'待复核',m.MissingReason||'',detail.issuer.MonitoringStatus==='paused'?'暂停采用':'待业务核准']);
+    rows.push([detail.issuer.LegalName,day(r.PeriodEnd),names[codes.indexOf(code)],display(m),m.NumericValue==null?'':'\t'+String(m.NumericValue),({yuan:'元',percent:'%'})[m.UnitCode]||'',({accounting_consolidated:'会计集团',regulatory_consolidated:'监管并表',standalone:'本行 / 母公司',unknown:'未确认'})[m.EntityScopeCode]||'',m.AccountingBasisCode||'',({pending:'待复核',verified:'已核对',corrected:'已更正'})[m.ReviewStatus]||'待复核',m.MissingReason||'',detail.issuer.MonitoringStatus==='paused'?'暂停采用':'正常采用']);
   }
   const csv='\ufeff'+rows.map(r=>r.map(v=>'"'+csvSafe(v).replace(/"/g,'""')+'"').join(',')).join('\r\n');
   const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'})),a=document.createElement('a');

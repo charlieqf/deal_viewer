@@ -816,6 +816,8 @@ a{color:var(--brand-700)}.brand{color:white;text-decoration:none}.brand-mark{fon
 .scope-pending{display:block;color:var(--amber);font-size:11px;font-weight:400}
 .status{display:inline-block;padding:3px 8px;border-radius:4px;color:var(--amber);background:var(--amber-soft);font-size:12px;white-space:nowrap}
 .status.paused{background:var(--red-soft);color:var(--red)}
+.status.done{background:var(--green-soft);color:var(--green)}
+.review-count{display:block;margin-top:4px;color:var(--muted);font-size:11px;white-space:nowrap}
 .unavailable{color:var(--muted);font-size:12px}
 .notice{margin:16px 0;padding:13px 17px;border-left:3px solid var(--amber);background:var(--amber-soft);color:#795b28;line-height:1.7}
 .notice.error{border-color:var(--red);background:var(--red-soft);color:#a53338}
@@ -892,6 +894,6 @@ dialog::backdrop{background:#0b2f6470}.dialog-head{display:flex;justify-content:
 .review-grid select.control{flex:none;height:38px}
 .review-help{padding:12px 14px;background:#f1f7ff;color:#244f82;border-radius:8px;line-height:1.8}
 .review-confirm[hidden]{display:none}
-.detail-table td small.value-verified,.value-verified{display:block;color:#28794b;font-size:11px}
+.detail-table td small.review-needed,.review-needed{display:block;color:var(--amber);font-size:11px}
 @media(max-width:600px){.review-grid{grid-template-columns:1fr}.review-grid .wide{grid-column:auto}}
 @media(max-width:720px){.topbar-inner{min-height:58px}.topbar-meta{display:none}.compact-hero{gap:10px;flex-direction:row;flex-wrap:wrap;padding:12px}.compact-hero .hero-meta{font-size:12px}}

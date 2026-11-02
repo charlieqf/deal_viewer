@@ -43,7 +43,7 @@ def verify_csv(path, data):
             missing={'material_label_not_found':'待补充/核查材料','scope_pending':'口径待核对','numeric_evidence_pending':'数字待核对','basis_pending':'准则待核对','evidence_pending':'证据待核对'}
             assert row['显示值']==(missing.get(note.get('missing_evidence',{}).get('code'),'待识别') if metric else '尚未采集')
         assert row['复核状态']=={'pending':'待复核','verified':'已核对','corrected':'已更正'}.get(metric.get('ReviewStatus'),'待复核')
-        assert row['主体采用状态']==('暂停采用' if data['issuer']['MonitoringStatus']=='paused' else '待业务核准')
+        assert row['主体采用状态']==('暂停采用' if data['issuer']['MonitoringStatus']=='paused' else '正常采用')
     return len(rows)
 
 def open_native_pdf(context,link,document_id,page_number,screenshot):
