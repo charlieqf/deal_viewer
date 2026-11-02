@@ -137,6 +137,17 @@ class BatchReviewTests(unittest.TestCase):
         with patch('ai_review_batch.assess',return_value=[]),self.assertRaises(AssertionError):
             negative_controls(answers,stored,self.pages,'bank')
 
+    def test_one_fully_evidenced_reading_covers_only_context_quotes_of_the_other(self):
+        from ai_review_batch import passed
+        a,b='goldencode','goldencode-d'
+        self.assertTrue(passed({a:[],b:[]}))
+        item=copy.deepcopy(self.item);item['evidence'].pop('issuer');item['evidence'].pop('unit')
+        self.assertTrue(passed({a:assess(self.item,self.stored,self.pages,'bank'),b:assess(item,self.stored,self.pages,'bank')}))
+        # Neither reading fully evidenced, or the other reading itself not matching, still goes to people.
+        self.assertFalse(passed({a:['period_quote_unverifiable'],b:['issuer_quote_unverifiable']}))
+        for e in ['value_quote_unverifiable','number_missing_in_quote','value_mismatch','scope_mismatch','basis_mismatch','model_uncertain','visual_check_required']:
+            self.assertFalse(passed({a:[],b:['issuer_quote_unverifiable',e]}))
+
     def test_duplicate_or_missing_model_item_rejected(self):
         import json
         records=[{'FinancialRecordId':1,'metrics':[{'MetricCode':'total_assets','ValueStatus':'reported'}]}]

@@ -4,7 +4,7 @@ from collections import Counter
 import json
 from pathlib import Path
 from ai_review import MODELS,query,save
-from ai_review_batch import assess,context,domestic_report,negative_controls,unreviewed
+from ai_review_batch import assess,context,domestic_report,negative_controls,passed,unreviewed
 from pilot_runtime import guarded_connection
 
 
@@ -25,8 +25,7 @@ def main(root):
         metrics={m['MetricCode']:m for m in record['metrics']};domestic=domestic_report(root,record)
         for result in checked:
             stored=metrics[result['metric']]
-            for model in MODELS:
-                assert not assess(result['findings'][model],stored,pages,record['InstitutionType'],domestic)
+            assert passed({model:assess(result['findings'][model],stored,pages,record['InstitutionType'],domestic) for model in MODELS})
             controls+=negative_controls(result['findings'],stored,pages,record['InstitutionType'],domestic)
     cn=guarded_connection()
     try:

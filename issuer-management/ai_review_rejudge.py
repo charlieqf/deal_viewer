@@ -12,7 +12,7 @@ import os
 from pathlib import Path
 import shutil
 from ai_review import MODELS,save
-from ai_review_batch import POLICIES,VERSION,assess,context,domestic_report,negative_controls,stamp
+from ai_review_batch import POLICIES,VERSION,assess,context,domestic_report,negative_controls,passed,stamp
 
 RETRIED=('exception','request_failed')
 
@@ -58,7 +58,7 @@ def rejudge(sources,out):
                 scoped={k:v for k,v in pages[phase].items() if k[0] in allowed}
                 domestic=domestic_report(root,record);answers={m:f['findings'].get(m) or {} for m in MODELS}
                 errors={m:assess(answers[m],stored,scoped,record['InstitutionType'],domestic) for m in MODELS}
-                status='exception' if any(errors.values()) else 'checks_passed'
+                status='checks_passed' if passed(errors) else 'exception'
                 if status=='checks_passed':
                     controls+=negative_controls(answers,stored,scoped,record['InstitutionType'],domestic)
                     records_out[record['FinancialRecordId']]=record

@@ -16,7 +16,7 @@ import unicodedata
 
 from ai_review import FACTORS, MODELS, numeric_token, query, save
 
-VERSION = 'issuer-batch-review-v10'
+VERSION = 'issuer-batch-review-v11'
 OUTPUT_BUDGET = 64000  # Combined reasoning + tool JSON; Gateway supports 128k.
 SINGLE_METRIC_RECOVERY_BUDGET = 16000
 SINGLE_METRIC_RECOVERY_PROMPT = '\n本次是单指标输出恢复。直接输出同一结构的完整JSON对象（refs和items），不要工具调用、代码块或JSON以外的文字。证据不足仍返回uncertain，不补造数字。'
@@ -26,7 +26,9 @@ RULE = 'bank-unknown-scope-standalone-20261020'
 OCR_RULE = 'ocr-plus-two-models-without-native-20261102'
 BASIS_RULE = 'domestic-unstated-basis-cas-20261102'
 QUOTE_RULE = 'nfkc-ordered-table-cells-20261102'
-POLICIES = [RULE, OCR_RULE, BASIS_RULE, QUOTE_RULE]
+PEER_RULE = 'peer-covers-context-quotes-20261103'
+POLICIES = [RULE, OCR_RULE, BASIS_RULE, QUOTE_RULE, PEER_RULE]
+CONTEXT_QUOTES = {f+'_quote_unverifiable' for f in ('period','unit','scope','basis','issuer')}
 QUOTE_PIECE = 4
 QUOTE_GAP = 120
 TRADITIONAL = '於個們會對與準則報屬東資產銀歸億經營淨額說應關計務際權據當無這開來時間發長為業總團並'
@@ -311,6 +313,13 @@ def assess(item, stored, pages, institution, domestic=False):
     return sorted(set(errors))
 
 
+def passed(errors):
+    """PEER_RULE: both readings match the stored value with a verified value quote; one fully
+    evidenced reading covers context quotes (period/unit/scope/basis/issuer) the other lacks."""
+    found=[set(errors[m]) for m in MODELS]
+    return any(not e for e in found) and all(e<=CONTEXT_QUOTES for e in found)
+
+
 def negative_controls(answers, stored, pages, institution, domestic=False):
     """Altered stored values must fail against the same passing answers; returns how many were rejected."""
     bad=[('NumericValue',str(Decimal(str(stored['NumericValue']))+1)),('PeriodEnd','2000-01-01'),
@@ -496,7 +505,7 @@ class Runner:
                                              'status':'not_applicable' if m['ValueStatus']=='not_applicable' else 'no_reported_value','errors':{'rules':[m['ValueStatus']]}});continue
                         errors={model:([failures[model][key]] if key in failures.get(model,{}) else assess(answers[model].get(key,{}),m,scoped,record['InstitutionType'],domestic)) for model in MODELS}
                         findings.append({'record_id':key[0],'issuer':record['LegalName'],'metric':key[1],'observation_id':m['ObservationId'],
-                                         'status':('request_failed' if any(key in failed for failed in failures.values()) else ('checks_passed' if not any(errors.values()) else 'exception')),'errors':errors,
+                                         'status':('request_failed' if any(key in failed for failed in failures.values()) else ('checks_passed' if passed(errors) else 'exception')),'errors':errors,
                                          'scope_policy':RULE,'policies':POLICIES,'domestic_report':domestic,'findings':{model:answers[model].get(key) for model in MODELS}})
                 history.append({'phase':phase,'findings':findings})
                 # Retry context/evidence issues once. Never erase prior disagreement.
