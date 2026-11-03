@@ -206,4 +206,18 @@ class CarriedReviewTests(unittest.TestCase):
         self.assertEqual(carried_review({'ObservationId':7},note,manual,ai),(manual,note))
 
 
+class OcrShardTests(unittest.TestCase):
+    def test_shard_without_pages_still_reports_its_timing(self):
+        import hashlib, json, os, tempfile
+        from pathlib import Path
+        import pilot_ocr_v2
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);(root/'input').mkdir();(root/'input/a.pdf').write_bytes(b'%PDF-scan')
+            sha=hashlib.sha256(b'%PDF-scan').hexdigest()
+            (root/'input/ocr-manifest.json').write_text(json.dumps([{'pdf':'a.pdf','transfer_sha256':sha,'pages':[{'sha256':sha,'page':1,'input_page':1}]}]))
+            with patch.object(pilot_ocr_v2,'ROOT',root),patch.dict(os.environ,{'OCR_SHARD_INDEX':'1','OCR_SHARD_COUNT':'2','OCR_OUTPUT':'ocr-new'}):
+                pilot_ocr_v2.main()
+            self.assertEqual(json.loads((root/'artifacts/ocr-new-timing-1-2.json').read_text())['processed'],0)
+
+
 if __name__=='__main__':unittest.main()

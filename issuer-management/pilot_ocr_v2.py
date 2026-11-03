@@ -62,6 +62,8 @@ def main():
         if doc is not None:doc.close()
     summary = {'profile':PROFILE,'processed':count,'cache_hits':hits,'page_seconds':round(sum(seconds),3),'wall_seconds':round(time.monotonic()-began,3),'shard':shard,'shards':shards,'model_init_seconds':init_seconds}
     name=os.environ.get('OCR_TIMING_NAME',f'{os.environ.get("OCR_OUTPUT","ocr")}-timing-{shard}-{shards}.json')
+    # A shard can get no page (one scan page, four shards) and then has created no output folder.
+    (ROOT/'artifacts').mkdir(exist_ok=True)
     (ROOT/'artifacts'/name).write_text(json.dumps(summary))
     print(json.dumps(summary), flush=True)
 
