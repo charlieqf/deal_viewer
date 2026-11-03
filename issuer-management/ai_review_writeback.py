@@ -109,8 +109,8 @@ def writeback(cn,root,out,apply):
     current,metrics,documents=live_state(cn)
     eligible,skipped=[],[]
     for item in items:
-        reason,target=classify(item,current,metrics,documents)
-        if reason:skipped.append(dict(item,reason=reason,target_record_id=target))
+        skip,target=classify(item,current,metrics,documents)
+        if skip:skipped.append(dict(item,reason=skip,target_record_id=target))
         else:eligible.append(dict(item,target_record_id=target,before=metrics[(target,item['metric'])]))
     if apply:
         for item in eligible:

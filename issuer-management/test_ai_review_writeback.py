@@ -92,9 +92,26 @@ class WritebackTests(unittest.TestCase):
         self.assertEqual(update.args[1],'ai-review:full-test-v9');self.assertEqual(update.args[3:],(90,11))
         log=next(c for c in cn.execute.call_args_list if 'IssuerChangeLog' in c.args[0])
         self.assertEqual(log.args[2],'ai_verify_metric');self.assertEqual(log.args[7],'full-test-v9:5:total_assets')
+        self.assertEqual(log.args[5],'AI双模型独立复核通过（full-test-v9）')
         cn.commit.assert_called_once();cn.rollback.assert_not_called()
         self.assertEqual((receipt['verified'],saved['committed']),(1,True))
         self.assertEqual(saved['eligible'][0]['before']['ReviewStatus'],'pending')
+
+    def test_rule_run_logs_its_reason_even_when_other_items_are_skipped(self):
+        cn=MagicMock();cn.execute.return_value.rowcount=1;cn.execute.return_value.fetchval.return_value=0
+        with tempfile.TemporaryDirectory() as folder:
+            root=run_dir(folder)
+            (root/'verification.json').write_text(json.dumps({'review_complete':True,'business_writes':False,'rule':'trend-x','reason':'趋势吻合'}))
+            results=json.loads((root/'results/5.json').read_text())['results']
+            results[1]['status']='checks_passed'  # net_profit is already reviewed and skipped last.
+            (root/'results/5.json').write_text(json.dumps({'results':results}))
+            live={(5,'total_assets'):live_metric(),(5,'net_profit'):live_metric(FinancialMetricId=91,MetricCode='net_profit',ObservationId=12,ReviewStatus='verified')}
+            with patch.object(wb,'live_state',return_value=({5:(5,'draft')},live,DOCS)):
+                receipt=wb.writeback(cn,root,Path(folder)/'out',True)
+        log=next(c for c in cn.execute.call_args_list if 'IssuerChangeLog' in c.args[0])
+        self.assertEqual((receipt['verified'],receipt['skipped']),(1,{'already_reviewed':1}))
+        self.assertEqual(log.args[5],'趋势吻合（full-test-v9）')
+        self.assertEqual(json.loads(log.args[4])['ai_review']['rule'],'trend-x')
 
     def test_apply_aborts_when_row_changes_during_write(self):
         cn=MagicMock();cn.execute.return_value.rowcount=0;cn.execute.return_value.fetchval.return_value=0
