@@ -12,6 +12,16 @@ POLICY={'version':'issuer-selection-v2','profile':'group_pilot','run_id':CONFIG.
         'priority':['known_accounting_basis','native_text','main_report'],'review':'pending'}
 
 
+def carried_review(chosen,note,manual,ai):
+    """Review state a new version inherits for one metric: a person's confirmation, or an AI
+    verification of the very same observation (observations and their evidence are immutable)."""
+    if manual:return manual,note
+    # A conflicting value from a newer report needs a fresh look.
+    if chosen and ai and ai['ObservationId']==chosen['ObservationId'] and not note.get('conflict'):
+        return ai,dict(note,ai_review=json.loads(ai['ReviewNote'])['ai_review'],ai_review_carried_from=ai['FinancialRecordId'])
+    return {},note
+
+
 def main():
     docs=json.loads((ARTIFACTS/'registered.json').read_text(encoding='utf-8'))
     issuer=docs[0]['issuer_id']; root=docs[0]['root_task_id']; cn=guarded_connection()
@@ -48,6 +58,16 @@ def main():
       JOIN DV.IssuerDocument d ON d.DocumentId=e.DocumentId
       WHERE r.n=1 AND o.Origin='reviewer' AND d.DocumentStatus='active'""",issuer)
     manual={(str(v['PeriodEnd']),v['MetricCode']):v for v in manual_rows}
+    ai_rows=query(cn,"""WITH current_records AS (
+      SELECT r.FinancialRecordId,s.PeriodEnd,ROW_NUMBER() OVER(PARTITION BY r.IssuerId,s.PeriodEnd ORDER BY r.FinancialRecordId DESC) n
+      FROM DV.IssuerFinancialRecord r JOIN DV.IssuerFinancialSeries s ON s.SeriesId=r.SeriesId
+      WHERE r.IssuerId=? AND r.RecordStatus<>'withdrawn')
+      SELECT r.PeriodEnd,m.FinancialRecordId,m.MetricCode,m.ObservationId,m.ReviewStatus,m.ReviewNote,m.ReviewedBy,m.ReviewedAt
+      FROM current_records r JOIN DV.IssuerFinancialMetric m ON m.FinancialRecordId=r.FinancialRecordId
+      WHERE r.n=1 AND m.ReviewStatus='verified' AND m.ReviewedBy LIKE 'ai-review:%' AND NOT EXISTS (
+        SELECT 1 FROM DV.IssuerObservationEvidence e JOIN DV.IssuerDocument d ON d.DocumentId=e.DocumentId
+        WHERE e.ObservationId=m.ObservationId AND d.DocumentStatus<>'active')""",issuer)
+    ai_verified={(str(v['PeriodEnd']),v['MetricCode']):v for v in ai_rows}
     periods=sorted({d['period_end'] for d in docs}); created=[]; record_ids=[]
     if baseline:assert set(periods)=={p for p,c in baseline}
     page_sets={}; gap_audit=[]
@@ -121,7 +141,7 @@ def main():
             for code in METRICS:
                 chosen=selected.get(code)
                 note=notes.get(code,{'issues':[missing[code]['code']],'missing_evidence':missing[code],'run_id':CONFIG['run_id']} if code in missing else {})
-                reviewed=manual.get((period,code),{})
+                reviewed,note=carried_review(chosen,note,manual.get((period,code)),ai_verified.get((period,code)))
                 cn.execute("INSERT DV.IssuerFinancialMetric(FinancialRecordId,IssuerId,MetricCode,ObservationId,ValueStatus,MissingReason,ReviewStatus,ReviewNote,ReviewedBy,ReviewedAt) VALUES(?,?,?,?,?,?,?,?,?,?)",record,issuer,code,chosen['ObservationId'] if chosen else None,'reported' if chosen else 'unresolved',missing[code]['message'] if code in missing else None,reviewed.get('ReviewStatus','pending'),json.dumps(note,ensure_ascii=False),reviewed.get('ReviewedBy'),reviewed.get('ReviewedAt'))
             cn.execute("INSERT DV.IssuerChangeLog(EntityType,EntityId,Action,AfterJson,Reason,ActorId,RequestId,RequestHash) VALUES('record',?,'create_draft',?,N'按主体和运行版本选择；历史草稿保留','codex-pilot',?,?)",record,encode(policy).decode(),'issuer-v2-draft-'+str(record),digest)
             created.append(record)

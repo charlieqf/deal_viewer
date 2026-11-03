@@ -188,4 +188,22 @@ class EvidenceTests(unittest.TestCase):
         with self.assertRaises(ValueError):validate(c,self.doc,pages)
 
 
+class CarriedReviewTests(unittest.TestCase):
+    def test_new_version_keeps_ai_verification_of_the_same_observation(self):
+        from pilot_v2_drafts import carried_review
+        import json
+        ai={'FinancialRecordId':284,'ObservationId':7,'ReviewStatus':'verified','ReviewedBy':'ai-review:full-v9','ReviewedAt':'2026-10-30',
+            'ReviewNote':json.dumps({'conflict':False,'ai_review':{'run':'full-v9'}})}
+        note={'conflict':False,'run_id':'new'}
+        reviewed,carried=carried_review({'ObservationId':7},note,None,ai)
+        self.assertEqual((reviewed['ReviewStatus'],reviewed['ReviewedBy']),('verified','ai-review:full-v9'))
+        self.assertEqual(carried,{'conflict':False,'run_id':'new','ai_review':{'run':'full-v9'},'ai_review_carried_from':284})
+        # Another observation, a new conflicting value, or no value at all starts pending again.
+        for chosen,new in (({'ObservationId':8},note),({'ObservationId':7},dict(note,conflict=True)),(None,{})):
+            self.assertEqual(carried_review(chosen,new,None,ai),({},new))
+        # A person's confirmation always wins.
+        manual={'ReviewStatus':'corrected','ReviewedBy':'reviewer'}
+        self.assertEqual(carried_review({'ObservationId':7},note,manual,ai),(manual,note))
+
+
 if __name__=='__main__':unittest.main()
