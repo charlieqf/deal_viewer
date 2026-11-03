@@ -149,12 +149,17 @@ def main():
         page.locator('#ratingsTab').click();expect(page.locator('#ratingsPanel')).to_be_visible()
         page.keyboard.press('ArrowRight');expect(page.locator('#tasksPanel')).to_be_visible()
         page.keyboard.press('Home');expect(page.locator('#metricsPanel')).to_be_visible()
-        # Unknowns/conflicts must not become comparable solid segments or calculated changes.
+        # Unknown scopes/conflicts must not become comparable solid segments or calculated changes;
+        # an amount with no stated standard follows CAS, and an unstated method is no method.
         guards=page.evaluate("""() => {
           const a={ObservationId:'1',ValueStatus:'reported',NumericValue:'100',MetricCode:'total_assets',UnitCode:'yuan',EntityScopeCode:'accounting_consolidated',AccountingBasisCode:'CAS',MeasurementBasisCode:'not_applicable'};
-          return [comparable(a,{...a,ObservationId:'2'}),comparable(a,{...a,EntityScopeCode:'standalone'}),comparable(a,{...a,AccountingBasisCode:'unknown'}),comparable({...a,AccountingBasisCode:'unknown'},{...a,AccountingBasisCode:'unknown'}),comparable(a,{...a,NumericValue:null}),comparable(a,{...a,ReviewNote:'{"conflict":true}'})];
+          const r={...a,MetricCode:'capital_adequacy_ratio',UnitCode:'percent',EntityScopeCode:'regulatory_consolidated',AccountingBasisCode:'not_applicable',MeasurementBasisCode:'not_specified'};
+          return [comparable(a,{...a,ObservationId:'2'}),comparable(a,{...a,EntityScopeCode:'standalone'}),comparable(a,{...a,AccountingBasisCode:'unknown'}),comparable({...a,AccountingBasisCode:'unknown'},{...a,AccountingBasisCode:'unknown'}),
+                  comparable(a,{...a,AccountingBasisCode:'IFRS'}),comparable({...a,AccountingBasisCode:'unknown'},{...a,AccountingBasisCode:'IFRS'}),comparable(a,{...a,MeasurementBasisCode:'not_specified'}),
+                  comparable(r,{...r,MeasurementBasisCode:'not_applicable'}),comparable(r,{...r,MeasurementBasisCode:'standardised'}),comparable(r,{...r,AccountingBasisCode:'unknown'}),
+                  comparable(a,{...a,EntityScopeCode:'unknown'}),comparable(a,{...a,NumericValue:null}),comparable(a,{...a,ReviewNote:'{"conflict":true}'})];
         }""")
-        assert guards==[True,False,False,False,False,False]
+        assert guards==[True,False,True,True,False,False,True,True,False,False,False,False,False]
         checks+=['year_filter_reload_and_filtered_csv','flow_chart_same_quarter_years','chart_evidence','chart_comparability_guards','tabs_keyboard_and_rating_empty_states']
         # Download the actual archived PDF and compare it with its registered hash.
         doc=data['19']['documents'][0]

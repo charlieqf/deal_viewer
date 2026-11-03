@@ -116,10 +116,14 @@ function chosenRows(){return detail.records.filter(r=>!$('year').value||day(r.Pe
 function renderMetrics(){
   $('metricRows').innerHTML=chosenRows().map(r=>`<tr><td><strong>${period(r.PeriodEnd)}</strong><small>截至 ${day(r.PeriodEnd)}</small></td>${codes.map(c=>`<td>${metricMarkup(detailMetric(r,c),undefined,true)}</td>`).join('')}<td>${adoptionLabel(detail.issuer,{metrics:codes.filter(c=>needsReview(detailMetric(r,c),detail.issuer)).length})}</td></tr>`).join('')||'<tr><td colspan="10" class="empty">当前年度暂无财务指标</td></tr>';
 }
+// Business rule: an amount whose report names no accounting standard follows CAS.
+function basisCode(m){return m.UnitCode==='yuan'&&m.AccountingBasisCode==='unknown'?'CAS':m.AccountingBasisCode;}
 function comparable(a,b){
   if(!hasValue(a)||!hasValue(b))return false;
+  // "Not stated" and "not applicable" both name no measurement method.
+  const value=(m,k)=>k==='AccountingBasisCode'?basisCode(m):k==='MeasurementBasisCode'&&m[k]==='not_specified'?'not_applicable':m[k];
   for(const k of ['EntityScopeCode','AccountingBasisCode','MeasurementBasisCode','UnitCode']){
-    if(!a[k]||a[k]==='unknown'||a[k]!==b[k])return false;
+    if(!value(a,k)||value(a,k)==='unknown'||value(a,k)!==value(b,k))return false;
   }
   try{if(JSON.parse(a.ReviewNote||'{}').conflict||JSON.parse(b.ReviewNote||'{}').conflict)return false;}catch{return false;}
   return a.MetricCode===b.MetricCode;
@@ -146,7 +150,7 @@ function renderChart(){
   const values=data.filter(p=>hasValue(p.m));
   $('chartEmpty').hidden=values.length>0;$('trendChart').hidden=!values.length;
   $('chartEmpty').textContent='当前指标尚无可展示的数值，可在历史财务指标中查看缺项原因。';
-  $('chartCaption').textContent=(flow?'仅比较最新季度对应的历年累计值。':'按报告期末展示。')+' 实线：同口径、同准则；虚线：口径或准则不同／未确认，仅供观察披露值趋势。缺值断开，数据点可查看证据。';
+  $('chartCaption').textContent=(flow?'仅比较最新季度对应的历年累计值。':'按报告期末展示。')+' 实线：同口径、同准则（未注明准则按中国企业会计准则）；虚线：口径或准则不同／未确认，仅供观察披露值趋势。缺值断开，数据点可查看证据。';
   if(!values.length){$('trendChart').innerHTML='';return;}
   const unit=index===0||flow?'亿元':'%',scale=unit==='亿元'?1e8:1;
   const nums=values.map(p=>Number(p.m.NumericValue)/scale),lo=Math.min(...nums),hi=Math.max(...nums);
@@ -240,7 +244,7 @@ async function evidence(id,issuerId,allowReview=false){
     $('evidenceTitle').textContent=context.issuer.DisplayName+' · '+period(r.PeriodEnd)+' · '+names[codes.indexOf(m.MetricCode)];
     let note={};try{note=JSON.parse(m.ReviewNote||'{}');}catch{}
     const scopes={accounting_consolidated:'会计集团',regulatory_consolidated:'监管并表',standalone:'本行 / 母公司',unknown:'未确认'};
-    $('evidenceBody').innerHTML=`<div class="detail-value">${display(m)} ${m.UnitCode==='yuan'?'亿元':''}</div><div class="meta"><span>范围：${esc(scopes[m.EntityScopeCode]||m.EntityScopeCode)}</span><span>准则：${esc(m.AccountingBasisCode==='unknown'?'依据待确认':m.AccountingBasisCode==='not_applicable'?'不适用':m.AccountingBasisCode)}</span><span>${day(m.PeriodStart)} 至 ${day(m.PeriodEnd)}</span></div><p class="warning">${context.issuer.MonitoringStatus==='paused'?'该主体暂停业务采用。 ':''}${m.ReviewStatus==='pending'?'当前数值尚未完成业务复核。':''} ${note.conflict?'同口径候选存在不同数值，需要核对。':''}</p><div id="evidenceItems">正在读取原文证据…</div>`;
+    $('evidenceBody').innerHTML=`<div class="detail-value">${display(m)} ${m.UnitCode==='yuan'?'亿元':''}</div><div class="meta"><span>范围：${esc(scopes[m.EntityScopeCode]||m.EntityScopeCode)}</span><span>准则：${esc(m.AccountingBasisCode==='not_applicable'?'不适用':basisCode(m)==='unknown'?'依据待确认':basisCode(m)+(basisCode(m)!==m.AccountingBasisCode?'（原文未注明，按规则）':''))}</span><span>${day(m.PeriodStart)} 至 ${day(m.PeriodEnd)}</span></div><p class="warning">${context.issuer.MonitoringStatus==='paused'?'该主体暂停业务采用。 ':''}${m.ReviewStatus==='pending'?'当前数值尚未完成业务复核。':''} ${note.conflict?'同口径候选存在不同数值，需要核对。':''}</p><div id="evidenceItems">正在读取原文证据…</div>`;
     const rows=await api('evidence',id);if(generation!==evidenceGeneration)return;
     $('evidenceItems').innerHTML=(note.reason?`<p class="notice">${esc(note.reason)}</p>`:'')+(allowReview&&context.issuer.MonitoringStatus==='active'?reviewButton(m,context.issuer.IssuerId):'')+rows.map(e=>`<section class="evidence-item"><h3>${e.EvidenceRole==='value'?'数值来源':'单位 / 口径 / 准则依据'} · PDF 第 ${e.PdfPage} 页</h3><a target="_blank" rel="noopener" href="api.ashx?action=document&amp;id=${encodeURIComponent(e.DocumentId)}#page=${e.PdfPage}">${esc(e.Title)} ↗</a><p class="muted">${e.Method==='manual_review'?'人工核对录入':e.Method==='visual_transcription'?'原图核对转录，待人工复核':e.Method==='paddleocr'?'OCR 识别，需核对扫描原图':'PDF 文字提取'} · 原值 ${esc(e.RawValue||'—')} · 原单位 ${esc(e.RawUnit||'—')}</p><pre>${esc(e.RawText)}</pre></section>`).join('')||'暂无证据';
   }catch(e){if(generation===evidenceGeneration)$('evidenceBody').textContent=e.message;}
@@ -373,7 +377,7 @@ function exportCsv(){
   const rows=[['主体','报告期','指标','显示值','原始入库值（文本，避免科学计数）','单位','口径','准则','复核状态','缺项原因','主体采用状态']];
   for(const r of chosenRows())for(const code of codes){
     const m=detailMetric(r,code)||{};
-    rows.push([detail.issuer.LegalName,day(r.PeriodEnd),names[codes.indexOf(code)],display(m),m.NumericValue==null?'':'\t'+String(m.NumericValue),({yuan:'元',percent:'%'})[m.UnitCode]||'',({accounting_consolidated:'会计集团',regulatory_consolidated:'监管并表',standalone:'本行 / 母公司',unknown:'未确认'})[m.EntityScopeCode]||'',m.AccountingBasisCode||'',({pending:'待复核',verified:'已核对',corrected:'已更正'})[m.ReviewStatus]||'待复核',m.MissingReason||'',detail.issuer.MonitoringStatus==='paused'?'暂停采用':'正常采用']);
+    rows.push([detail.issuer.LegalName,day(r.PeriodEnd),names[codes.indexOf(code)],display(m),m.NumericValue==null?'':'\t'+String(m.NumericValue),({yuan:'元',percent:'%'})[m.UnitCode]||'',({accounting_consolidated:'会计集团',regulatory_consolidated:'监管并表',standalone:'本行 / 母公司',unknown:'未确认'})[m.EntityScopeCode]||'',basisCode(m)||'',({pending:'待复核',verified:'已核对',corrected:'已更正'})[m.ReviewStatus]||'待复核',m.MissingReason||'',detail.issuer.MonitoringStatus==='paused'?'暂停采用':'正常采用']);
   }
   const csv='\ufeff'+rows.map(r=>r.map(v=>'"'+csvSafe(v).replace(/"/g,'""')+'"').join(',')).join('\r\n');
   const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'})),a=document.createElement('a');
