@@ -9,10 +9,10 @@ YI = 100000000
 
 
 def metric(record, metric_code, period, value, status='verified', scope='accounting_consolidated', basis='CAS', note=None,
-           observation=None, issuer=1, institution='bank'):
+           observation=None, issuer=1):
     ratio = metric_code in tr.RATIOS
     return {'FinancialRecordId': record, 'IssuerId': issuer, 'RecordPeriodEnd': period, 'LegalName': '测试银行',
-            'InstitutionType': institution, 'MetricCode': metric_code, 'ValueStatus': 'reported', 'ReviewStatus': status,
+            'MetricCode': metric_code, 'ValueStatus': 'reported', 'ReviewStatus': status,
             'ReviewNote': json.dumps(note) if note else None, 'ObservationId': observation or record*10+len(metric_code),
             'NumericValue': str(value), 'UnitCode': 'percent' if ratio else 'yuan', 'EntityScopeCode': scope,
             'AccountingBasisCode': 'not_applicable' if ratio else basis,
@@ -102,8 +102,11 @@ class TrendTests(unittest.TestCase):
             findings = {'goldencode': {'status': 'found'}, 'goldencode-d': {'status': 'found'}}
             results = [{'metric': 'net_profit', 'observation_id': target['ObservationId'], 'status': 'exception', 'findings': findings,
                         'errors': {'goldencode': ['scope_quote_unverifiable', 'basis_mismatch'], 'goldencode-d': ['value_mismatch']}},
-                       {'metric': 'net_profit', 'observation_id': other['ObservationId'], 'status': 'exception', 'findings': findings,
-                        'errors': {'goldencode': ['value_mismatch'], 'goldencode-d': ['model_uncertain']}}]
+                       # One model misread; the other's request failed, which leaves an error code but no answer.
+                       {'metric': 'net_profit', 'observation_id': other['ObservationId'], 'status': 'request_failed',
+                        'findings': {'goldencode': {'status': 'found'}, 'goldencode-d': None},
+                        'errors': {'goldencode': ['value_mismatch'], 'goldencode-d': ['invalid_structured_response']}},
+                       {'metric': 'total_assets', 'observation_id': 1, 'status': 'no_reported_value', 'errors': {'rules': ['unresolved']}}]
             (source/'results/1.json').write_text(json.dumps({'results': results}))
             evidence = [{'ObservationId': target['ObservationId'], 'DocumentId': 7, 'PdfPage': 3, 'Sha256': 'A'*64}]
             out = Path(folder)/'trend'

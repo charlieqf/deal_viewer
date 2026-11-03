@@ -195,17 +195,14 @@ def validate(c,doc,pages):
         raise ValueError('Scope not supported by cited page')
     if c['accounting_basis'] in ('CAS','IFRS'):
         n=c.get('basis_page'); quote=literal_compact(c.get('basis_quote',''))
-        cas,ifrs=('企业会计准则','中国会计准则'),('国际财务报告准则','国际会计准则')
-        cited=n in by_page and len(quote)>=8 and quote in literal_compact(by_page[n]['text'])
-        names_ifrs=any(t in variants(quote) for t in ifrs) or any(t in compact(p['text']) for p in pages for t in ifrs)
-        if c['accounting_basis']=='CAS' and not names_ifrs and not (cited and any(t in variants(quote) for t in cas)):
+        ifrs=('国际财务报告准则','国际会计准则')
+        terms=('企业会计准则','中国会计准则') if c['accounting_basis']=='CAS' else ifrs
+        proven=n in by_page and len(quote)>=8 and quote in literal_compact(by_page[n]['text']) and any(t in variants(quote) for t in terms)
+        if proven:context.add(n)
+        elif c['accounting_basis']=='CAS' and not any(t in compact(text) for text in [quote]+[p['text'] for p in pages] for t in ifrs):
             # Business rule (2026-11-03): a report that names no standard is stored as
-            # "not stated", which review and charts read as CAS. Only an unproven CAS
-            # claim is downgraded; IFRS, or any mention of IFRS, still needs evidence.
+            # "not stated", which review and charts read as CAS. IFRS claims, and CAS
+            # claims on material mentioning IFRS, still need a literal quote.
             c['accounting_basis']='unknown'
-        else:
-            if not cited:raise ValueError('Accounting basis requires a literal evidence quote')
-            terms=cas if c['accounting_basis']=='CAS' else ifrs
-            if not any(t in variants(quote) for t in terms): raise ValueError('Basis quote does not identify the claimed standard')
-            context.add(n)
+        else:raise ValueError('Accounting basis requires a literal quote naming the standard')
     return numeric,unit,value_page,context

@@ -9,9 +9,9 @@ business tables. A pending reported value passes only when both hold:
    - ratios lie within 5% (relative) of the two nearest verified periods (one each side
      when both exist);
    - cumulative revenue and profit rise within the year, strictly between the verified
-     earlier and later quarter of that year. Without a later verified quarter (the latest
-     period or the annual figure), and always for the first quarter, the value must also
-     be within 30% of the verified figure for the same period a year earlier.
+     earlier quarter (zero for the first quarter) and later quarter of that year. Without
+     a later verified quarter (the latest period or the annual figure), and always for the
+     first quarter, the value must also be within 30% of the verified figure a year earlier.
 Values passed by this rule never serve as references, so passes cannot chain.
 The output directory is accepted by ai_review_writeback.py like any review run.
 """
@@ -22,7 +22,7 @@ from decimal import Decimal
 import hashlib
 import json
 from pathlib import Path
-from ai_review import MODELS, query, save
+from ai_review import query, save
 from ai_review_batch import stamp
 
 VERSION = 'issuer-trend-review-v1'
@@ -33,7 +33,7 @@ DONE = ('verified', 'corrected')
 RATIO_BAND = Decimal('0.05')
 YOY_BAND = Decimal('0.30')
 NEAR_DAYS = 400
-# Any of these means a model did not read this exact value from this metric's row.
+# Any of these means a model's answer did not read this exact value from this metric's row.
 READ_ERRORS = {'model_uncertain', 'value_mismatch', 'invalid_value_or_unit', 'unit_kind_mismatch',
                'number_missing_in_quote', 'value_quote_unverifiable', 'metric_mismatch', 'period_end_mismatch'}
 
@@ -49,52 +49,53 @@ def series(m):
     return (m['IssuerId'], m['MetricCode'], m['EntityScopeCode'], basis(m), method, m['UnitCode'], m['PeriodBasis'])
 
 
-def trend_passed(m):
-    try:note = json.loads(m.get('ReviewNote') or '{}')
-    except ValueError:return False
-    return isinstance(note, dict) and (note.get('ai_review') or {}).get('rule') == RULE
-
-
 def reference(m):
-    return (m['ValueStatus'] == 'reported' and m['ReviewStatus'] in DONE and m['ObservationId'] is not None
-            and m['EntityScopeCode'] != 'unknown' and not trend_passed(m))
+    # Write-back records the rule in the review note; values it passed are not references.
+    return (m['ValueStatus'] == 'reported' and m['ReviewStatus'] in DONE and m['EntityScopeCode'] != 'unknown'
+            and RULE not in (m['ReviewNote'] or ''))
 
 
 def day(m):
     return date.fromisoformat(str(m['PeriodEnd'])[:10])
 
 
-def ref(m):
+def cite(m):
     return {'period_end': str(day(m)), 'value': str(m['NumericValue']), 'record_id': m['FinancialRecordId'],
             'observation_id': m['ObservationId']}
 
 
+def number(m):
+    return Decimal(str(m['NumericValue']))
+
+
+def near(value, base, band):
+    # Relative difference without division; a non-positive base never matches.
+    return abs(value - base) <= band * base
+
+
 def judge(m, refs):
-    """Return (rule, references) when the trend confirms m, else (None, reason)."""
-    value = Decimal(str(m['NumericValue'])); when = day(m)
+    """Return (rule, cited references) when verified neighbours confirm m, else (None, reason)."""
+    value = number(m); when = day(m)
     if m['MetricCode'] in RATIOS:
-        near = [r for r in refs if abs((day(r) - when).days) <= NEAR_DAYS]
-        before = sorted((r for r in near if day(r) < when), key=day, reverse=True)
-        after = sorted((r for r in near if day(r) > when), key=day)
+        close = [r for r in refs if abs((day(r) - when).days) <= NEAR_DAYS]
+        before = sorted((r for r in close if day(r) < when), key=day, reverse=True)
+        after = sorted((r for r in close if day(r) > when), key=day)
         chosen = [before[0], after[0]] if before and after else (before or after)[:2]
         if len(chosen) < 2:return None, 'too_few_verified_neighbours'
-        if any(Decimal(str(r['NumericValue'])) <= 0 for r in chosen):return None, 'non_positive_reference'
-        if all(abs(value / Decimal(str(r['NumericValue'])) - 1) <= RATIO_BAND for r in chosen):
-            return 'ratio_band', [ref(r) for r in chosen]
-        return None, 'outside_ratio_band'
-    if value <= 0:return None, 'non_positive_value'
+        if not all(near(value, number(r), RATIO_BAND) for r in chosen):return None, 'outside_ratio_band'
+        return 'ratio_band', [cite(r) for r in chosen]
     year = [r for r in refs if day(r).year == when.year]
     lower = max((r for r in year if day(r) < when), key=day, default=None)
     upper = min((r for r in year if day(r) > when), key=day, default=None)
     prior = next((r for r in refs if day(r) == date(when.year - 1, when.month, when.day)), None)
-    if lower and not value > Decimal(str(lower['NumericValue'])):return None, 'not_above_earlier_quarter'
-    if upper and not value < Decimal(str(upper['NumericValue'])):return None, 'not_below_later_quarter'
-    if lower and upper:return 'within_year', [ref(lower), ref(upper)]
-    first_quarter = (when.month, when.day) == (3, 31)
-    if not (lower or first_quarter):return None, 'no_verified_earlier_quarter'
-    if not prior or Decimal(str(prior['NumericValue'])) <= 0:return None, 'no_verified_prior_year'
-    if abs(value / Decimal(str(prior['NumericValue'])) - 1) > YOY_BAND:return None, 'outside_year_on_year_band'
-    return 'year_on_year', [ref(r) for r in (lower, upper, prior) if r]
+    if not (lower or (when.month, when.day) == (3, 31)):return None, 'no_verified_earlier_quarter'
+    if not value > (number(lower) if lower else 0):return None, 'not_above_earlier_quarter'
+    if upper and not value < number(upper):return None, 'not_below_later_quarter'
+    if lower and upper:return 'within_year', [cite(lower), cite(upper)]
+    # Zero is a weak lower bound and a missing later quarter no upper bound: compare a year earlier.
+    if not prior:return None, 'no_verified_prior_year'
+    if not near(value, number(prior), YOY_BAND):return None, 'outside_year_on_year_band'
+    return 'year_on_year', [cite(r) for r in (lower, upper, prior) if r]
 
 
 def readings(sources):
@@ -106,9 +107,9 @@ def readings(sources):
         origin[root.name] = hashlib.sha256(verification.read_bytes()).hexdigest()
         for path in (root/'results').glob('*.json'):
             for r in json.loads(path.read_text(encoding='utf-8'))['results']:
-                for model in MODELS:
-                    errors = (r.get('errors') or {}).get(model)
-                    if errors is not None and (r.get('findings') or {}).get(model) and not set(errors) & READ_ERRORS:
+                # Rows without a reported value carry no 'findings'; a failed request has no answer.
+                for model, answer in r.get('findings', {}).items():
+                    if answer and not set(r['errors'][model]) & READ_ERRORS:
                         reads[(r['metric'], r['observation_id'])].add(root.name+':'+model)
     return reads, origin
 
@@ -120,15 +121,11 @@ def review(metrics, reads):
         if reference(m):pool[series(m)].append(m)
     results = defaultdict(list); counts = Counter()
     for m in metrics:
-        if (m['MetricCode'] not in RATIOS+FLOWS or m['ReviewStatus'] != 'pending' or m['ValueStatus'] != 'reported'
-                or m['ObservationId'] is None):continue
-        if m['MetricCode'] in RATIOS and m['InstitutionType'] == 'amc':continue  # AMC ratios are not reviewed.
+        if m['MetricCode'] not in RATIOS+FLOWS or m['ReviewStatus'] != 'pending' or m['ValueStatus'] != 'reported':continue
         out = {'record_id': m['FinancialRecordId'], 'issuer': m['LegalName'], 'metric': m['MetricCode'],
                'observation_id': m['ObservationId'], 'period_end': str(day(m)), 'value': str(m['NumericValue'])}
         read = sorted(reads.get((m['MetricCode'], m['ObservationId']), ()))
-        if m['EntityScopeCode'] == 'unknown':rule, detail = None, 'scope_unknown'
-        elif not read:rule, detail = None, 'no_exact_ai_reading'
-        else:rule, detail = judge(m, [r for r in pool[series(m)] if day(r) != day(m)])
+        rule, detail = judge(m, pool[series(m)]) if read else (None, 'no_exact_ai_reading')
         if rule:out.update(status='checks_passed', rule=rule, references=detail, exact_readings=read)
         else:out.update(status='trend_not_met', reason=detail)
         counts[out['status'] if rule else detail] += 1
@@ -142,7 +139,7 @@ SELECTED = """WITH ranked AS (SELECT r.FinancialRecordId,r.IssuerId,s.PeriodEnd,
 
 
 def load(cn):
-    metrics = query(cn, SELECTED+"""SELECT r.FinancialRecordId,r.IssuerId,r.PeriodEnd RecordPeriodEnd,i.LegalName,i.InstitutionType,m.MetricCode,
+    metrics = query(cn, SELECTED+"""SELECT r.FinancialRecordId,r.IssuerId,r.PeriodEnd RecordPeriodEnd,i.LegalName,m.MetricCode,
       m.ValueStatus,m.ReviewStatus,m.ReviewNote,o.ObservationId,o.NumericValue,o.UnitCode,o.EntityScopeCode,
       o.AccountingBasisCode,o.MeasurementBasisCode,o.PeriodEnd,o.PeriodBasis
       FROM ranked r JOIN DV.Issuer i ON i.IssuerId=r.IssuerId JOIN DV.IssuerFinancialMetric m ON m.FinancialRecordId=r.FinancialRecordId
@@ -189,11 +186,10 @@ def main():
     p.add_argument('--source', type=Path, action='append', required=True, help='Completed review run whose readings count (read only)')
     p.add_argument('--out', type=Path, required=True)
     a = p.parse_args()
-    from pilot_runtime import PRODUCTION, guarded_connection
-    if not PRODUCTION:raise RuntimeError('Trend review reads the production issuer database only')
+    from pilot_runtime import guarded_connection
     cn = guarded_connection()
     try:metrics, evidence = load(cn)
-    finally:cn.rollback();cn.close()
+    finally:cn.close()
     print(json.dumps(run(metrics, evidence, a.source, a.out), ensure_ascii=False))
 
 

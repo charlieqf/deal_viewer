@@ -116,5 +116,5 @@ class Store:
                 (issuer, kind, str(item['source_id']), item['url'], item['title'], item.get('published'),
                  digest, len(content), count, stamp, stamp))
             self.db.execute('INSERT INTO events(at,document_id,event,detail) VALUES(?,?,?,?)',
-                            (stamp, cursor.lastrowid, 'downloaded', json.dumps({'sha256': digest, 'source': 'chinamoney', **({'pdf_repaired': True} if repaired else {})})))
+                            (stamp, cursor.lastrowid, 'downloaded', json.dumps({'sha256': digest, 'source': 'chinamoney', 'pdf_repaired': repaired})))
             return cursor.lastrowid, True

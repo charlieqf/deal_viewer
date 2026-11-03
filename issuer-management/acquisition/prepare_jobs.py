@@ -9,7 +9,6 @@ from pathlib import Path
 from pilot_runtime import atomic_json, guarded_connection, period_from_name
 from prepare_pilot import inspect_pdf
 from .state import Store, now
-from .worker import names_issuer
 
 
 def prepare_jobs(root, inventory, production_archive):
@@ -21,9 +20,6 @@ def prepare_jobs(root, inventory, production_archive):
             if not issuer or issuer['monitoring_status']!='active': continue
             try:
                 if cn.execute('SELECT MonitoringStatus FROM DV.Issuer WHERE IssuerId=?',issuer['id']).fetchval()!='active': continue
-                if row['kind'] in ('financial','rating') and not names_issuer(row['title'],issuer):
-                    with store.db:store.db.execute("UPDATE documents SET status='other_issuer_title',error=NULL WHERE id=?",(row['id'],))
-                    continue
                 path=Path(root)/'archive'/(row['digest']+'.pdf')
                 if hashlib.sha256(path.read_bytes()).hexdigest()!=row['digest']: raise ValueError('archive_hash_mismatch')
                 # A known file still acquires a new source record, but does not need another model call.
@@ -95,9 +91,6 @@ def prepare_jobs(root, inventory, production_archive):
         for row in store.db.execute("SELECT * FROM documents WHERE status IN ('prepared','processing_failed')"):
             if row['kind']=='financial' and any(term in row['title'] for term in ('募集资金使用','存续期评估认证')):
                 with store.db:store.db.execute("UPDATE documents SET status='excluded_document_type',error=NULL WHERE id=?",(row['id'],))
-                continue
-            if row['kind'] in ('financial','rating') and row['issuer_id'] in issuers and not names_issuer(row['title'],issuers[row['issuer_id']]):
-                with store.db:store.db.execute("UPDATE documents SET status='other_issuer_title',error=NULL WHERE id=?",(row['id'],))
                 continue
             job=Path(root)/'jobs'/f"{row['issuer_id']}-{row['kind']}-{row['digest']}"
             if not any(j['id']==row['id'] for j in jobs):

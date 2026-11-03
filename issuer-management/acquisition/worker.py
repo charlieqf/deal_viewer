@@ -17,8 +17,8 @@ KEYWORDS = {
 
 
 def issuer_names(issuer):
-    # Titles sometimes omit the corporate suffix. This is a search variant only;
-    # identity validation still uses the legal name and confirmed aliases.
+    # Titles sometimes omit the corporate suffix; the short name is both a search
+    # variant and an accepted title match, next to the legal name and confirmed aliases.
     short=issuer['name']
     for suffix in ('股份有限公司','有限责任公司','有限公司'):
         if short.endswith(suffix):
