@@ -11,6 +11,10 @@ def now():
     return datetime.now(timezone.utc).isoformat()
 
 
+class InvalidPdf(ValueError):
+    """The received bytes are not a usable PDF, as opposed to a failed transfer."""
+
+
 class Store:
     def __init__(self, root):
         self.root = Path(root)
@@ -83,10 +87,10 @@ class Store:
     def archive(self, issuer, kind, item, content):
         import pymupdf
         if not content.startswith(b'%PDF-'):
-            raise ValueError('response_is_not_pdf')
+            raise InvalidPdf('response_is_not_pdf')
         with pymupdf.open(stream=content, filetype='pdf') as pdf:
             if pdf.is_encrypted or not pdf.page_count:
-                raise ValueError('encrypted_or_empty_pdf')
+                raise InvalidPdf('encrypted_or_empty_pdf')
             count = pdf.page_count
             for page in pdf:
                 page.get_text()  # Force page tree parsing before marking valid.
@@ -94,7 +98,7 @@ class Store:
             # Accept those only when the transfer is complete; a cut-off file is not.
             repaired = pdf.is_repaired
             if repaired and b'%%EOF' not in content[-2048:]:
-                raise ValueError('truncated_pdf')
+                raise InvalidPdf('truncated_pdf')
         digest = hashlib.sha256(content).hexdigest()
         target = self.root / 'archive' / (digest + '.pdf')
         target.parent.mkdir(exist_ok=True)

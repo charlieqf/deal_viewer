@@ -1,12 +1,13 @@
 """Monthly acquisition CLI. Downloading is explicitly distinct from SQL ingestion."""
 import argparse
+import hashlib
 import json
 import re
 import time
 from pathlib import Path
 
 from .chinamoney import ChinaMoney, attachments, DownloadHTTPError
-from .state import Store, now
+from .state import Store, now, InvalidPdf
 from risk_rules import default_title_selected, DEFAULT_TERMS
 
 KEYWORDS = {
@@ -44,7 +45,7 @@ def collect(store, adapter, issuers, since='2024-01-01', kinds=('financial', 'ra
         issuers=sorted(issuers,key=lambda x:x['id'] in touched)
     run = store.start()
     consecutive_blocked=0
-    summary = dict(run_id=run, downloaded=0, reused=0, failed=0, searches=0, skipped_paused=0)
+    summary = dict(run_id=run, downloaded=0, reused=0, failed=0, unusable=0, searches=0, skipped_paused=0)
     try:
         for issuer in issuers:
             if issuer['monitoring_status'] != 'active':
@@ -60,6 +61,7 @@ def collect(store, adapter, issuers, since='2024-01-01', kinds=('financial', 'ra
                     'SELECT url FROM documents WHERE issuer_id=? AND kind=? AND last_seen>=?',
                     (issuer['id'],kind,boundary))} if resume else set()
                 failed_urls=set()
+                unusable_urls=set()
                 for name in names:
                     for keyword in KEYWORDS[kind]:
                         query = name + ' ' + keyword
@@ -73,7 +75,6 @@ def collect(store, adapter, issuers, since='2024-01-01', kinds=('financial', 'ra
                             try:
                                 for result in adapter.search(query):
                                     if intervals:
-                                        import hashlib
                                         raw=json.dumps(result,ensure_ascii=False,sort_keys=True).encode('utf-8')
                                         digest=hashlib.sha256(raw).hexdigest()
                                         directory=store.root/'search-responses';directory.mkdir(exist_ok=True)
@@ -97,7 +98,7 @@ def collect(store, adapter, issuers, since='2024-01-01', kinds=('financial', 'ra
                                                 continue
                                             if kind in ('financial','rating') and not names_issuer(attachment['title'],issuer):
                                                 continue
-                                            if attachment['url'] in downloaded_urls:
+                                            if attachment['url'] in downloaded_urls or attachment['url'] in unusable_urls:
                                                 continue
                                             if attachment['url'] in failed_urls:
                                                 download_errors+=1
@@ -106,11 +107,23 @@ def collect(store, adapter, issuers, since='2024-01-01', kinds=('financial', 'ra
                                                 content = adapter.download(attachment)
                                                 _, created = store.archive(issuer['id'], kind, attachment, content)
                                             except Exception as error:
-                                                download_errors += 1
-                                                failed_urls.add(attachment['url'])
+                                                failure=str(error) if isinstance(error,DownloadHTTPError) else type(error).__name__
+                                                if isinstance(error,InvalidPdf):
+                                                    failure=f'{error} sha256:{hashlib.sha256(content).hexdigest()}'
+                                                # The same bytes rejected on an earlier run: the published file itself is broken
+                                                # and retrying cannot help. It stays listed in download_failures for people.
+                                                unusable=isinstance(error,InvalidPdf) and store.db.execute(
+                                                    'SELECT 1 FROM download_failures WHERE issuer_id=? AND kind=? AND url=? AND error=?',
+                                                    (issuer['id'],kind,attachment['url'],failure)).fetchone() is not None
+                                                if unusable:
+                                                    summary['unusable']+=1
+                                                    unusable_urls.add(attachment['url'])
+                                                else:
+                                                    download_errors+=1
+                                                    failed_urls.add(attachment['url'])
                                                 with store.db:
                                                     store.db.execute('INSERT OR REPLACE INTO download_failures VALUES(?,?,?,?,?)',
-                                                        (issuer['id'],kind,attachment['url'],str(error) if isinstance(error,DownloadHTTPError) else type(error).__name__,now()))
+                                                        (issuer['id'],kind,attachment['url'],failure,now()))
                                                     store.db.execute('INSERT OR REPLACE INTO download_failure_details VALUES(?,?,?,?,?,?)',
                                                         (issuer['id'],kind,attachment['url'],str(attachment['source_id']),attachment['title'],attachment['published']))
                                                 consecutive_blocked=consecutive_blocked+1 if isinstance(error,DownloadHTTPError) and error.status in (403,407,429) else 0

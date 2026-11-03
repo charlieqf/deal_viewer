@@ -175,6 +175,32 @@ class AcquisitionTests(unittest.TestCase):
             self.assertEqual(store.db.execute('SELECT COUNT(*) FROM download_failures').fetchone()[0],1)
             store.db.close()
 
+    def test_same_broken_file_on_a_later_run_no_longer_fails_the_search(self):
+        import pymupdf
+        pdf=pymupdf.open()
+        for n in range(3):pdf.new_page().insert_text((50,50),'A report page '+str(n))
+        content=pdf.tobytes();pdf.close()
+        class Adapter:
+            def __init__(self,body):self.body=body
+            def search(self,query):yield {'total':1,'pageItems':[{'id':1,'title':'A report','paths':['/a.pdf']}]}
+            def download(self,item):return self.body
+        def run(body):return collect(store,Adapter(body),[{'id':1,'name':'A','monitoring_status':'active'}],kinds=('rating',))
+        def failure():return store.db.execute('SELECT error FROM download_failures').fetchone()
+        with tempfile.TemporaryDirectory() as tmp:
+            store=Store(tmp)
+            # A cut-off transfer may be transient: a first rejection, or different bytes, still fail.
+            self.assertEqual(run(content[:len(content)*2//3])['failed'],2)
+            self.assertEqual(run(content[:len(content)*3//4])['failed'],2)
+            self.assertRegex(failure()[0],'^truncated_pdf sha256:[0-9a-f]{64}$')
+            result=run(content[:len(content)*3//4])
+            self.assertEqual((result['failed'],result['unusable']),(0,1))
+            self.assertEqual(store.db.execute('SELECT status FROM runs ORDER BY id DESC').fetchone()[0],'complete')
+            self.assertIsNotNone(failure())
+            # A repaired file at the source is archived and clears the failure.
+            self.assertEqual(run(content)['downloaded'],1)
+            self.assertIsNone(failure())
+            store.db.close()
+
     def test_title_must_name_the_issuer_or_an_alias(self):
         from acquisition.worker import names_issuer
         issuer={'name':'江苏银行股份有限公司','confirmed_aliases':['江苏银行']}
