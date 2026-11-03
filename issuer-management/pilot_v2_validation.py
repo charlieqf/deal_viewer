@@ -198,11 +198,15 @@ def validate(c,doc,pages):
         ifrs=('国际财务报告准则','国际会计准则')
         terms=('企业会计准则','中国会计准则') if c['accounting_basis']=='CAS' else ifrs
         proven=n in by_page and len(quote)>=8 and quote in literal_compact(by_page[n]['text']) and any(t in variants(quote) for t in terms)
+        texts=[compact(p['text']) for p in pages]
+        def names(words,within):return any(t in text for text in within for t in words)
         if proven:context.add(n)
-        elif c['accounting_basis']=='CAS' and not any(t in compact(text) for text in [quote]+[p['text'] for p in pages] for t in ifrs):
+        elif c['accounting_basis']=='CAS' and not names(ifrs,[compact(quote)]) and (names(terms,texts) or not names(ifrs,texts)):
             # Business rule (2026-11-03): a report that names no standard is stored as
-            # "not stated", which review and charts read as CAS. IFRS claims, and CAS
-            # claims on material mentioning IFRS, still need a literal quote.
+            # "not stated", which review and charts read as CAS. So is a CAS claim on material
+            # that names CAS and mentions IFRS only beside it (A+H banks point to their separate
+            # IFRS edition). IFRS claims, a quote naming IFRS, and material naming IFRS but not
+            # CAS still need a literal quote.
             c['accounting_basis']='unknown'
         else:raise ValueError('Accounting basis requires a literal quote naming the standard')
     return numeric,unit,value_page,context

@@ -156,9 +156,14 @@ class EvidenceTests(unittest.TestCase):
             c=dict(self.c,**delta)
             self.assertEqual(validate(c,self.doc,self.pages)[3],{1,2})
             self.assertEqual(c['accounting_basis'],'unknown')
-        # A report that mentions IFRS anywhere keeps needing a literal CAS quote.
+        # Material naming IFRS but not CAS keeps needing a literal CAS quote.
         pages=[self.pages[0],self.pages[1],{'page':3,'text':'按照國際財務報告準則編製的財務報表'}]
         with self.assertRaises(ValueError):validate(dict(self.c,basis_page=9),self.doc,pages)
+        # 交通银行 2026Q3: CAS is named and IFRS only as the edition published elsewhere.
+        pages[2]={'page':3,'text':'本集团按照中国会计准则要求编制的主要会计数据和财务指标如下。按照国际财务报告准则编制的季度报告载于披露易网站。'}
+        c=dict(self.c,basis_page=9)
+        validate(c,self.doc,pages)
+        self.assertEqual(c['accounting_basis'],'unknown')
     def test_separators_are_not_repaired(self):
         pages=[dict(p,text=p['text'].replace('53,374','53.374')) for p in self.pages]
         with self.assertRaises(ValueError):validate(self.c,self.doc,pages)
