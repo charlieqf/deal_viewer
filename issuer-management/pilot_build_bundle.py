@@ -55,7 +55,9 @@ def main():
         try:
             result=parsed
             if search_text(result['issuer_name'])!=search_text(ISSUER):raise ValueError('Issuer mismatch')
-            if result.get('period_start')!=doc['period_start'] or result.get('period_end')!=doc['period_end']:raise ValueError('Report period mismatch')
+            # A disclosure may name only its end date (e.g. a quarterly capital report);
+            # every candidate's own period is still checked against the document.
+            if result.get('period_start') not in (doc['period_start'],None) or result.get('period_end')!=doc['period_end']:raise ValueError('Report period mismatch')
             for ordinal,c in enumerate(result['candidates'],1):
                 try:
                     if CONFIG:

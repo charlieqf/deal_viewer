@@ -106,6 +106,9 @@ class EvidenceTests(unittest.TestCase):
         self.assertEqual(context_candidates(model,self.doc,'测试银行'),[(3,self.c)])
         self.assertEqual(context_candidates(dict(model,issuer_name='其他银行'),self.doc,'测试银行'),[])
         self.assertEqual(context_candidates(dict(model,period_end='2024-12-31'),self.doc,'测试银行'),[])
+        # A disclosure naming only its end date keeps candidates; their own periods are validated later.
+        self.assertEqual(context_candidates(dict(model,period_start=None),self.doc,'测试银行'),[(3,self.c)])
+        self.assertEqual(context_candidates(dict(model,period_start='2025-07-01'),self.doc,'测试银行'),[])
     def test_company_table_intro_overrides_unrelated_group_strategy(self):
         text='結合集團整體發展戰略。下表載列於所示日期本公司資本充足率、資本淨額及風險加權資產情況。於2026年6月30日（人民幣百萬元）核心一級資本充足率9.04 一級資本充足率13.45 資本充足率13.45'
         self.assertTrue(scope_conflict('capital_adequacy_ratio','regulatory_consolidated','13.45',text))
@@ -146,8 +149,16 @@ class EvidenceTests(unittest.TestCase):
         self.assertEqual(str(validate(c,self.doc,pages)[0]),'53374000000')
         with self.assertRaises(ValueError):validate(dict(c,basis_quote='本财务报表按照国际财务报告准则编制'),self.doc,pages)
     def test_unsubstantiated_basis_is_not_accepted(self):
-        for delta in [{'basis_page':9},{'basis_quote':'按照国际财务报告准则编制'},{'unit_page':3},{'scope_page':3}]:
+        for delta in [{'basis_quote':'按照国际财务报告准则编制'},{'unit_page':3},{'scope_page':3},{'accounting_basis':'IFRS','basis_page':9}]:
             with self.assertRaises(ValueError):validate(dict(self.c,**delta),self.doc,self.pages)
+    def test_unproven_cas_claim_is_stored_as_not_stated(self):
+        for delta in [{'basis_page':9},{'basis_quote':'本报告未经审计请注意'}]:
+            c=dict(self.c,**delta)
+            self.assertEqual(validate(c,self.doc,self.pages)[3],{1,2})
+            self.assertEqual(c['accounting_basis'],'unknown')
+        # A report that mentions IFRS anywhere keeps needing a literal CAS quote.
+        pages=[self.pages[0],self.pages[1],{'page':3,'text':'按照國際財務報告準則編製的財務報表'}]
+        with self.assertRaises(ValueError):validate(dict(self.c,basis_page=9),self.doc,pages)
     def test_separators_are_not_repaired(self):
         pages=[dict(p,text=p['text'].replace('53,374','53.374')) for p in self.pages]
         with self.assertRaises(ValueError):validate(self.c,self.doc,pages)

@@ -1,6 +1,7 @@
 """Monthly acquisition CLI. Downloading is explicitly distinct from SQL ingestion."""
 import argparse
 import json
+import re
 import time
 from pathlib import Path
 
@@ -13,6 +14,22 @@ KEYWORDS = {
     'rating': ['主体 评级', '评级'],
     'default': list(DEFAULT_TERMS),
 }
+
+
+def issuer_names(issuer):
+    # Titles sometimes omit the corporate suffix. This is a search variant only;
+    # identity validation still uses the legal name and confirmed aliases.
+    short=issuer['name']
+    for suffix in ('股份有限公司','有限责任公司','有限公司'):
+        if short.endswith(suffix):
+            short=short[:-len(suffix)];break
+    return list(dict.fromkeys([issuer['name'], short, *issuer.get('confirmed_aliases', [])]))
+
+
+def names_issuer(title, issuer):
+    """Search hits also list institutions sharing words (江苏XX农村商业银行 for 江苏银行)."""
+    def plain(text):return re.sub(r'\s+','',text).replace('(','（').replace(')','）')
+    return any(plain(name) in plain(title) for name in issuer_names(issuer))
 
 
 def collect(store, adapter, issuers, since='2024-01-01', kinds=('financial', 'rating'), resume=False,
@@ -33,13 +50,7 @@ def collect(store, adapter, issuers, since='2024-01-01', kinds=('financial', 'ra
             if issuer['monitoring_status'] != 'active':
                 summary['skipped_paused'] += 1
                 continue
-            # Titles sometimes omit the corporate suffix. This is a search variant only;
-            # identity validation still uses the legal name and confirmed aliases.
-            search_name=issuer['name']
-            for suffix in ('股份有限公司','有限责任公司','有限公司'):
-                if search_name.endswith(suffix):
-                    search_name=search_name[:-len(suffix)];break
-            names = list(dict.fromkeys([issuer['name'], search_name, *issuer.get('confirmed_aliases', [])]))
+            names = issuer_names(issuer)
             for kind in kinds:
                 interval=(intervals or {}).get(str(issuer['id'])+':'+kind,{'since':since,'until':None})
                 since=interval['since']
@@ -83,6 +94,8 @@ def collect(store, adapter, issuers, since='2024-01-01', kinds=('financial', 'ra
                                             if interval['until'] and attachment['published'] and attachment['published']>interval['until']:
                                                 continue
                                             if kind=='financial' and any(term in attachment['title'] for term in ('募集资金使用','存续期评估认证')):
+                                                continue
+                                            if kind in ('financial','rating') and not names_issuer(attachment['title'],issuer):
                                                 continue
                                             if attachment['url'] in downloaded_urls:
                                                 continue

@@ -102,6 +102,9 @@ def writeback(cn,root,out,apply):
     provenance={'run':run,'snapshot_version':version,'models':list(MODELS),'result':'checks_passed',
                 'reviewer_commit':json.loads(release.read_text()).get('commit') if release.exists() else None,
                 'verification_sha256':hashlib.sha256((root/'verification.json').read_bytes()).hexdigest()}
+    # A rule-based run (e.g. the trend rule) names its rule and reason instead of the dual-model wording.
+    if verification.get('rule'):provenance['rule']=verification['rule']
+    reason=(verification.get('reason') or 'AI双模型独立复核通过')+'（'+run+'）'
     if apply:lock_issuers(cn,{i['issuer_id'] for i in items})
     current,metrics,documents=live_state(cn)
     eligible,skipped=[],[]
@@ -120,7 +123,7 @@ def writeback(cn,root,out,apply):
                           'observation_id':item['observation_id'],'review_status':'verified','reviewed_by':actor,'ai_review':provenance})
             cn.execute("""INSERT DV.IssuerChangeLog(EntityType,EntityId,Action,BeforeJson,AfterJson,Reason,ActorId,RequestId,RequestHash)
               VALUES('issuer',?,?,?,?,?,?,?,?)""",item['issuer_id'],ACTION,encode(before),after,
-              'AI双模型独立复核通过（'+run+'）',actor,f"{run}:{item['target_record_id']}:{item['metric']}",
+              reason,actor,f"{run}:{item['target_record_id']}:{item['metric']}",
               hashlib.sha256(after.encode('utf-8')).digest())
     receipt={'mode':'applied' if apply else 'dry_run','run':run,'version':version,'actor':actor,
              'at':datetime.now(timezone.utc).isoformat(),'checks_passed':len(items),'verified':len(eligible),

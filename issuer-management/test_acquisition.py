@@ -27,7 +27,7 @@ class AcquisitionTests(unittest.TestCase):
         class Adapter:
             count=0
             def search(self,query):
-                yield {'total':10,'pageItems':[{'id':i,'title':'example','paths':['/'+str(i)+'.pdf']} for i in range(10)]}
+                yield {'total':10,'pageItems':[{'id':i,'title':'A example','paths':['/'+str(i)+'.pdf']} for i in range(10)]}
             def download(self,item):
                 self.count+=1
                 raise DownloadHTTPError(403)
@@ -137,16 +137,35 @@ class AcquisitionTests(unittest.TestCase):
             self.assertEqual(store.db.execute('SELECT COUNT(*) FROM documents').fetchone()[0], 2)
             store.db.close()
 
+    def test_complete_repaired_pdf_is_kept_and_cut_off_pdf_is_not(self):
+        import json, re, pymupdf
+        with tempfile.TemporaryDirectory() as tmp:
+            store = Store(tmp)
+            item = dict(source_id='1', url=allowed_url('/a.pdf'), title='Example')
+            pdf = pymupdf.open(); pdf.new_page().insert_text((50, 50), 'Issuer report'); content = pdf.tobytes(); pdf.close()
+            stale = re.sub(rb'startxref\s+\d+', b'startxref\n9', content)  # Wrong xref offset; MuPDF repairs it.
+            with pymupdf.open(stream=stale, filetype='pdf') as check: self.assertTrue(check.is_repaired)
+            document, created = store.archive(1, 'financial', item, stale)
+            self.assertTrue(created)
+            detail = store.db.execute('SELECT detail FROM events WHERE document_id=?', (document,)).fetchone()[0]
+            self.assertTrue(json.loads(detail)['pdf_repaired'])
+            with self.assertRaisesRegex(ValueError, 'truncated_pdf'):
+                store.archive(1, 'financial', dict(item, url=allowed_url('/b.pdf')), stale[:len(stale) * 2 // 3])
+            store.db.close()
+
     def test_one_bad_download_does_not_hide_later_reports(self):
         import pymupdf
         pdf=pymupdf.open();pdf.new_page();content=pdf.tobytes();pdf.close()
         class Adapter:
             def search(self, query):
-                yield {'total':2,'pageItems':[
-                    {'id':1,'title':'broken','paths':['/bad.pdf']},
-                    {'id':2,'title':'good','paths':['/good.pdf']}]}
+                yield {'total':3,'pageItems':[
+                    {'id':1,'title':'A broken','paths':['/bad.pdf']},
+                    {'id':2,'title':'A good','paths':['/good.pdf']},
+                    # Another institution whose name shares the search words is never fetched.
+                    {'id':3,'title':'江苏常熟农村商业银行股份有限公司评级报告','paths':['/other.pdf']}]}
             def download(self,item):
                 if item['source_id']==1:raise ValueError('broken')
+                if item['source_id']==3:raise AssertionError('other issuer downloaded')
                 return content
         with tempfile.TemporaryDirectory() as tmp:
             store=Store(tmp)
@@ -155,6 +174,16 @@ class AcquisitionTests(unittest.TestCase):
             self.assertEqual(result['failed'],2)
             self.assertEqual(store.db.execute('SELECT COUNT(*) FROM download_failures').fetchone()[0],1)
             store.db.close()
+
+    def test_title_must_name_the_issuer_or_an_alias(self):
+        from acquisition.worker import names_issuer
+        issuer={'name':'江苏银行股份有限公司','confirmed_aliases':['江苏银行']}
+        self.assertTrue(names_issuer('江苏银行股份有限公司2026年第三季度报告',issuer))
+        self.assertTrue(names_issuer('江苏银行 2025 年度报告',issuer))
+        for title in ('江苏常熟农村商业银行股份有限公司2024年度经审计的财务报告','江苏长江商业银行股份有限公司2026年三季度信息披露报告'):
+            self.assertFalse(names_issuer(title,issuer))
+        self.assertFalse(names_issuer('中信百信银行股份有限公司2026年三季度信息披露报告',{'name':'中信银行股份有限公司'}))
+        self.assertTrue(names_issuer('丰田汽车金融(中国)有限公司2025年年度报告',{'name':'丰田汽车金融（中国）有限公司'}))
 
     def test_pdf_preparation_on_runtime_version(self):
         import pymupdf

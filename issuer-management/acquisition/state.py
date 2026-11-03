@@ -85,11 +85,16 @@ class Store:
         if not content.startswith(b'%PDF-'):
             raise ValueError('response_is_not_pdf')
         with pymupdf.open(stream=content, filetype='pdf') as pdf:
-            if pdf.is_encrypted or not pdf.page_count or pdf.is_repaired:
-                raise ValueError('encrypted_empty_or_repaired_pdf')
+            if pdf.is_encrypted or not pdf.page_count:
+                raise ValueError('encrypted_or_empty_pdf')
             count = pdf.page_count
             for page in pdf:
                 page.get_text()  # Force page tree parsing before marking valid.
+            # MuPDF also repairs harmless producer faults such as stale xref offsets.
+            # Accept those only when the transfer is complete; a cut-off file is not.
+            repaired = pdf.is_repaired
+            if repaired and b'%%EOF' not in content[-2048:]:
+                raise ValueError('truncated_pdf')
         digest = hashlib.sha256(content).hexdigest()
         target = self.root / 'archive' / (digest + '.pdf')
         target.parent.mkdir(exist_ok=True)
@@ -111,5 +116,5 @@ class Store:
                 (issuer, kind, str(item['source_id']), item['url'], item['title'], item.get('published'),
                  digest, len(content), count, stamp, stamp))
             self.db.execute('INSERT INTO events(at,document_id,event,detail) VALUES(?,?,?,?)',
-                            (stamp, cursor.lastrowid, 'downloaded', json.dumps({'sha256': digest, 'source': 'chinamoney'})))
+                            (stamp, cursor.lastrowid, 'downloaded', json.dumps({'sha256': digest, 'source': 'chinamoney', **({'pdf_repaired': True} if repaired else {})})))
             return cursor.lastrowid, True
