@@ -106,9 +106,9 @@ class EvidenceTests(unittest.TestCase):
         self.assertEqual(context_candidates(model,self.doc,'测试银行'),[(3,self.c)])
         self.assertEqual(context_candidates(dict(model,issuer_name='其他银行'),self.doc,'测试银行'),[])
         self.assertEqual(context_candidates(dict(model,period_end='2024-12-31'),self.doc,'测试银行'),[])
-        # A disclosure naming only its end date keeps candidates; their own periods are validated later.
-        self.assertEqual(context_candidates(dict(model,period_start=None),self.doc,'测试银行'),[(3,self.c)])
-        self.assertEqual(context_candidates(dict(model,period_start='2025-07-01'),self.doc,'测试银行'),[])
+        # The report-level start is not checked; candidates' own periods are validated later.
+        for start in (None,'2025-10-01'):
+            self.assertEqual(context_candidates(dict(model,period_start=start),self.doc,'测试银行'),[(3,self.c)])
     def test_company_table_intro_overrides_unrelated_group_strategy(self):
         text='結合集團整體發展戰略。下表載列於所示日期本公司資本充足率、資本淨額及風險加權資產情況。於2026年6月30日（人民幣百萬元）核心一級資本充足率9.04 一級資本充足率13.45 資本充足率13.45'
         self.assertTrue(scope_conflict('capital_adequacy_ratio','regulatory_consolidated','13.45',text))

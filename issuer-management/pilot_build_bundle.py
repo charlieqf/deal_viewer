@@ -55,9 +55,9 @@ def main():
         try:
             result=parsed
             if search_text(result['issuer_name'])!=search_text(ISSUER):raise ValueError('Issuer mismatch')
-            # A disclosure may name only its end date (e.g. a quarterly capital report);
-            # every candidate's own period is still checked against the document.
-            if result.get('period_start') not in (doc['period_start'],None) or result.get('period_end')!=doc['period_end']:raise ValueError('Report period mismatch')
+            # Only the end date: models also give a single-quarter column's start or none at all,
+            # and every candidate's own start and end are checked against the document.
+            if result.get('period_end')!=doc['period_end']:raise ValueError('Report period mismatch')
             for ordinal,c in enumerate(result['candidates'],1):
                 try:
                     if CONFIG:

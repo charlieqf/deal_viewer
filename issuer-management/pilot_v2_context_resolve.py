@@ -25,7 +25,7 @@ def context_candidates(model,doc,issuer):
     """Malformed/rejected model members must not stop processing valid siblings."""
     if not isinstance(model,dict) or not isinstance(model.get('candidates'),list):return []
     if search_text(model.get('issuer_name',''))!=search_text(issuer):return []
-    if model.get('period_start') not in (doc['period_start'],None) or model.get('period_end')!=doc['period_end']:return []
+    if model.get('period_end')!=doc['period_end']:return []
     required=('period_start','period_end','period_basis','entity_scope','accounting_basis','currency','method','raw_unit')
     return [(ordinal,c) for ordinal,c in enumerate(model['candidates'],1)
             if isinstance(c,dict) and c.get('metric_code') in METRICS
