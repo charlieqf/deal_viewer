@@ -145,7 +145,7 @@ def library_response(cn,q):
     if kind not in ('','financial','rating') or len(search)>200:raise ValueError('invalid_filter')
     base=""" FROM DV.IssuerDocument d JOIN DV.IssuerFile f ON f.FileId=d.FileId
     JOIN DV.Issuer i ON i.IssuerId=d.IssuerId
-    WHERE d.DocumentStatus='active' AND f.ArchiveStatus='archived'
+    WHERE d.DocumentStatus='active' AND f.ArchiveStatus='archived' AND i.MonitoringStatus<>'removed'
     AND f.StorageBackendCode IN ('r760_filesystem','dealviewer_filesystem')"""
     date="CASE WHEN d.DocumentType='issuer_rating' THEN d.PublishedDate ELSE d.MainPeriodEnd END"
     where='';args=[]
@@ -191,7 +191,7 @@ def app(env,start):
                 return respond(start,'200 OK',{'status':'ok','module':'issuer-management','commit':version},head=head)
             if action=='risk' and id>0:
                 from risk_repository import detail as risk_detail
-                if not cn.execute('SELECT IssuerId FROM DV.Issuer WHERE IssuerId=?',id).fetchval():
+                if not cn.execute("SELECT IssuerId FROM DV.Issuer WHERE IssuerId=? AND MonitoringStatus<>'removed'",id).fetchval():
                     return respond(start,'404 Not Found',{'error':'not_found'})
                 return respond(start,'200 OK',risk_detail(cn,id),head=head)
             if action=='risk-original' and id>0:
@@ -213,7 +213,7 @@ def app(env,start):
                 (SELECT MAX(MainPeriodEnd) FROM DV.IssuerDocument d WHERE d.IssuerId=i.IssuerId) LatestPeriod,
                 (SELECT COUNT(DISTINCT s.PeriodEnd) FROM DV.IssuerFinancialSeries s WHERE s.IssuerId=i.IssuerId) PeriodCount,
                 (SELECT TOP 1 t.Status FROM DV.IssuerProcessingTask t WHERE t.IssuerId=i.IssuerId AND t.RootTaskId IS NULL ORDER BY TaskId DESC) ProcessingStatus
-                FROM DV.Issuer i ORDER BY i.IssuerId""")
+                FROM DV.Issuer i WHERE i.MonitoringStatus<>'removed' ORDER BY i.IssuerId""")
                 counts={r['IssuerId']:r['ProductCount'] for r in query(cn,
                     'SELECT IssuerId,COUNT(DISTINCT TrustId) ProductCount FROM DV.vw_IssuerNplProduct GROUP BY IssuerId')}
                 for issuer in data:issuer['NplProductCount']=counts.get(issuer['IssuerId'],0)
@@ -228,11 +228,14 @@ def app(env,start):
                           o.ObservationId,o.NumericValue,o.UnitCode,o.EntityScopeCode,o.AccountingBasisCode,o.MeasurementBasisCode,o.PeriodStart,o.PeriodEnd
                           FROM latest r JOIN DV.IssuerFinancialMetric m ON m.FinancialRecordId=r.FinancialRecordId
                           LEFT JOIN DV.IssuerMetricObservation o ON o.ObservationId=m.ObservationId WHERE r.latest_n=1""")}
+                    # Removed issuers keep their history in SQL but leave every list and count.
+                    visible={i['IssuerId'] for i in data['issuers']}
+                    for key in ('ratings','records','metrics'):data[key]=[r for r in data[key] if r['IssuerId'] in visible]
             elif action=='library':
                 try:data=library_response(cn,q)
                 except ValueError as e:return respond(start,'400 Bad Request',{'error':str(e)})
             elif action=='issuer' and id>0:
-                issuer=query(cn,'SELECT IssuerId,LegalName,DisplayName,InstitutionType,MonitoringStatus FROM DV.Issuer WHERE IssuerId=?',id)
+                issuer=query(cn,"SELECT IssuerId,LegalName,DisplayName,InstitutionType,MonitoringStatus FROM DV.Issuer WHERE IssuerId=? AND MonitoringStatus<>'removed'",id)
                 if not issuer:return respond(start,'404 Not Found',{'error':'not_found'})
                 data={'issuer':issuer[0],
                   'ratings':query(cn,"SELECT c.RatingCandidateId,c.Agency,c.RatingDate,c.Grade,c.PreviousGrade,c.ChangeDirection,c.Outlook,c.RatingAction,c.ReviewStatus,c.DocumentId,c.EvidenceJson,d.Title FROM DV.IssuerRatingCandidate c JOIN DV.IssuerDocument d ON d.DocumentId=c.DocumentId WHERE c.IssuerId=? AND d.DocumentStatus='active' ORDER BY c.RatingDate DESC,c.Agency,c.RatingCandidateId DESC",id),
@@ -242,7 +245,7 @@ def app(env,start):
                   'tasks':query(cn,'SELECT TaskId,Stage,Status,OutcomeCode,CreatedAt,FinishedAt FROM DV.IssuerProcessingTask WHERE IssuerId=? AND RootTaskId IS NULL ORDER BY TaskId DESC',id)}
             elif action=='evidence' and id>0:data=query(cn,"SELECT e.DocumentId,e.PdfPage,e.EvidenceRole,e.RawValue,e.RawUnit,e.ColumnHeader,e.Method,e.RawText,d.Title FROM DV.IssuerObservationEvidence e JOIN DV.IssuerDocument d ON d.DocumentId=e.DocumentId WHERE e.ObservationId=? AND d.DocumentStatus='active' ORDER BY e.EvidenceId",id)
             elif action=='products' and id>0:
-                issuer=query(cn,'SELECT IssuerId,LegalName FROM DV.Issuer WHERE IssuerId=?',id)
+                issuer=query(cn,"SELECT IssuerId,LegalName FROM DV.Issuer WHERE IssuerId=? AND MonitoringStatus<>'removed'",id)
                 if not issuer:return respond(start,'404 Not Found',{'error':'not_found'})
                 products=query(cn,'''SELECT TrustId,TrustCode,TrustNameShort,TrustName,ProductSubject,
                     StatusTrust,TrustStatus,TrustStartDate FROM DV.vw_IssuerNplProduct

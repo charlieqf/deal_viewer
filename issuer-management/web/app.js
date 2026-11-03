@@ -193,7 +193,7 @@ function renderDetail(){
   const x=detail.issuer;let riskLink=document.getElementById('issuerRiskLink');if(!riskLink){riskLink=document.createElement('a');riskLink.id='issuerRiskLink';riskLink.className='secondary-btn';document.querySelector('#detail').prepend(riskLink);}riskLink.href='risk.html?id='+encodeURIComponent(x.IssuerId);riskLink.textContent='风险信息与建议分';$('name').textContent=x.LegalName;$('name').title=x.LegalName;$('name').hidden=false;$('appTitle').hidden=true;$('detailLogo').textContent=x.DisplayName.replace(/^中国/,'').slice(0,2);
   $('institution').textContent=typeName(x.InstitutionType);$('detailStatus').textContent=`${detail.documents.length} 份报告 · ${detail.records.length} 个报告期`;
   $('sourceHold').hidden=x.MonitoringStatus!=='paused';
-  document.querySelector('.review-line .status').outerHTML=adoptionLabel(x);
+  const adoption=adoptionLabel(x);$('adoptionBadge').innerHTML=adoption;$('adoptionBadge').hidden=!adoption;
   document.title=x.DisplayName+' · DealViewer';
   const years=[...new Set(detail.records.map(r=>day(r.PeriodEnd).slice(0,4)))],params=new URLSearchParams(location.hash.slice(1));
   $('year').innerHTML='<option value="">全部年度</option>'+years.map(y=>`<option>${y}</option>`).join('');
@@ -382,12 +382,12 @@ function exportCsv(){
 async function boot(){
   // A tab kept open across a deployment may have the previous HTML. Restore the
   // current shell once before attaching listeners, without a reload loop.
-  if(!$('appTitle')||!$('reviewDefinition')||!$('products')){
+  if(!$('appTitle')||!$('reviewDefinition')||!$('products')||!$('adoptionBadge')){
     try{
       const response=await fetch('index.html?v=20261027-20',{cache:'reload'});
       if(!response.ok)throw new Error('页面更新失败，请刷新。');
       const doc=new DOMParser().parseFromString(await response.text(),'text/html');
-      if(!doc.getElementById('products'))throw new Error('页面版本更新中，请刷新。');
+      if(!doc.getElementById('adoptionBadge'))throw new Error('页面版本更新中，请刷新。');
       document.body.replaceChildren(...doc.body.childNodes);
       const sheet=document.querySelector('link[rel=stylesheet]');if(sheet)sheet.href='style.css?v=20261027-20';
     }catch(e){document.body.textContent=e.message;return;}
