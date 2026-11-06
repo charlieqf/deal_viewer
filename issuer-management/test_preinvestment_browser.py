@@ -10,8 +10,8 @@ with sync_playwright() as pw:
     browser=pw.chromium.launch(headless=True);page=browser.new_page(viewport={'width':1440,'height':1100})
     page.on('pageerror',lambda e:errors.append(str(e)))
     page.goto(base+'risk.html?id='+str(cfg['issuer_id']))
-    expect(page.locator('#preItems')).to_contain_text('来源尚未完成查询',timeout=45000)
-    assert page.locator('#preItems').inner_text().count('来源尚未完成查询')==3
+    expect(page.locator('#preItems')).to_contain_text('尚未完成查询',timeout=45000)
+    assert page.locator('#preItems').inner_text().count('尚未完成查询')==3
     page.locator('#add').click();page.locator('#category').select_option('servicer_failure')
     expect(page.locator('#preFields')).to_be_visible()
     page.locator('#preProduct').fill('浏览器隔离验收ABS')

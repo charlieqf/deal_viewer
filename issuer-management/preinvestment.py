@@ -15,6 +15,74 @@ REQUIRED = {
 }
 EFFECTIVENESS = {'active': '仍有效', 'resolved': '已解除／已纠正', 'unknown': '当前状态待核实'}
 
+# Shared by the issuer API and product API; callers must not infer a result from
+# a zero deduction or an empty event list alone.
+SOURCES = {
+    'abs_suspension': ('chinamoney_abs_suspension', 'amac_abs_suspension'),
+    'servicer_failure': ('chinamoney_servicer_failure',),
+    'maturity_unpaid': ('chinamoney_maturity_unpaid',),
+}
+STATUS_LABELS = {
+    'confirmed': '已确认相关风险事件',
+    'pending_review': '存在待核对事件',
+    'query_failed': '来源查询失败',
+    'not_connected': '来源尚未接入',
+    'not_queried': '尚未完成查询',
+    'pending_processing': '材料待解析',
+    'not_detected': '未检出相关风险事件',
+}
+
+
+def item_statuses(events, sources, summary):
+    """Build category results from serialized facts, without writing review state.
+
+    An empty successful search needs no human confirmation. Missing/failed
+    searches and unprocessed documents never become a negative risk finding.
+    The existing confirmed-event view remains authoritative for deductions.
+    """
+    by_source = {source['code']: source for source in sources}
+    result = {}
+    for kind, deduction_field in zip(KINDS, ('SuspensionDeduction', 'ServicerDeduction', 'MaturityDeduction')):
+        relevant = [event for event in events if event['Category'] == kind]
+        pending = sum(event['Status'] == 'pending' for event in relevant)
+        confirmed = sum(event['Status'] == 'confirmed' and bool(event.get('EventDate'))
+                        and summary['WindowStart'] <= event['EventDate'] <= summary['BusinessDate']
+                        for event in relevant)
+        checks = []
+        for code in SOURCES[kind]:
+            source = by_source.get(code, {})
+            latest = source.get('latest') or {}
+            checks.append(dict(code=code, label=source.get('label', code),
+                               status=latest.get('Status', 'not_queried'),
+                               checked_at=latest.get('CheckedAt'),
+                               query_start=latest.get('QueryStart'), query_end=latest.get('QueryEnd'),
+                               pending_documents=latest.get('PendingDocuments', 0),
+                               failure_reason=latest.get('FailureReason')))
+        # Source logs repeat the category backlog; they are not disjoint queues.
+        backlog = max(check['pending_documents'] or 0 for check in checks)
+        states = {check['status'] for check in checks}
+        if confirmed:
+            status = 'confirmed'
+        elif pending:
+            status = 'pending_review'
+        elif states - {'success', 'not_connected', 'not_queried'}:
+            status = 'query_failed'
+        elif 'not_connected' in states:
+            status = 'not_connected'
+        elif 'not_queried' in states:
+            status = 'not_queried'
+        elif backlog:
+            status = 'pending_processing'
+        else:
+            status = 'not_detected'
+        ends = [check['query_end'] for check in checks]
+        result[kind] = dict(category=kind, label=LABELS[kind], status=status,
+                            status_label=STATUS_LABELS[status], requires_review=bool(pending),
+                            confirmed_events=confirmed, pending_events=pending,
+                            pending_documents=backlog, suggested_deduction=summary[deduction_field],
+                            query_end=min(ends) if all(ends) else None, sources=checks)
+    return result
+
 
 def title_selected(kind, title, filename=''):
     return any(t in (title or '') or t in (filename or '') for t in TERMS[kind])

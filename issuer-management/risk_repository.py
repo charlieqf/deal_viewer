@@ -5,7 +5,7 @@ from datetime import date
 
 from issuer_review import ReviewError, rows, encode
 from risk_rules import CATEGORIES, STATUSES, classify, event_key, penalty_total, LIMIT, business_day
-from preinvestment import KINDS as PREINVESTMENT_KINDS, confirmation_error, current_state
+from preinvestment import KINDS as PREINVESTMENT_KINDS, confirmation_error, current_state, item_statuses
 
 
 def append_event(cn, issuer_id, issuer_name, category, facts, pages, source_url, digest,
@@ -180,6 +180,8 @@ def detail(cn, issuer_id):
         for record in latest+success: record.pop('CheckKey',None)
         sources.append(dict(code=code,label=label,latest=latest[0] if latest else None,
                             success=success[0] if success else None,**source_status(latest,success[0] if success else None)))
-    return json.loads(encode(dict(events=events,sources=sources,
+    value = json.loads(encode(dict(events=events,sources=sources,
         summary=rows(cn,'SELECT * FROM DV.vw_IssuerRiskSummary WHERE IssuerId=?',issuer_id)[0],
         preinvestment_summary=rows(cn,'SELECT * FROM DV.vw_IssuerPreInvestmentRiskSummary WHERE IssuerId=?',issuer_id)[0])))
+    value['preinvestment_items'] = item_statuses(value['events'], value['sources'], value['preinvestment_summary'])
+    return value
