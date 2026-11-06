@@ -4,6 +4,9 @@ import unittest
 import os
 import tempfile
 import multiprocessing
+import json
+from pathlib import Path
+from unittest.mock import MagicMock,patch
 
 from acquisition.job_runner import run_jobs
 
@@ -26,6 +29,21 @@ def pacing_probe(directory, result):
 
 
 class ProcessingParallelTests(unittest.TestCase):
+    def test_recovery_respects_paused_and_newly_removed_issuers(self):
+        from acquisition.prepare_jobs import prepare_jobs
+        from acquisition.state import Store
+        for inventory_status,sql_ids in [('paused',[(1,)]),('active',[])]:
+            with self.subTest(inventory_status=inventory_status),tempfile.TemporaryDirectory() as directory:
+                root=Path(directory);store=Store(root)
+                with store.db:
+                    store.db.execute('''INSERT INTO documents(issuer_id,kind,source_id,url,title,digest,bytes,pages,first_seen,last_seen,status)
+                        VALUES(1,'rating','1','https://example.test/1','example',?,1,1,'now','now','prepared')''',('a'*64,))
+                store.db.close()
+                cn=MagicMock();cn.execute.return_value=sql_ids
+                with patch('acquisition.prepare_jobs.guarded_connection',return_value=cn):
+                    prepare_jobs(root,[dict(id=1,monitoring_status=inventory_status)],root/'archive')
+                self.assertEqual(json.loads((root/'jobs.json').read_text()),[])
+
     def test_bounded_parallelism_and_same_document_serialization(self):
         jobs=[dict(id=i,path=f'/jobs/{i//2}-rating-{i//2:064x}') for i in range(12)]
         lock=threading.Lock();active=set();peak=[0];overlap=[]

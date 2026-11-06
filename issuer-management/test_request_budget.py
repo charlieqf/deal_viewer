@@ -9,10 +9,10 @@ class RequestBudgetTests(unittest.TestCase):
             check_budget(35,399,config)
             with self.assertRaises(RuntimeError):check_budget(35,400,config)
 
-    def test_production_plan_ceiling_and_root_limit(self):
+    def test_production_continues_past_old_daily_cap_with_finite_root_retries(self):
         config={'pipeline':'issuer-production-v1'}
-        check_budget(35,449,config)
-        with self.assertRaises(RuntimeError):check_budget(35,450,config)
+        self.assertIsNone(daily_limit(config))
+        for daily in (449,450,451,10000):check_budget(35,daily,config)
         with self.assertRaises(RuntimeError):check_budget(36,0,config)
 
 

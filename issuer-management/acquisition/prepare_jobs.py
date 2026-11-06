@@ -91,7 +91,11 @@ def prepare_jobs(root, inventory, production_archive):
                 cn.rollback()
                 with store.db: store.db.execute("UPDATE documents SET status='preparation_failed',error=? WHERE id=?",(type(error).__name__,row['id']))
         # A restart must recover already prepared jobs too.
+        active_ids={int(r[0]) for r in cn.execute("SELECT IssuerId FROM DV.Issuer WHERE MonitoringStatus='active'")}
         for row in store.db.execute("SELECT * FROM documents WHERE status IN ('prepared','processing_failed')"):
+            issuer=issuers.get(row['issuer_id'])
+            if not issuer or issuer['monitoring_status']!='active' or row['issuer_id'] not in active_ids:
+                continue
             if row['kind']=='financial' and any(term in row['title'] for term in ('募集资金使用','存续期评估认证')):
                 with store.db:store.db.execute("UPDATE documents SET status='excluded_document_type',error=NULL WHERE id=?",(row['id'],))
                 continue
