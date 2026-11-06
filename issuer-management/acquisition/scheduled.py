@@ -8,6 +8,7 @@ import shutil
 from pathlib import Path
 import subprocess
 import sys
+import threading
 
 from .state import Store, now
 
@@ -138,13 +139,18 @@ def main():
                 return 'processing_failed',reason
         from .job_runner import run_jobs
         from .job_runner import worker_slot
+        halt=threading.Event();processed=0
         def bounded_process(item):
-            with worker_slot(site):return process(item)
-        for item,(status,reason) in run_jobs(jobs[:args.limit_jobs],bounded_process,args.workers):
+            with worker_slot(site):
+                result=process(item)
+                if result[1] and result[1].startswith('quota_deferred:模型'):halt.set()
+                return result
+        for item,(status,reason) in run_jobs(jobs[:args.limit_jobs],bounded_process,args.workers,halt):
+            processed+=1
             if status=='processing_failed':failed=True
             with journal.db:journal.db.execute("UPDATE documents SET status=?,error=? WHERE id=?",(status,reason,item['id']))
             print(json.dumps({'event':'document_processed','document_id':item['id'],'kind':item['kind'],'status':status}),flush=True)
-        print(json.dumps({'processed':min(len(jobs),args.limit_jobs),'remaining':max(0,len(jobs)-args.limit_jobs),'failed':failed}))
+        print(json.dumps({'processed':processed,'remaining':len(jobs)-processed,'failed':failed}))
         if failed:raise SystemExit(1)
     finally:
         import_failed=False

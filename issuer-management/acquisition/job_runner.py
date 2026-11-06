@@ -1,6 +1,6 @@
 """Bounded document processing; identical document roots never run together."""
 from collections import OrderedDict
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor, wait, FIRST_COMPLETED
 from pathlib import Path
 from contextlib import contextmanager
 import time
@@ -26,7 +26,7 @@ def worker_slot(directory):
             handle.close()
 
 
-def run_jobs(jobs, process, workers):
+def run_jobs(jobs, process, workers, stop=None):
     groups = OrderedDict()
     for item in jobs:
         name = Path(item['path']).name
@@ -34,9 +34,23 @@ def run_jobs(jobs, process, workers):
         groups.setdefault((issuer, digest), []).append(item)
 
     def group(items):
-        return [(item, process(item)) for item in items]
+        results=[]
+        for item in items:
+            if stop is not None and stop.is_set():break
+            results.append((item,process(item)))
+        return results
 
     with ThreadPoolExecutor(max_workers=workers) as pool:
-        futures = [pool.submit(group, items) for items in groups.values()]
-        for future in as_completed(futures):
-            yield from future.result()
+        remaining=iter(groups.values());futures=set()
+        def fill():
+            while len(futures)<workers and not (stop is not None and stop.is_set()):
+                items=next(remaining,None)
+                if items is None:break
+                futures.add(pool.submit(group,items))
+        fill()
+        while futures:
+            finished,_=wait(futures,return_when=FIRST_COMPLETED)
+            for future in finished:
+                futures.remove(future)
+                yield from future.result()
+            fill()

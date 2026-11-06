@@ -29,6 +29,16 @@ def pacing_probe(directory, result):
 
 
 class ProcessingParallelTests(unittest.TestCase):
+    def test_gateway_deferral_leaves_unstarted_documents_queued(self):
+        stop=threading.Event()
+        jobs=[dict(id=i,path=f'/jobs/1-rating-{i:064x}') for i in range(20)]
+        def process(item):
+            stop.set()
+            return 'processing_failed','quota_deferred:model'
+        results=list(run_jobs(jobs,process,4,stop))
+        self.assertGreater(len(results),0)
+        self.assertLessEqual(len(results),4)
+
     def test_recovery_respects_paused_and_newly_removed_issuers(self):
         from acquisition.prepare_jobs import prepare_jobs
         from acquisition.state import Store
