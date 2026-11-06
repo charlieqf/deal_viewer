@@ -165,21 +165,29 @@ def register(local=False) -> None:
             file_id = cn.execute("INSERT DV.IssuerFile(Sha256,StorageKey,ByteSize,PageCount,ValidationStatus,StorageBackendCode,ArchiveStatus,ArchivedAt) OUTPUT inserted.FileId VALUES(?,?,?,?,?,?,?,CASE WHEN ?=1 THEN NULL ELSE SYSUTCDATETIME() END)", digest, storage_key, item["bytes"], item["page_count"], "verified",backend,'registered_local' if registered_local else 'archived',int(registered_local)).fetchval()
         doc_id = cn.execute("SELECT DocumentId FROM DV.IssuerDocument WHERE IssuerId=? AND FileId=?", issuer_id, file_id).fetchval()
         is_rating = CONFIG.get('document_kind') == 'rating'
-        is_risk = CONFIG.get('document_kind') in ('default','penalty')
+        from preinvestment import KINDS as PREINVESTMENT_KINDS
+        is_risk = CONFIG.get('document_kind') in ('default','penalty',*PREINVESTMENT_KINDS)
         start, end, kind = (None, None, 'risk_'+CONFIG['document_kind']) if is_risk else (None, None, 'issuer_rating') if is_rating else period_from_name(item["source_name"])
         if not doc_id:
             doc_id = cn.execute("INSERT DV.IssuerDocument(IssuerId,FileId,Title,DocumentType,MainPeriodStart,MainPeriodEnd) OUTPUT inserted.DocumentId VALUES(?,?,?,?,?,?)", issuer_id, file_id, item["source_name"], kind, start, end).fetchval()
             if CONFIG.get('acquisition_version') and item.get('published_date'):
                 cn.execute('UPDATE DV.IssuerDocument SET PublishedDate=? WHERE DocumentId=?',item['published_date'],doc_id)
-        source_system = 'chinamoney' if CONFIG.get('acquisition_version') else 'manual_dataset'
+        source_system = CONFIG.get('source_system','chinamoney') if CONFIG.get('acquisition_version') else 'manual_dataset'
         locator = item.get('source_relative',ISSUER + "/" + item["source_name"])
         if source_system == 'chinamoney':
             from acquisition.chinamoney import allowed_url
             locator = allowed_url(item['source_url'])
+        elif source_system == 'amac':
+            from urllib.parse import urlparse
+            locator=item['source_url'];parsed=urlparse(locator)
+            if parsed.scheme!='https' or parsed.netloc!='www.amac.org.cn' or not parsed.path.startswith('/zlgl/jlcf/'):
+                raise ValueError('invalid_amac_source')
+        elif source_system != 'manual_dataset':
+            raise ValueError('unsupported_document_source')
         locator_hash = sha(locator.encode("utf-8"))
         if not cn.execute("SELECT SourceId FROM DV.IssuerDocumentSource WHERE DocumentId=? AND SourceSystem=? AND LocatorHash=?", doc_id, source_system, locator_hash).fetchval():
             cn.execute("INSERT DV.IssuerDocumentSource(DocumentId,SourceSystem,SourceLocator,LocatorHash,LocatorNormalizationVersion,OriginalFileName,ImportRootTaskId) VALUES(?,?,?,?,?,?,?)", doc_id, source_system, locator, locator_hash, "1", item["source_name"], root_task)
-        elif source_system == 'chinamoney':
+        elif source_system in ('chinamoney','amac'):
             cn.execute("UPDATE DV.IssuerDocumentSource SET LastSeenAt=SYSUTCDATETIME() WHERE DocumentId=? AND SourceSystem=? AND LocatorHash=?",doc_id,source_system,locator_hash)
         cn.commit()
         result.append(dict(item, issuer_id=issuer_id, file_id=file_id, document_id=doc_id, root_task_id=root_task, period_start=start, period_end=end, document_type=kind, period_verified=False,server_archived=PRODUCTION or not local))

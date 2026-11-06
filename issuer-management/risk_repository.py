@@ -5,6 +5,7 @@ from datetime import date
 
 from issuer_review import ReviewError, rows, encode
 from risk_rules import CATEGORIES, STATUSES, classify, event_key, penalty_total, LIMIT, business_day
+from preinvestment import KINDS as PREINVESTMENT_KINDS, confirmation_error, current_state
 
 
 def append_event(cn, issuer_id, issuer_name, category, facts, pages, source_url, digest,
@@ -94,12 +95,24 @@ def review(cn, payload):
         if status not in STATUSES: raise ReviewError('事件状态无效。')
         facts = p.get('fields', json.loads(before['FieldsJson']))
         if not isinstance(facts, dict): raise ReviewError('字段格式无效。')
+        if before['Category'] in PREINVESTMENT_KINDS and facts.get('effectiveness','unknown')!='unknown':
+            if current_state(facts,business_day())['code']=='unknown':
+                raise ReviewError('请提供当前状态的有效依据日期和原文引文；尚未核清可选“待核实”。')
         event_date = p.get('event_date') or None
         try:
             if event_date and date.fromisoformat(event_date)>business_day(): raise ValueError()
         except (ValueError, TypeError): raise ReviewError('事件日期无效。')
         if status=='confirmed':
             if not event_date: raise ReviewError('确认适用需填写事件日期。')
+            if before['Category'] in PREINVESTMENT_KINDS:
+                error=confirmation_error(before['Category'],facts)
+                if error: raise ReviewError(error)
+                evidence=facts.get('evidence',{})
+                quote=evidence.get('review') or evidence.get('conclusion')
+                if not isinstance(quote,dict) or not str(quote.get('quote') or '').strip():
+                    raise ReviewError('请填写本项事实的原文引文。')
+                if facts.get('effectiveness','unknown') not in ('active','resolved','unknown'):
+                    raise ReviewError('当前有效状态无效。')
             if before['Category']=='penalty':
                 name=cn.execute('SELECT LegalName FROM DV.Issuer WHERE IssuerId=?', before['IssuerId']).fetchval()
                 amount,basis=penalty_total(facts,name)
@@ -145,6 +158,12 @@ SOURCES = {'qcc': '企查查处罚', 'nfra': '金融监管总局处罚', 'pbc': 
            'chinamoney_default': '中国货币网违约标题检索', 'international': '国际评级（人工补录）'}
 
 
+SOURCES.update({'chinamoney_abs_suspension':'中国货币网ABS暂停／恢复备案检索',
+                'chinamoney_servicer_failure':'中国货币网后备机构与服务机构变更检索',
+                'chinamoney_maturity_unpaid':'中国货币网法定到期与未清偿检索',
+                'amac_abs_suspension':'基金业协会机构纪律处分'})
+
+
 def detail(cn, issuer_id):
     from risk_rules import source_status
     events=rows(cn, 'SELECT * FROM DV.RiskEvent WHERE IssuerId=? ORDER BY DiscoveredAt DESC',issuer_id)
@@ -152,6 +171,8 @@ def detail(cn, issuer_id):
         event['RowVersion']=bytes(event['RowVersion']).hex()
         event['OriginalHash']=bytes(event['OriginalHash']).hex()
         event.pop('EventKey')
+        if event['Category'] in PREINVESTMENT_KINDS:
+            event['CurrentState']=current_state(json.loads(event['FieldsJson']),business_day())
     sources=[]
     for code,label in SOURCES.items():
         latest=rows(cn,'SELECT TOP 1 * FROM DV.RiskCheckLog WHERE IssuerId=? AND Source=? ORDER BY CheckedAt DESC,RiskCheckLogId DESC',issuer_id,code)
@@ -159,4 +180,6 @@ def detail(cn, issuer_id):
         for record in latest+success: record.pop('CheckKey',None)
         sources.append(dict(code=code,label=label,latest=latest[0] if latest else None,
                             success=success[0] if success else None,**source_status(latest,success[0] if success else None)))
-    return json.loads(encode(dict(events=events,sources=sources,summary=rows(cn,'SELECT * FROM DV.vw_IssuerRiskSummary WHERE IssuerId=?',issuer_id)[0])))
+    return json.loads(encode(dict(events=events,sources=sources,
+        summary=rows(cn,'SELECT * FROM DV.vw_IssuerRiskSummary WHERE IssuerId=?',issuer_id)[0],
+        preinvestment_summary=rows(cn,'SELECT * FROM DV.vw_IssuerPreInvestmentRiskSummary WHERE IssuerId=?',issuer_id)[0])))

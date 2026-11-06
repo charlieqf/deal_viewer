@@ -14,7 +14,7 @@ def main():
     try:
         assert cn.execute('SELECT DB_NAME()').fetchval()=='PortfolioManagement'
         cn.execute("SET XACT_ABORT ON; DECLARE @r int; EXEC @r=sys.sp_getapplock @Resource='issuer-risk-migration',@LockMode='Exclusive',@LockOwner='Transaction',@LockTimeout=10000; IF @r<0 THROW 51000,'Migration locked',1;")
-        for number,name in [('008','production_migration_008_risk.sql'),('009','production_migration_009_product_mapping.sql')]:
+        for number,name in [('008','production_migration_008_risk.sql'),('009','production_migration_009_product_mapping.sql'),('010','production_migration_010_preinvestment.sql')]:
             raw=(root/name).read_bytes();digest=hashlib.sha256(raw).hexdigest();marker='IssuerRiskMigration'+number+'Hash'
             prior=cn.execute('SELECT CONVERT(varchar(64),value) FROM sys.extended_properties WHERE class=0 AND name=?',marker).fetchval()
             if prior and prior!=digest:raise RuntimeError('migration_hash_changed')
@@ -40,7 +40,7 @@ def main():
             cn.execute("UPDATE DV.ProductIssuerMapping SET IssuerId=?,MappingSource='manual',Basis=?,UpdatedAt=SYSUTCDATETIME() WHERE ProductId=32641",toyota,basis)
             log_change(cn,'product_mapping',32641,prior[0],{'IssuerId':toyota,'MappingSource':'manual'},dict(reviewer='V2.3实施',reason=basis,request_id='risk23-fengyao-32641'))
         cn.commit()
-        print(json.dumps({'migrated':['008','009'],'products':count,'known_role_corrected':bool(prior)}))
+        print(json.dumps({'migrated':['008','009','010'],'products':count,'known_role_corrected':bool(prior)}))
     except BaseException:cn.rollback();raise
     finally:cn.close()
 

@@ -9,12 +9,16 @@ from pathlib import Path
 from .chinamoney import ChinaMoney, attachments, DownloadHTTPError
 from .state import Store, now, InvalidPdf
 from risk_rules import default_title_selected, DEFAULT_TERMS
+from preinvestment import KINDS as PREINVESTMENT_KINDS, TERMS as PREINVESTMENT_TERMS, title_selected
 
 KEYWORDS = {
     'financial': ['年度报告', '半年度报告', '季度报告', '财务', '信息披露公告'],
     'rating': ['主体 评级', '评级'],
     'default': list(DEFAULT_TERMS),
 }
+
+
+KEYWORDS.update({k:list(v) for k,v in PREINVESTMENT_TERMS.items()})
 
 
 def issuer_names(issuer):
@@ -85,7 +89,8 @@ def collect(store, adapter, issuers, since='2024-01-01', kinds=('financial', 'ra
                                     total = result['total']; seen += len(result['pageItems'])
                                     for item in result['pageItems']:
                                         for attachment in attachments(item):
-                                            if kind=='default' and not default_title_selected(attachment['title'],attachment.get('filename','')):
+                                            if ((kind=='default' and not default_title_selected(attachment['title'],attachment.get('filename','')))
+                                                    or (kind in PREINVESTMENT_KINDS and not title_selected(kind,attachment['title'],attachment.get('filename','')))):
                                                 with store.db:store.db.execute('INSERT INTO events(at,event,detail) VALUES(?,?,?)',
                                                     (now(),'title_filtered',json.dumps({'issuer_id':issuer['id'],'title':attachment['title'],'url':attachment['url'],'reason':'标题筛选未下载'},ensure_ascii=False)))
                                                 continue
@@ -171,7 +176,7 @@ def main():
     parser.add_argument('--root', type=Path, required=True)
     parser.add_argument('--issuers', type=Path, required=True, help='Explicit active/paused inventory with confirmed aliases')
     parser.add_argument('--since', default='2024-01-01')
-    parser.add_argument('--kind', choices=['financial', 'rating', 'default', 'risk', 'all'], default='all')
+    parser.add_argument('--kind', choices=['financial', 'rating', 'default', 'risk', 'all', *PREINVESTMENT_KINDS], default='all')
     parser.add_argument('--batch-file',type=Path)
     parser.add_argument('--max-pages', type=int, default=100)
     parser.add_argument('--headed', action='store_true')
@@ -188,7 +193,7 @@ def main():
         try:
             context = browser.new_context(locale='zh-CN', timezone_id='Asia/Shanghai', accept_downloads=True)
             batch=json.loads(args.batch_file.read_text()) if args.batch_file else {}
-            kinds=('rating','default') if args.kind=='risk' else ('financial','rating') if args.kind=='all' else (args.kind,)
+            kinds=('rating','default',*PREINVESTMENT_KINDS) if args.kind=='risk' else ('financial','rating') if args.kind=='all' else (args.kind,)
             summary = collect(store, ChinaMoney(context, args.max_pages,since=args.since),
                               json.loads(args.issuers.read_text(encoding='utf-8')),
                               args.since,kinds,args.resume,batch.get('started'),batch.get('intervals'))

@@ -6,6 +6,7 @@ import subprocess
 import sys
 from pathlib import Path
 from pilot_runtime import ROOT, CONFIG, ARTIFACTS, atomic_json, guarded_connection
+from preinvestment import KINDS as PREINVESTMENT_KINDS
 
 
 def main():
@@ -20,7 +21,7 @@ def main():
             elif 'Issuer request limit reached' in result.stdout:
                 atomic_json(ARTIFACTS/'processing-result.json',{'status':'waiting_quota','error':'quota_deferred:该材料已达有限重试上限，需核对后继续'})
             result.check_returncode()
-    if CONFIG['document_kind'] in ('default','penalty'):
+    if CONFIG['document_kind'] in ('default','penalty',*PREINVESTMENT_KINDS):
         from .risk_pipeline import prepare,ingest
         prepare();run('pilot_runtime.py','register-local')
         run('pilot_register_plan.py','--mode','risk')

@@ -3,6 +3,7 @@ import json
 from datetime import datetime, timedelta, timezone, date
 from pathlib import Path
 from risk_rules import window_start
+from preinvestment import KINDS as PREINVESTMENT_KINDS
 from .state import now
 
 
@@ -13,18 +14,21 @@ def batch(root, inventory, current=None):
     anchor-=timedelta(days=(anchor.weekday()-1)%7)
     if current<anchor: anchor-=timedelta(days=7)
     path=Path(root)/'batches'/(anchor.date().isoformat()+'.json')
-    if path.exists(): return json.loads(path.read_text(encoding='utf-8'))
+    existing=json.loads(path.read_text(encoding='utf-8')) if path.exists() else None
     history=Path(root)/'successful-intervals.json'
     history=json.loads(history.read_text()) if history.exists() else {}
     end=current.date();start=window_start(end)
     intervals={}
     for issuer in inventory:
-        for kind in ('rating','default'):
+        for kind in ('rating','default',*PREINVESTMENT_KINDS):
             key=str(issuer['id'])+':'+kind
             previous=history.get(key)
             since=max(start,date.fromisoformat(previous)-timedelta(days=7)) if previous else start
             intervals[key]={'since':since.isoformat(),'until':end.isoformat()}
     value={'id':anchor.date().isoformat(),'started':now(),'intervals':intervals}
+    if existing:
+        value=existing
+        for key,interval in intervals.items():value['intervals'].setdefault(key,interval)
     path.parent.mkdir(parents=True,exist_ok=True)
     temp=path.with_suffix('.part');temp.write_text(json.dumps(value),encoding='utf-8');temp.replace(path)
     return value

@@ -5,10 +5,12 @@ import json
 import shutil
 from datetime import date
 from pathlib import Path
+from urllib.parse import urlparse
 
 from pilot_runtime import atomic_json, guarded_connection, period_from_name
 from prepare_pilot import inspect_pdf
 from .state import Store, now
+from preinvestment import KINDS as PREINVESTMENT_KINDS
 
 
 def prepare_jobs(root, inventory, production_archive):
@@ -31,7 +33,7 @@ def prepare_jobs(root, inventory, production_archive):
                     needs_rating_refresh=not cn.execute('''SELECT TOP 1 a.AttemptId FROM DV.IssuerProcessingAttempt a
                         JOIN DV.IssuerProcessingTask t ON t.TaskId=a.TaskId
                         WHERE t.DocumentId=? AND a.PromptVersion=? AND a.Status='succeeded' ''',existing,PROMPT_VERSION).fetchval()
-                if existing and row['kind'] not in ('default','penalty') and not needs_rating_refresh:
+                if existing and row['kind'] not in ('default','penalty',*PREINVESTMENT_KINDS) and not needs_rating_refresh:
                     digest=hashlib.sha256(row['url'].encode()).digest()
                     if not cn.execute("SELECT SourceId FROM DV.IssuerDocumentSource WITH(UPDLOCK,HOLDLOCK) WHERE DocumentId=? AND SourceSystem='chinamoney' AND LocatorHash=?",existing,digest).fetchval():
                         cn.execute('''INSERT DV.IssuerDocumentSource(DocumentId,SourceSystem,SourceLocator,LocatorHash,
@@ -62,6 +64,7 @@ def prepare_jobs(root, inventory, production_archive):
                     database='PortfolioManagement',pipeline='issuer-production-v1',metrics_version='profit-v2',
                     run_id=job.name,acquisition_version='chinamoney-v1',document_kind=row['kind'],
                     confirmed_aliases=issuer['confirmed_aliases'])
+                config['source_system']='amac' if urlparse(row['url']).hostname=='www.amac.org.cn' else 'chinamoney'
                 if row['kind']=='rating':
                     from .rating import PROMPT_VERSION
                     config.update(prompt_version=PROMPT_VERSION,schema_version='issuer-rating-v1')

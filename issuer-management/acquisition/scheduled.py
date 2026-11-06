@@ -79,6 +79,8 @@ def main():
                 batch_args=['--batch-file',batch_file]
                 try:run('acquisition.risk_sources','--root',ROOT,'--issuers',inventory,'--batch-file',batch_file,timeout=3600)
                 except (subprocess.CalledProcessError,subprocess.TimeoutExpired):failed=True
+                try:run('acquisition.preinvestment_sources','--root',ROOT,'--issuers',inventory,'--batch-file',batch_file,timeout=3600)
+                except (subprocess.CalledProcessError,subprocess.TimeoutExpired):failed=True
             try:run('acquisition.worker','--root',ROOT,'--issuers',inventory,'--resume','--kind',args.kind,*batch_args,timeout=21600)
             except (subprocess.CalledProcessError,subprocess.TimeoutExpired):
                 failed=True
@@ -109,7 +111,8 @@ def main():
             if hashlib.sha256(target.read_bytes()).hexdigest()!=digest:raise ValueError('production_archive_hash_mismatch')
         run('acquisition.prepare_jobs','--root',ROOT,'--issuers',inventory,'--archive',PRODUCTION/'archive',sql=True)
         jobs=json.loads((ROOT/'jobs.json').read_text())
-        jobs.sort(key=lambda item:item['kind']!='rating')
+        from .job_order import fair_order
+        jobs=fair_order(jobs)
         if journal.db.execute("SELECT COUNT(*) FROM documents WHERE status='preparation_failed'").fetchone()[0]:
             failed=True
         for item in jobs[:args.limit_jobs]:

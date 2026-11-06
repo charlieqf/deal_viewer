@@ -174,7 +174,7 @@ def app(env,start):
         if vendor not in file.parents or not file.is_file():return respond(start,'404 Not Found',{'error':'not_found'})
         mime='text/javascript' if file.suffix=='.mjs' else mimetypes.guess_type(file.name)[0] or 'application/octet-stream'
         return respond(start,'200 OK',file.read_bytes(),mime,head=head)
-    if path in ('/','/index.html','/style.css','/app.js','/viewer.html','/viewer.js','/documents.html','/documents.css','/documents.js','/risk.html','/risk.js','/risk.css'):
+    if path in ('/','/index.html','/style.css','/app.js','/viewer.html','/viewer.js','/documents.html','/documents.css','/documents.js','/risk.html','/risk.js','/risk.css','/preinvestment.js'):
         file=WEB/('index.html' if path=='/' else path[1:]);return respond(start,'200 OK',file.read_bytes(),(mimetypes.guess_type(file.name)[0] or 'text/plain')+'; charset=utf-8',head=head)
     if path not in ('/api.ashx','/health'):return respond(start,'404 Not Found',{'error':'not_found'})
     q=parse_qs(env.get('QUERY_STRING',''));action=q.get('action',['issuers'])[0];raw_id=q.get('id',['0'])[0]
@@ -194,6 +194,14 @@ def app(env,start):
                 if not cn.execute("SELECT IssuerId FROM DV.Issuer WHERE IssuerId=? AND MonitoringStatus<>'removed'",id).fetchval():
                     return respond(start,'404 Not Found',{'error':'not_found'})
                 return respond(start,'200 OK',risk_detail(cn,id),head=head)
+            if action=='product-risk' and id>0:
+                from risk_repository import detail as risk_detail
+                mapping=query(cn,'''SELECT m.ProductId,m.IssuerId,m.MappingSource,m.Basis,i.LegalName
+                    FROM DV.ProductIssuerMapping m LEFT JOIN DV.Issuer i ON i.IssuerId=m.IssuerId WHERE m.ProductId=?''',id)
+                if not mapping or not mapping[0]['IssuerId']:
+                    return respond(start,'200 OK',{'mapping_status':'unresolved','product_id':str(id),'risk':None},head=head)
+                return respond(start,'200 OK',{'mapping_status':'mapped','mapping':mapping[0],
+                    'risk':risk_detail(cn,int(mapping[0]['IssuerId']))},head=head)
             if action=='risk-original' and id>0:
                 event=query(cn,'SELECT EvidenceJson FROM DV.RiskEvent WHERE RiskEventId=?',id)
                 digest=q.get('hash',[''])[0]

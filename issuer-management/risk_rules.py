@@ -9,7 +9,8 @@ from decimal import Decimal, InvalidOperation
 
 DEFAULT_TERMS = ('违约', '未按期兑付', '未能按期', '兑付风险', '展期')
 STATUSES = ('pending', 'confirmed', 'excluded', 'below_threshold', 'other_debtor')
-CATEGORIES = ('penalty', 'rating', 'default')
+from preinvestment import KINDS as PREINVESTMENT_KINDS
+CATEGORIES = ('penalty', 'rating', 'default') + PREINVESTMENT_KINDS
 LIMIT = Decimal('100000000')
 
 
@@ -95,6 +96,9 @@ def classify(category, facts, issuer, pages):
         raise ValueError('invalid_category')
     if facts.get('extraction_error'):
         return 'pending'
+    if category in PREINVESTMENT_KINDS:
+        from preinvestment import classify as classify_preinvestment
+        return classify_preinvestment(category, facts, pages)
     if category == 'penalty':
         amount, basis = penalty_total(facts, issuer)
         if amount is not None and amount <= LIMIT:
@@ -122,6 +126,9 @@ def event_key(issuer_id, category, facts, digest):
         identity = normalize_name(facts.get('decision_number')) or digest
     elif category == 'rating':
         identity = [normalize_name(facts.get('agency')), facts.get('event_date'), facts.get('grade'), facts.get('change_direction')]
+        if not all(identity): identity = digest
+    elif category in PREINVESTMENT_KINDS:
+        identity = [normalize_name(facts.get('party')), facts.get('decision_number') or facts.get('product_name'), facts.get('event_date')]
         if not all(identity): identity = digest
     else:
         identity = [normalize_name(facts.get('debtor')), facts.get('debt_id'), facts.get('event_date'), facts.get('action')]
