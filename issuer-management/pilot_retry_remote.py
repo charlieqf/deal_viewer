@@ -3,6 +3,7 @@ from concurrent.futures import ThreadPoolExecutor
 import argparse
 import gzip
 import json
+import os
 import threading
 import time
 
@@ -74,6 +75,8 @@ def main():
         cn.commit()
         with lock:
             time.sleep(max(0,next_start[0]-time.monotonic()));next_start[0]=time.monotonic()+4.2
+        from request_pacing import wait_for_slot
+        wait_for_slot()
         started=time.monotonic();out=ARTIFACTS/'responses'/(str(attempt_id)+'.json')
         print(json.dumps({'event':'request_start','attempt_id':attempt_id,'previous_attempt':None if args.fresh else item['attempt_id'],'transport':'r760-loopback'}),flush=True)
         try:
@@ -94,7 +97,8 @@ def main():
         finally:cn.close()
     # Dedicated production account permits four concurrent requests; starts stay
     # at least 4.2 s apart (below its 20 requests/minute limit).
-    with ThreadPoolExecutor(max_workers=4 if PRODUCTION else 2) as pool:list(pool.map(call,registry))
+    workers=min(4 if PRODUCTION else 2,max(1,int(os.environ.get('ISSUER_GATEWAY_WORKERS','4' if PRODUCTION else '2'))))
+    with ThreadPoolExecutor(max_workers=workers) as pool:list(pool.map(call,registry))
 
 
 def recover_saved(registry):

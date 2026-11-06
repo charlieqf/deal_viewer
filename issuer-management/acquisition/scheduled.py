@@ -22,6 +22,7 @@ def main():
     global ROOT
     parser=argparse.ArgumentParser();parser.add_argument('--skip-collect',action='store_true')
     parser.add_argument('--limit-jobs',type=int,default=10)
+    parser.add_argument('--workers',type=int,choices=range(1,5),default=4)
     parser.add_argument('--collect-only',action='store_true')
     parser.add_argument('--kind',choices=['financial','risk'],default='financial')
     args=parser.parse_args()
@@ -43,6 +44,7 @@ def main():
     base+=['-v',str(site)+':'+str(site),'-e','ISSUER_SITE_STATE='+str(site)]
     def run(module,*arguments,job=None,sql=False,timeout=7200):
         name='dealviewer-issuer-auto-'+module.rsplit('.',1)[-1].replace('_','-')+('-risk' if args.kind=='risk' else '')+('-processing' if args.skip_collect else '')
+        if job:name+='-'+hashlib.sha256(str(job).encode()).hexdigest()[:12]
         cmd=list(base)+['--name',name]
         proxy_file=PRODUCTION/'private/acquisition-network.json'
         if module in ('acquisition.worker','acquisition.risk_sources') and proxy_file.exists():
@@ -55,7 +57,7 @@ def main():
         if job:
             cmd+=['-e','ISSUER_PILOT_ROOT='+str(job)]
             if module=='acquisition.process_job':
-                cmd+=['-v','/data/dealviewer-issuer-pilot/private/gateway.json:'+str(job/'private/gateway.json')+':ro']
+                cmd+=['-e','ISSUER_GATEWAY_WORKERS=1','-v','/data/dealviewer-issuer-pilot/private/gateway.json:'+str(job/'private/gateway.json')+':ro']
         else:
             cmd+=['-e','ISSUER_PILOT_ROOT='+str(ROOT)]
         try:
@@ -115,7 +117,7 @@ def main():
         jobs=fair_order(jobs)
         if journal.db.execute("SELECT COUNT(*) FROM documents WHERE status='preparation_failed'").fetchone()[0]:
             failed=True
-        for item in jobs[:args.limit_jobs]:
+        def process(item):
             job=Path(item['path']);(job/'private').mkdir(exist_ok=True);os.chown(job/'private',1200,1201)
             try:
                 if item['ocr_pages']:
@@ -128,13 +130,20 @@ def main():
                 outcome=job/'artifacts/processing-result.json'
                 status=json.loads(outcome.read_text()).get('status') if outcome.exists() else 'pending_review'
                 if status not in ('pending_review','needs_evidence_review','archive_only','classified'):raise ValueError('invalid_processing_outcome')
-                with journal.db:journal.db.execute("UPDATE documents SET status=?,error=NULL WHERE id=?",(status,item['id']))
+                return status,None
             except Exception as error:
-                failed=True
                 reason=type(error).__name__
                 outcome=job/'artifacts/processing-result.json'
                 if outcome.exists():reason=json.loads(outcome.read_text()).get('error',reason)
-                with journal.db:journal.db.execute("UPDATE documents SET status='processing_failed',error=? WHERE id=?",(reason,item['id']))
+                return 'processing_failed',reason
+        from .job_runner import run_jobs
+        from .job_runner import worker_slot
+        def bounded_process(item):
+            with worker_slot(site):return process(item)
+        for item,(status,reason) in run_jobs(jobs[:args.limit_jobs],bounded_process,args.workers):
+            if status=='processing_failed':failed=True
+            with journal.db:journal.db.execute("UPDATE documents SET status=?,error=? WHERE id=?",(status,reason,item['id']))
+            print(json.dumps({'event':'document_processed','document_id':item['id'],'kind':item['kind'],'status':status}),flush=True)
         print(json.dumps({'processed':min(len(jobs),args.limit_jobs),'remaining':max(0,len(jobs)-args.limit_jobs),'failed':failed}))
         if failed:raise SystemExit(1)
     finally:
