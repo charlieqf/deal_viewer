@@ -14,21 +14,23 @@ def main():
         page.on('pageerror',lambda e:errors.append(str(e)));page.set_viewport_size({'width':1440,'height':1100})
         page.goto(base+'risk.html?id='+str(cfg['issuer_id']))
         expect(page.locator('#title')).to_contain_text('页面验收银行',timeout=45000)
-        expect(page.locator('#score strong')).to_have_text('15 / 15')
+        expect(page.locator('#score, #preScore')).to_have_count(0)
+        page.locator('[data-indicator="post_b"]').click()
         expect(page.locator('#events')).to_contain_text('待确认')
-        assert page.locator('#sources .red').count()>=1;checks+=['pending_not_scored','stale_red','source_not_connected']
+        assert page.locator('#sources .red').count()>=1;checks+=['pending_status','stale_red','source_not_connected']
         page.locator('[data-event="'+str(cfg['event_id'])+'"]').click()
         page.locator('#status').select_option('confirmed');page.locator('#reason').fill('浏览器核对主体评级下调及原文')
         page.locator('#reviewer').fill('隔离库浏览器验收');page.locator('#key').fill(cfg['review_key']);page.locator('#save').click()
-        expect(page.locator('#editor')).not_to_be_visible(timeout=45000);expect(page.locator('#score strong')).to_have_text('5 / 15',timeout=45000)
-        checks+=['single_reviewer_confirm','current_score_updates']
+        expect(page.locator('#editor')).not_to_be_visible(timeout=45000);expect(page.locator('tr[data-category="rating"]')).to_have_attribute('data-status','confirmed',timeout=45000)
+        checks+=['single_reviewer_confirm','indicator_status_updates']
         page.screenshot(path=str(a.out/'risk-desktop.png'),full_page=True)
-        page.reload();expect(page.locator('#score strong')).to_have_text('5 / 15',timeout=45000)
+        page.reload();expect(page.locator('tr[data-category="rating"]')).to_have_attribute('data-status','confirmed',timeout=45000)
+        page.locator('[data-indicator="post_b"]').click()
         page.locator('[data-event="'+str(cfg['event_id'])+'"]').click();page.locator('#status').select_option('excluded')
         page.locator('#reason').fill('浏览器更正归类，保留原文及日志');page.locator('#reviewer').fill('隔离库浏览器验收');page.locator('#key').fill(cfg['review_key']);page.locator('#save').click()
         try:expect(page.locator('#editor')).not_to_be_visible(timeout=45000)
         except AssertionError:raise AssertionError(page.locator('#formError').inner_text())
-        expect(page.locator('#score strong')).to_have_text('15 / 15',timeout=45000)
+        expect(page.locator('tr[data-category="rating"]')).not_to_have_attribute('data-status','confirmed',timeout=45000)
         expect(page.locator('#events [data-event]')).to_have_count(0)
         page.locator('#collapsed').locator('..').locator('summary').first.click();expect(page.locator('#collapsed')).to_contain_text('已排除')
         checks+=['correction_to_excluded','collapsed_exclusions']

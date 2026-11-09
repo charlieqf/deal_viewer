@@ -184,4 +184,5 @@ def detail(cn, issuer_id):
         summary=rows(cn,'SELECT * FROM DV.vw_IssuerRiskSummary WHERE IssuerId=?',issuer_id)[0],
         preinvestment_summary=rows(cn,'SELECT * FROM DV.vw_IssuerPreInvestmentRiskSummary WHERE IssuerId=?',issuer_id)[0])))
     value['preinvestment_items'] = item_statuses(value['events'], value['sources'], value['preinvestment_summary'])
-    return value
+    from risk_indicators import attach_indicators
+    return attach_indicators(value)

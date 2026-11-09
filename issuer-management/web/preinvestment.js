@@ -12,19 +12,3 @@ function preCategoryFields(){const kind=$('category').value;preFields.hidden=map
 function preEdit(f){$('preProduct').value=f.product_name||'';for(const key of Object.keys(preFlags))$('pre_'+key).checked=f[key]===true;$('preEffect').value=f.effectiveness||'unknown';$('preAsOf').value=f.effectiveness_as_of||'';preCategoryFields();}
 function prePayload(){if(!preKinds.includes($('category').value))return {};const value={product_name:$('preProduct').value,effectiveness:$('preEffect').value,effectiveness_as_of:$('preAsOf').value||null};for(const key of Object.keys(preFlags))value[key]=$('pre_'+key).checked;return value;}
 function preEvent(e,f){if(!preKinds.includes(e.Category))return '';const s=e.CurrentState||{label:'当前状态待核实'};return `<p>涉事产品：${esc(f.product_name||'待核清')}；${esc(s.label)}${s.as_of?'（证据截至 '+esc(s.as_of)+'）':''}</p>`;}
-function renderPreinvestment(r){
- const s=r.preinvestment_summary;if(!s)return;
- $('preScore').innerHTML=`<h2>投前负面舆情：新增三项</h2><p>建议扣分 <strong>${s.SuggestedDeduction} / 5</strong>；近24个月已确认适用事件计分，三项合计最多扣5分。</p><p>本区不含不良率、拨备覆盖率两项；评价人汇总时沿用负面舆情总扣分上限5分。当前有效状态单独展示，已解除的历史事件保留。</p>`;
- $('preItems').innerHTML='<table><thead><tr><th>核查事项</th><th>当前整理结果</th><th>建议扣分</th></tr></thead><tbody>'+preKinds.map(kind=>{
- const item=r.preinvestment_items?.[kind];
- if(!item)return `<tr><td>${esc(preLabels[kind])}</td><td>核查状态暂不可用，请刷新重试</td><td>—</td></tr>`;
- const notes=[];
- if(item.status==='not_detected')notes.push('已查渠道未检出，无需人工操作');
- if(item.confirmed_events)notes.push(`近24个月已确认 ${item.confirmed_events} 项`);
- if(item.requires_review)notes.push(`待核对 ${item.pending_events} 项，请在下方对应风险事件中核对`);
- if(item.pending_documents)notes.push(`本类别待解析 ${item.pending_documents} 份`);
- if(item.query_end)notes.push(`查询截至 ${item.query_end}`);
- if(item.sources.some(x=>x.status!=='success'))notes.push('来源查询状态见下表');
- return `<tr data-category="${kind}" data-status="${esc(item.status)}"><td>${esc(preLabels[kind])}</td><td>${esc(item.status_label)}${notes.map(note=>`<small>${esc(note)}</small>`).join('')}</td><td>${esc(item.suggested_deduction)}</td></tr>`;
- }).join('')+'</tbody></table>';
-}

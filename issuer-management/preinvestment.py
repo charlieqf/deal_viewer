@@ -33,7 +33,8 @@ STATUS_LABELS = {
 }
 
 
-def item_statuses(events, sources, summary):
+def item_statuses(events, sources, summary, *, kinds=KINDS, source_map=SOURCES,
+                  label_map=LABELS, deduction_fields=('SuspensionDeduction', 'ServicerDeduction', 'MaturityDeduction')):
     """Build category results from serialized facts, without writing review state.
 
     An empty successful search needs no human confirmation. Missing/failed
@@ -42,14 +43,14 @@ def item_statuses(events, sources, summary):
     """
     by_source = {source['code']: source for source in sources}
     result = {}
-    for kind, deduction_field in zip(KINDS, ('SuspensionDeduction', 'ServicerDeduction', 'MaturityDeduction')):
+    for kind, deduction_field in zip(kinds, deduction_fields):
         relevant = [event for event in events if event['Category'] == kind]
         pending = sum(event['Status'] == 'pending' for event in relevant)
         confirmed = sum(event['Status'] == 'confirmed' and bool(event.get('EventDate'))
                         and summary['WindowStart'] <= event['EventDate'] <= summary['BusinessDate']
                         for event in relevant)
         checks = []
-        for code in SOURCES[kind]:
+        for code in source_map[kind]:
             source = by_source.get(code, {})
             latest = source.get('latest') or {}
             checks.append(dict(code=code, label=source.get('label', code),
@@ -76,7 +77,7 @@ def item_statuses(events, sources, summary):
         else:
             status = 'not_detected'
         ends = [check['query_end'] for check in checks]
-        result[kind] = dict(category=kind, label=LABELS[kind], status=status,
+        result[kind] = dict(category=kind, label=label_map[kind], status=status,
                             status_label=STATUS_LABELS[status], requires_review=bool(pending),
                             confirmed_events=confirmed, pending_events=pending,
                             pending_documents=backlog, suggested_deduction=summary[deduction_field],

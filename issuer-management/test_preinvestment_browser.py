@@ -18,7 +18,8 @@ with sync_playwright() as pw:
     page.locator('#eventDate').fill('2026-11-06');page.locator('#quote').fill('Synthetic isolated browser acceptance evidence.')
     page.locator('#reason').fill('测试材料补录，尚未确认');page.locator('#reviewer').fill('隔离库浏览器验收');page.locator('#key').fill(cfg['review_key']);page.locator('#save').click()
     expect(page.locator('#editor')).not_to_be_visible(timeout=45000)
-    expect(page.locator('#preScore strong')).to_have_text('0 / 5')
+    expect(page.locator('tr[data-category="servicer_failure"]')).to_have_attribute('data-status','pending_review')
+    page.locator('[data-indicator="pre_b"]').click()
     card=page.locator('#events .event').filter(has_text='存续期管理失职并启动后备机构').last
     card.locator('button').click();page.locator('#status').select_option('confirmed')
     page.locator('#pre_has_event').check();page.locator('#pre_issuer_applicable').check();page.locator('#pre_management_failure').check()
@@ -26,8 +27,8 @@ with sync_playwright() as pw:
     expect(page.locator('#formError')).to_contain_text('全部触发条件',timeout=45000)
     page.locator('#pre_backup_activated').check();page.locator('#reason').fill('两条件均确认，保留原文')
     page.locator('#save').click();expect(page.locator('#editor')).not_to_be_visible(timeout=45000)
-    expect(page.locator('#preScore strong')).to_have_text('5 / 5',timeout=45000)
-    expect(page.locator('#score strong')).to_have_text('15 / 15')
+    expect(page.locator('tr[data-category="servicer_failure"]')).to_have_attribute('data-status','confirmed',timeout=45000)
+    expect(page.locator('#score, #preScore')).to_have_count(0)
     card=page.locator('#events .event').filter(has_text='存续期管理失职并启动后备机构').last
     card.locator('button').click();page.locator('#preEffect').select_option('resolved');page.locator('#preAsOf').fill('2026-11-06')
     page.locator('#quote').fill('Synthetic evidence: servicing remedied on 2026-11-06.')
@@ -38,6 +39,6 @@ with sync_playwright() as pw:
     page.set_viewport_size({'width':390,'height':844});page.screenshot(path=str(a.out/'preinvestment-mobile.png'),full_page=True)
     assert not errors,errors
     browser.close()
-result={'passed':True,'checks':['three_unknown_not_no','candidate_not_scored','joint_condition_required','confirmed_5_cap','postinvestment_unchanged','dated_resolution_display'],'page_errors':errors}
+result={'passed':True,'checks':['three_unknown_not_no','candidate_pending','joint_condition_required','confirmed_status','no_score_display','dated_resolution_display'],'page_errors':errors}
 (a.out/'preinvestment-browser-acceptance.json').write_text(json.dumps(result,ensure_ascii=False,indent=2),encoding='utf-8')
 print(json.dumps(result))

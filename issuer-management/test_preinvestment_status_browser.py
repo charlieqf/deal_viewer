@@ -7,6 +7,7 @@ from urllib.request import urlopen
 
 from playwright.sync_api import sync_playwright, expect
 from preinvestment import item_statuses, SOURCES
+from risk_indicators import attach_indicators
 
 
 def main():
@@ -44,6 +45,7 @@ def main():
                 for codes in SOURCES.values() for code in codes]
             mutate(fixture)
             fixture['preinvestment_items'] = item_statuses(fixture['events'], fixture['sources'], fixture['preinvestment_summary'])
+            attach_indicators(fixture)
             pattern = '**/api.ashx?action=risk&*'
             page.route(pattern, lambda route: route.fulfill(json=fixture))
             page.reload()
@@ -56,10 +58,12 @@ def main():
             else:
                 expect(row).not_to_contain_text('无需人工操作')
             if requires_review:
-                expect(row).to_contain_text('请在下方对应风险事件中核对')
+                expect(row).to_contain_text('可点击查看明细核对')
+                row.locator('button').click()
                 expect(page.locator('#events button')).to_have_text('核对 / 更正')
+                page.locator('#closeIndicator').click()
             else:
-                expect(row).not_to_contain_text('请在下方对应风险事件中核对')
+                expect(row).not_to_contain_text('可点击查看明细核对')
             page.unroute(pattern)
             checked.append(name)
 
